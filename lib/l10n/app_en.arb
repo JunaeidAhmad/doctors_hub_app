@@ -1,0 +1,218 @@
+{
+  "@@locale": "en",
+  "appName": "Doctors Hub",
+  "home": "Home",
+  "doctors": "Doctors",
+  "diagnostics": "Diagnostics",
+  "bookings": "Bookings",
+  "hospitals": "Hospitals",
+
+  "heroTitle": "Book doctors and lab tests across Bangladesh",
+  "heroSubtitle": "No account required. Instant confirmation via SMS.",
+  "searchTabDoctors": "Doctors",
+  "searchTabDiagnostics": "Diagnostics",
+  "searchTabHospitals": "Hospitals",
+  "allSpecialties": "All Specialties",
+  "allCategories": "All Categories",
+  "allBangladesh": "All Bangladesh",
+  "searchButton": "Search",
+
+  "specialtiesSection": "Specialties",
+  "popularDoctorsSection": "Popular Doctors",
+  "diagnosticTestsSection": "Diagnostic Tests",
+  "hospitalsSection": "Hospitals",
+  "seeAll": "See all →",
+
+  "doctorsCountKicker": "{count} DOCTORS · {specialty}",
+  "@doctorsCountKicker": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "specialty": {"type": "String"}
+    }
+  },
+  "searchDoctorsPlaceholder": "Search doctor name, hospital, specialty...",
+  "filterDivision": "Division",
+  "filterHospital": "Hospital",
+  "filterSpecialty": "Specialty",
+  "clearAllFilters": "Clear filters",
+  "noDoctorsFound": "No doctors found",
+  "noDoctorsFoundDesc": "Try adjusting your search query or filters.",
+
+  "experienceYears": "{years} years exp",
+  "@experienceYears": {
+    "placeholders": {
+      "years": {"type": "String"}
+    }
+  },
+  "ratingReviews": "{rating} ({count})",
+  "@ratingReviews": {
+    "placeholders": {
+      "rating": {"type": "String"},
+      "count": {"type": "int"}
+    }
+  },
+  "chambersCount": "{count} chambers",
+  "@chambersCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "fromFee": "from ৳{fee}",
+  "@fromFee": {
+    "placeholders": {
+      "fee": {"type": "String"}
+    }
+  },
+  "moreChambers": "+ {count} more chambers",
+  "@moreChambers": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "doctorAbout": "About",
+  "doctorChambers": "Chambers & Schedule",
+  "visitFeeFrom": "Visit fee from ৳{fee}",
+  "@visitFeeFrom": {
+    "placeholders": {
+      "fee": {"type": "String"}
+    }
+  },
+  "bookAVisit": "Book a visit",
+
+  "step1Kicker": "STEP 1 OF 2",
+  "whereAndWhen": "Where and when?",
+  "selectChamber": "Select chamber",
+  "selectDate": "Select date",
+  "selectSlot": "Select appointment time",
+  "notAtChamberToday": "Not at this chamber that day",
+  "noSlotsAvailable": "No slots available for this day",
+  "morningShift": "Morning Shift",
+  "eveningShift": "Evening Shift",
+  "continueButton": "Continue",
+
+  "step2Kicker": "STEP 2 OF 2",
+  "almostThere": "Almost there",
+  "doctorLabel": "Doctor",
+  "whenLabel": "When",
+  "whereLabel": "Where",
+  "feeLabel": "Fee",
+  "patientName": "Patient Name",
+  "patientNameHint": "Enter patient's full name",
+  "patientPhone": "Mobile Number",
+  "patientPhoneHint": "01XXXXXXXXX",
+  "invalidPhone": "Enter a valid 11-digit Bangladesh mobile number",
+  "nameRequired": "Patient name is required",
+  "paymentMethod": "Payment Method",
+  "payAtCounter": "Pay at counter",
+  "payAtCounterDesc": "Pay the consultation fee when you visit the clinic",
+  "payNow": "Pay now with bKash / Nagad / Card",
+  "confirmBooking": "Confirm booking",
+  "payWithBkash": "Pay ৳{fee} with bKash",
+  "@payWithBkash": {
+    "placeholders": {
+      "fee": {"type": "String"}
+    }
+  },
+
+  "otpTitle": "Verify Phone Number",
+  "otpSubtitle": "We sent a 6-digit verification code to {phone}",
+  "@otpSubtitle": {
+    "placeholders": {
+      "phone": {"type": "String"}
+    }
+  },
+  "enterOtp": "Enter OTP",
+  "verifyAndConfirm": "Verify & Confirm",
+  "resendOtp": "Resend code",
+  "resendIn": "Resend in {seconds}s",
+  "@resendIn": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+
+  "bookedSuccessTitle": "You're booked!",
+  "bookingRef": "Booking Ref",
+  "serialNumber": "Serial Number",
+  "forPatient": "For",
+  "bookedAt": "At",
+  "bookedWhen": "When",
+  "paymentStatus": "Payment",
+  "successNote": "Please arrive 15 minutes before your scheduled appointment. We've sent details via SMS.",
+  "seeMyBookings": "See my bookings",
+  "backToHome": "Back to home",
+
+  "diagnosticsTitle": "Diagnostics & Lab Tests",
+  "searchDiagnosticsPlaceholder": "Search test name (e.g. CBC, Lipid Profile)...",
+  "reportTimeHours": "Report in {hours}h",
+  "@reportTimeHours": {
+    "placeholders": {
+      "hours": {"type": "int"}
+    }
+  },
+  "fastingRequired": "Fasting required (8–12 hrs)",
+  "noFastingRequired": "No fasting required",
+  "usualPriceRange": "Usual price: ৳{min} – ৳{max}",
+  "@usualPriceRange": {
+    "placeholders": {
+      "min": {"type": "String"},
+      "max": {"type": "String"}
+    }
+  },
+  "homePickup": "Home pickup",
+  "atLabOnly": "At lab only",
+  "moreLabs": "+ {count} more labs offering this test",
+  "@moreLabs": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "bookTest": "Book test",
+  "sampleCollection": "Sample Collection",
+  "visitLabOption": "Visit lab",
+  "homePickupOption": "Home pickup (+৳{charge})",
+  "@homePickupOption": {
+    "placeholders": {
+      "charge": {"type": "String"}
+    }
+  },
+  "pickupAddress": "Home Pickup Address",
+  "pickupAddressHint": "House, Road, Area, Landmark...",
+  "addressRequired": "Pickup address is required for home collection",
+  "timeWindow": "Preferred Time Window",
+
+  "hospitalsTitle": "Hospitals & Diagnostic Centers",
+  "searchHospitalsPlaceholder": "Search hospital name or area...",
+
+  "myBookingsTitle": "My Bookings",
+  "upcomingBookingsKicker": "{count} UPCOMING",
+  "@upcomingBookingsKicker": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "savedOnPhone": "Saved on this phone",
+  "doctorVisitTag": "DOCTOR VISIT",
+  "labTestTag": "LAB TEST",
+  "cancelBooking": "Cancel",
+  "cancelDialogTitle": "Cancel Appointment",
+  "cancelDialogMessage": "To cancel your appointment with the chamber, please call the facility directly at {phone}.",
+  "@cancelDialogMessage": {
+    "placeholders": {
+      "phone": {"type": "String"}
+    }
+  },
+  "removeBooking": "Remove from phone",
+  "callChamber": "Call Chamber",
+  "close": "Close",
+  "noBookings": "No bookings yet",
+  "noBookingsDesc": "Your booked doctor visits and lab tests will be saved here.",
+
+  "retry": "Retry",
+  "errorOccurred": "Something went wrong",
+  "networkError": "Unable to connect. Please check your internet connection.",
+  "language": "Language",
+  "english": "English",
+  "bangla": "বাংলা"
+}

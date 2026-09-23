@@ -1,0 +1,218 @@
+{
+  "@@locale": "bn",
+  "appName": "ডক্টরস হাব",
+  "home": "হোম",
+  "doctors": "ডাক্তার",
+  "diagnostics": "ডায়াগনস্টিক",
+  "bookings": "বুকিং",
+  "hospitals": "হাসপাতাল",
+
+  "heroTitle": "সারা বাংলাদেশে ডাক্তার ও ল্যাব টেস্ট বুক করুন",
+  "heroSubtitle": "অ্যাকাউন্ট খোলার ঝামেলা নেই। এসএমএস-এ নিশ্চিতকরণ।",
+  "searchTabDoctors": "ডাক্তার",
+  "searchTabDiagnostics": "ডায়াগনস্টিক",
+  "searchTabHospitals": "হাসপাতাল",
+  "allSpecialties": "সকল বিশেষজ্ঞ",
+  "allCategories": "সকল ক্যাটাগরি",
+  "allBangladesh": "সমগ্র বাংলাদেশ",
+  "searchButton": "অনুসন্ধান",
+
+  "specialtiesSection": "বিশেষজ্ঞ বিভাগ",
+  "popularDoctorsSection": "জনপ্রিয় ডাক্তারগণ",
+  "diagnosticTestsSection": "ডায়াগনস্টিক টেস্ট",
+  "hospitalsSection": "হাসপাতাল ও সেন্টার",
+  "seeAll": "সব দেখুন →",
+
+  "doctorsCountKicker": "{count} জন ডাক্তার · {specialty}",
+  "@doctorsCountKicker": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "specialty": {"type": "String"}
+    }
+  },
+  "searchDoctorsPlaceholder": "ডাক্তার, হাসপাতাল বা বিশেষজ্ঞ খুঁজুন...",
+  "filterDivision": "বিভাগ",
+  "filterHospital": "হাসপাতাল",
+  "filterSpecialty": "বিশেষজ্ঞ",
+  "clearAllFilters": "ফিল্টার মুছুন",
+  "noDoctorsFound": "কোন ডাক্তার পাওয়া যায়নি",
+  "noDoctorsFoundDesc": "অনুগ্রহ করে আপনার অনুসন্ধানের শব্দ বা ফিল্টার পরিবর্তন করুন।",
+
+  "experienceYears": "{years} বছরের অভিজ্ঞতা",
+  "@experienceYears": {
+    "placeholders": {
+      "years": {"type": "String"}
+    }
+  },
+  "ratingReviews": "{rating} ({count})",
+  "@ratingReviews": {
+    "placeholders": {
+      "rating": {"type": "String"},
+      "count": {"type": "int"}
+    }
+  },
+  "chambersCount": "{count} টি চেম্বার",
+  "@chambersCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "fromFee": "৳{fee} থেকে",
+  "@fromFee": {
+    "placeholders": {
+      "fee": {"type": "String"}
+    }
+  },
+  "moreChambers": "+ আরও {count} টি চেম্বার",
+  "@moreChambers": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "doctorAbout": "পরিচিতি",
+  "doctorChambers": "চেম্বার ও সময়সূচী",
+  "visitFeeFrom": "ভিজিট ফি ৳{fee} থেকে",
+  "@visitFeeFrom": {
+    "placeholders": {
+      "fee": {"type": "String"}
+    }
+  },
+  "bookAVisit": "অ্যাপয়েন্টমেন্ট নিন",
+
+  "step1Kicker": "ধাপ ১ / ২",
+  "whereAndWhen": "স্থান ও সময় নির্বাচন",
+  "selectChamber": "চেম্বার নির্বাচন করুন",
+  "selectDate": "তারিখ নির্বাচন করুন",
+  "selectSlot": "সময় নির্বাচন করুন",
+  "notAtChamberToday": "এই দিনে এই চেম্বারে রোগী দেখেন না",
+  "noSlotsAvailable": "এই দিনের কোন স্লট খালি নেই",
+  "morningShift": "সকাল শিফট",
+  "eveningShift": "সন্ধ্যা শিফট",
+  "continueButton": "পরবর্তী ধাপ",
+
+  "step2Kicker": "ধাপ ২ / ২",
+  "almostThere": "প্রায় সম্পন্ন",
+  "doctorLabel": "ডাক্তার",
+  "whenLabel": "সময়",
+  "whereLabel": "স্থান",
+  "feeLabel": "ভিজিট ফি",
+  "patientName": "রোগীর নাম",
+  "patientNameHint": "রোগীর পুরো নাম লিখুন",
+  "patientPhone": "মোবাইল নম্বর",
+  "patientPhoneHint": "০১XXXXXXXXX",
+  "invalidPhone": "সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন",
+  "nameRequired": "রোগীর নাম আবশ্যক",
+  "paymentMethod": "পেমেন্ট মাধ্যম",
+  "payAtCounter": "চেম্বারে গিয়ে ফি প্রদান",
+  "payAtCounterDesc": "চেম্বারে উপস্থিত হয়ে সরাসরি কাউন্টারে ফি দিন",
+  "payNow": "বিকাশ / নগদ / কার্ড দিয়ে পরিশোধ",
+  "confirmBooking": "বুকিং নিশ্চিত করুন",
+  "payWithBkash": "বিকাশে ৳{fee} পরিশোধ করুন",
+  "@payWithBkash": {
+    "placeholders": {
+      "fee": {"type": "String"}
+    }
+  },
+
+  "otpTitle": "মোবাইল নম্বর যাচাই",
+  "otpSubtitle": "আমরা আপনার {phone} নম্বরে ৬ ডিজিটের কোড পাঠিয়েছি",
+  "@otpSubtitle": {
+    "placeholders": {
+      "phone": {"type": "String"}
+    }
+  },
+  "enterOtp": "ওটিপি কোড দিন",
+  "verifyAndConfirm": "যাচাই ও নিশ্চিত করুন",
+  "resendOtp": "কোড পুনরায় পাঠান",
+  "resendIn": "{seconds} সেকেন্ড পর পুনরায় পাঠান",
+  "@resendIn": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+
+  "bookedSuccessTitle": "বুকিং সফল হয়েছে!",
+  "bookingRef": "বুকিং রেফারেন্স",
+  "serialNumber": "সিরিয়াল নম্বর",
+  "forPatient": "রোগী",
+  "bookedAt": "স্থান",
+  "bookedWhen": "তারিখ ও সময়",
+  "paymentStatus": "পেমেন্ট",
+  "successNote": "নির্ধারিত সময়ের ১৫ মিনিট পূর্বে উপস্থিত থাকুন। এসএমএস এর মাধ্যমে বিস্তারিত পাঠানো হয়েছে।",
+  "seeMyBookings": "আমার বুকিং দেখুন",
+  "backToHome": "হোমে ফিরে যান",
+
+  "diagnosticsTitle": "ডায়াগনস্টিক ও ল্যাব টেস্ট",
+  "searchDiagnosticsPlaceholder": "টেস্টের নাম লিখে খুঁজুন (উদাঃ CBC)...",
+  "reportTimeHours": "রিপোর্ট {hours} ঘণ্টায়",
+  "@reportTimeHours": {
+    "placeholders": {
+      "hours": {"type": "int"}
+    }
+  },
+  "fastingRequired": "না খেয়ে থাকা আবশ্যক (৮-১২ ঘণ্টা)",
+  "noFastingRequired": "না খেয়ে থাকার প্রয়োজন নেই",
+  "usualPriceRange": "আনুমানিক খরচ: ৳{min} – ৳{max}",
+  "@usualPriceRange": {
+    "placeholders": {
+      "min": {"type": "String"},
+      "max": {"type": "String"}
+    }
+  },
+  "homePickup": "হোম স্যাম্পল কালেকশন",
+  "atLabOnly": "শুধুমাত্র ল্যাবে",
+  "moreLabs": "+ আরও {count} টি ল্যাবে এই টেস্টটি আছে",
+  "@moreLabs": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "bookTest": "টেস্ট বুক করুন",
+  "sampleCollection": "স্যাম্পল কালেকশন পদ্ধতি",
+  "visitLabOption": "ল্যাবে গিয়ে",
+  "homePickupOption": "হোম পিকআপ (+৳{charge})",
+  "@homePickupOption": {
+    "placeholders": {
+      "charge": {"type": "String"}
+    }
+  },
+  "pickupAddress": "হোম পিকআপ ঠিকানা",
+  "pickupAddressHint": "বাড়ি, রোড, এলাকা, ল্যান্ডমার্ক...",
+  "addressRequired": "হোম পিকআপের জন্য ঠিকানা প্রয়োজন",
+  "timeWindow": "পছন্দের সময়",
+
+  "hospitalsTitle": "হাসপাতাল ও ডায়াগনস্টিক সেন্টার",
+  "searchHospitalsPlaceholder": "হাসপাতাল বা এলাকার নাম খুঁজুন...",
+
+  "myBookingsTitle": "আমার বুকিংসমূহ",
+  "upcomingBookingsKicker": "{count} টি আসন্ন বুকিং",
+  "@upcomingBookingsKicker": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "savedOnPhone": "এই ফোনে সংরক্ষিত",
+  "doctorVisitTag": "ডাক্তার ভিজিট",
+  "labTestTag": "ল্যাব টেস্ট",
+  "cancelBooking": "বাতিল",
+  "cancelDialogTitle": "অ্যাপয়েন্টমেন্ট বাতিল",
+  "cancelDialogMessage": "অ্যাপয়েন্টমেন্ট বাতিল করতে অনুগ্রহ করে সরাসরি চেম্বারে {phone} নম্বরে যোগাযোগ করুন।",
+  "@cancelDialogMessage": {
+    "placeholders": {
+      "phone": {"type": "String"}
+    }
+  },
+  "removeBooking": "তালিকা থেকে সরান",
+  "callChamber": "চেম্বারে কল করুন",
+  "close": "বন্ধ করুন",
+  "noBookings": "কোন বুকিং নেই",
+  "noBookingsDesc": "আপনার সকল ডাক্তার অ্যাপয়েন্টমেন্ট ও ল্যাব টেস্টের তথ্য এখানে দেখতে পাবেন।",
+
+  "retry": "পুনরায় চেষ্টা করুন",
+  "errorOccurred": "কিছু সমস্যা হয়েছে",
+  "networkError": "ইন্টারনেট সংযোগ নেই। সংযোগ পরীক্ষা করে পুনরায় চেষ্টা করুন।",
+  "language": "ভাষা",
+  "english": "English",
+  "bangla": "বাংলা"
+}
