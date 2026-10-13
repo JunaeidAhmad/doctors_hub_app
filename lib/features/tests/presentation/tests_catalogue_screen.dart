@@ -39,7 +39,15 @@ class _TestsCatalogueScreenState extends ConsumerState<TestsCatalogueScreen> {
   Timer? _debounceTimer;
 
   String? _category;
-  String? _division;
+  int? _divisionId;
+  String? _divisionName;
+  int? _districtId;
+  String? _districtName;
+  int? _thanaId;
+  String? _thanaName;
+  String _fulfillment = 'all';
+  String _ownershipType = 'all';
+  bool _showFilters = false;
   String _searchQuery = '';
 
   final List<DiagnosticTest> _tests = [];
@@ -54,11 +62,85 @@ class _TestsCatalogueScreenState extends ConsumerState<TestsCatalogueScreen> {
   final Map<String, bool> _expandedTests = {};
   final Map<String, List<FacilityTest>> _facilityTestsMap = {};
 
+  static const _fulfillmentOptions = [
+    'all',
+    'home',
+    'center',
+  ];
+
+  String _fulfillmentLabel(String key, bool isBn) {
+    switch (key) {
+      case 'home':
+        return isBn ? 'হোম পিকআপ' : 'Home Pickup';
+      case 'center':
+        return isBn ? 'সেন্টার টেস্ট' : 'Center Visit';
+      case 'all':
+      default:
+        return isBn ? 'সকল' : 'All';
+    }
+  }
+
+  static const _ownershipOptions = [
+    'all',
+    'private',
+    'hospital_affiliated',
+    'government',
+    'ngo',
+  ];
+
+  String _ownershipLabel(String key, bool isBn) {
+    switch (key) {
+      case 'private':
+        return isBn ? 'বেসরকারি' : 'Private';
+      case 'hospital_affiliated':
+        return isBn ? 'হাসপাতাল ল্যাব' : 'Hospital Lab';
+      case 'government':
+        return isBn ? 'সরকারি' : 'Govt';
+      case 'ngo':
+        return isBn ? 'এনজিও' : 'NGO';
+      case 'all':
+      default:
+        return isBn ? 'সকল' : 'All';
+    }
+  }
+
+  int get _activeFiltersCount {
+    int count = 0;
+    if (_divisionId != null ||
+        (_divisionName != null &&
+            _divisionName!.isNotEmpty &&
+            _divisionName != 'All Bangladesh')) {
+      count++;
+    }
+    if (_districtId != null ||
+        (_districtName != null &&
+            _districtName!.isNotEmpty &&
+            _districtName != 'All Districts')) {
+      count++;
+    }
+    if (_thanaId != null ||
+        (_thanaName != null &&
+            _thanaName!.isNotEmpty &&
+            _thanaName != 'All Areas')) {
+      count++;
+    }
+    if (_fulfillment != 'all') {
+      count++;
+    }
+    if (_ownershipType != 'all') {
+      count++;
+    }
+    return count;
+  }
+
+  bool get _hasActiveFilters =>
+      _activeFiltersCount > 0 || (_category != null && _category!.isNotEmpty);
+
   @override
   void initState() {
     super.initState();
     _category = widget.initialCategory;
-    _division = widget.initialDivision;
+    _divisionName = widget.initialDivision;
     _searchQuery = widget.initialSearch ?? '';
     _searchController = TextEditingController(text: _searchQuery);
 
@@ -92,6 +174,52 @@ class _TestsCatalogueScreenState extends ConsumerState<TestsCatalogueScreen> {
     });
   }
 
+  void _resetAllFilters() {
+    setState(() {
+      _divisionId = null;
+      _divisionName = null;
+      _districtId = null;
+      _districtName = null;
+      _thanaId = null;
+      _thanaName = null;
+      _fulfillment = 'all';
+      _ownershipType = 'all';
+      _facilityTestsMap.clear();
+    });
+    _fetchTests(page: 1);
+  }
+
+  void _clearLocationFilters() {
+    setState(() {
+      _divisionId = null;
+      _divisionName = null;
+      _districtId = null;
+      _districtName = null;
+      _thanaId = null;
+      _thanaName = null;
+      _facilityTestsMap.clear();
+    });
+    _fetchTests(page: 1);
+  }
+
+  void _clearAll() {
+    setState(() {
+      _category = null;
+      _divisionId = null;
+      _divisionName = null;
+      _districtId = null;
+      _districtName = null;
+      _thanaId = null;
+      _thanaName = null;
+      _fulfillment = 'all';
+      _ownershipType = 'all';
+      _searchQuery = '';
+      _searchController.clear();
+      _facilityTestsMap.clear();
+    });
+    _fetchTests(page: 1);
+  }
+
   Future<void> _fetchTests({required int page, bool isLoadMore = false}) async {
     if (isLoadMore) {
       setState(() => _isLoadingMore = true);
@@ -119,6 +247,7 @@ class _TestsCatalogueScreenState extends ConsumerState<TestsCatalogueScreen> {
           _tests.clear();
           _tests.addAll(result.results);
           _isLoading = false;
+          _facilityTestsMap.clear();
         }
         _totalCount = result.count;
         _currentPage = page;
@@ -142,7 +271,17 @@ class _TestsCatalogueScreenState extends ConsumerState<TestsCatalogueScreen> {
     if (_facilityTestsMap.containsKey(testId)) return;
     try {
       final repo = ref.read(testRepositoryProvider);
-      final labs = await repo.getFacilityTestsForTest(testId, division: _division);
+      final labs = await repo.getFacilityTestsForTest(
+        testId,
+        division: _divisionName,
+        divisionId: _divisionId,
+        district: _districtName,
+        districtId: _districtId,
+        area: _thanaName,
+        thanaId: _thanaId,
+        fulfillment: _fulfillment != 'all' ? _fulfillment : null,
+        ownership: _ownershipType != 'all' ? _ownershipType : null,
+      );
       if (mounted) {
         setState(() {
           _facilityTestsMap[testId] = labs;
@@ -156,6 +295,9 @@ class _TestsCatalogueScreenState extends ConsumerState<TestsCatalogueScreen> {
     final locale = ref.watch(localeProvider);
     final isBn = locale.languageCode == 'bn';
     final categoriesAsync = ref.watch(testCategoriesProvider);
+    final divisionsAsync = ref.watch(divisionsProvider);
+    final districtsAsync = ref.watch(districtsProvider(_divisionId));
+    final thanasAsync = ref.watch(thanasProvider(_districtId));
 
     return DhScaffold(
       body: SafeArea(
@@ -166,69 +308,666 @@ class _TestsCatalogueScreenState extends ConsumerState<TestsCatalogueScreen> {
             Container(
               color: AppColors.paper,
               padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Kicker(
-                    isBn
-                        ? '$_totalCount টি টেস্ট · ডায়াগনস্টিক'
-                        : '$_totalCount TESTS · DIAGNOSTICS',
-                  ),
-                  const SizedBox(height: 10),
-                  DhSearchField(
-                    controller: _searchController,
-                    hintText: isBn
-                        ? 'টেস্টের নাম লিখে খুঁজুন...'
-                        : 'Search test name (e.g. CBC, Lipid Profile)...',
-                    onChanged: _onSearchChanged,
-                    onClear: () {
-                      _debounceTimer?.cancel();
-                      setState(() => _searchQuery = '');
-                      _fetchTests(page: 1);
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  // Categories Dropdown
-                  categoriesAsync.when(
-                    data: (categories) {
-                      final items = [
-                        DhDropdownItem<String>(
-                          value: '',
-                          label: isBn ? 'সকল টেস্ট ক্যাটাগরি' : 'All Test Categories',
-                        ),
-                        ...categories.map(
-                          (c) => DhDropdownItem<String>(
-                            value: c.slug,
-                            label: c.localizedName(isBn ? 'bn' : 'en'),
-                          ),
-                        ),
-                      ];
-                      return DhDropdown<String>(
-                        value: _category ?? '',
-                        items: items,
-                        onChanged: (val) {
-                          setState(() => _category = val);
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.sizeOf(context).height * 0.65,
+                ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Kicker(
+                        isBn
+                            ? '$_totalCount টি টেস্ট · ডায়াগনস্টিক'
+                            : '$_totalCount TESTS · DIAGNOSTICS',
+                      ),
+                      const SizedBox(height: 10),
+                      DhSearchField(
+                        controller: _searchController,
+                        hintText: isBn
+                            ? 'টেস্টের নাম লিখে খুঁজুন...'
+                            : 'Search test name (e.g. CBC, Lipid Profile)...',
+                        onChanged: _onSearchChanged,
+                        onClear: () {
+                          _debounceTimer?.cancel();
+                          setState(() => _searchQuery = '');
                           _fetchTests(page: 1);
                         },
-                      );
-                    },
-                    loading: () => const SkeletonRow(height: 48),
-                    error: (_, __) => const SizedBox.shrink(),
-                  ),
+                      ),
+                      const SizedBox(height: 10),
 
-                  // Division Chip if filtered
-                  if (_division != null && _division!.isNotEmpty) ...[
-                    const SizedBox(height: 10),
-                    FilterChipDark(
-                      label: _division!,
-                      onDeleted: () {
-                        setState(() => _division = null);
-                        _facilityTestsMap.clear();
-                        _fetchTests(page: 1);
-                      },
-                    ),
-                  ],
-                ],
+                      // Category Dropdown + Hideable Filter Toggle Button
+                      Row(
+                        children: [
+                          Expanded(
+                            child: categoriesAsync.when(
+                              data: (categories) {
+                                final items = [
+                                  DhDropdownItem<String>(
+                                    value: '',
+                                    label: isBn
+                                        ? 'সকল টেস্ট ক্যাটাগরি'
+                                        : 'All Test Categories',
+                                  ),
+                                  ...categories.map(
+                                    (c) => DhDropdownItem<String>(
+                                      value: c.slug,
+                                      label:
+                                          c.localizedName(isBn ? 'bn' : 'en'),
+                                    ),
+                                  ),
+                                ];
+                                return DhDropdown<String>(
+                                  value: _category ?? '',
+                                  items: items,
+                                  onChanged: (val) {
+                                    setState(() => _category = val);
+                                    _fetchTests(page: 1);
+                                  },
+                                );
+                              },
+                              loading: () => const SkeletonRow(height: 48),
+                              error: (_, __) => const SizedBox.shrink(),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          // Hideable Filter Button
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                _showFilters = !_showFilters;
+                              });
+                            },
+                            child: Container(
+                              height: 48,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 14),
+                              decoration: BoxDecoration(
+                                color: _showFilters || _activeFiltersCount > 0
+                                    ? AppColors.ink
+                                    : AppColors.paper,
+                                border: Border.all(
+                                  color: AppColors.ink,
+                                  width: AppColors.borderWidth,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    _showFilters ? Icons.close : Icons.tune,
+                                    size: 20,
+                                    color:
+                                        _showFilters || _activeFiltersCount > 0
+                                            ? AppColors.paper
+                                            : AppColors.ink,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    _showFilters
+                                        ? (isBn ? 'লুকান' : 'Hide')
+                                        : (isBn ? 'ফিল্টার' : 'Filters'),
+                                    style: TextStyle(
+                                      fontFamily: AppTypography.fontMono,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                      color: _showFilters ||
+                                              _activeFiltersCount > 0
+                                          ? AppColors.paper
+                                          : AppColors.ink,
+                                    ),
+                                  ),
+                                  if (_activeFiltersCount > 0) ...[
+                                    const SizedBox(width: 6),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 6, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: _showFilters
+                                            ? AppColors.accent
+                                            : AppColors.paper,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: Text(
+                                        '$_activeFiltersCount',
+                                        style: TextStyle(
+                                          fontFamily:
+                                              AppTypography.fontMono,
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w700,
+                                          color: _showFilters
+                                              ? AppColors.paper
+                                              : AppColors.ink,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      // Collapsible Filter Panel
+                      if (_showFilters) ...[
+                        const SizedBox(height: 12),
+                        Container(
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: AppColors.fill,
+                            border: Border.all(
+                              color: AppColors.ink,
+                              width: AppColors.borderWidth,
+                            ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Panel Header
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.tune,
+                                          size: 16, color: AppColors.ink),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        isBn
+                                            ? 'ফিল্টার অপশন'
+                                            : 'FILTER OPTIONS',
+                                        style: AppTypography.kicker.copyWith(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      if (_activeFiltersCount > 0) ...[
+                                        const SizedBox(width: 8),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 6, vertical: 1),
+                                          decoration: BoxDecoration(
+                                            color: AppColors.accent,
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                          child: Text(
+                                            '$_activeFiltersCount',
+                                            style: const TextStyle(
+                                              color: AppColors.paper,
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                  if (_activeFiltersCount > 0)
+                                    InkWell(
+                                      onTap: _resetAllFilters,
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 4, vertical: 2),
+                                        child: Text(
+                                          isBn ? 'সব রিসেট' : 'Reset All',
+                                          style: AppTypography.tag.copyWith(
+                                            color: AppColors.accent,
+                                            fontWeight: FontWeight.w600,
+                                            decoration:
+                                                TextDecoration.underline,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              const Divider(
+                                  color: AppColors.ink,
+                                  height: 1,
+                                  thickness: 1),
+                              const SizedBox(height: 12),
+
+                              // 1. LOCATION (DIVISION, DISTRICT, THANA/AREA)
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    isBn ? 'অবস্থান (লোকেশন)' : 'LOCATION',
+                                    style: AppTypography.kicker
+                                        .copyWith(fontSize: 11),
+                                  ),
+                                  if (_divisionId != null ||
+                                      _districtId != null ||
+                                      _thanaId != null ||
+                                      (_divisionName != null &&
+                                          _divisionName!.isNotEmpty &&
+                                          _divisionName != 'All Bangladesh'))
+                                    InkWell(
+                                      onTap: _clearLocationFilters,
+                                      child: Text(
+                                        isBn ? 'মুছুন' : 'Clear',
+                                        style: AppTypography.tag.copyWith(
+                                          color: AppColors.accent,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                              const SizedBox(height: 6),
+                              // Division Dropdown
+                              divisionsAsync.when(
+                                data: (divisions) {
+                                  final items = [
+                                    DhDropdownItem<int?>(
+                                      value: null,
+                                      label: isBn
+                                          ? 'সমগ্র বাংলাদেশ (বিভাগ)'
+                                          : 'All Bangladesh (Division)',
+                                    ),
+                                    ...divisions.map(
+                                      (d) => DhDropdownItem<int?>(
+                                        value: d.id,
+                                        label: d.localizedName(
+                                            isBn ? 'bn' : 'en'),
+                                      ),
+                                    ),
+                                  ];
+                                  return DhDropdown<int?>(
+                                    value: _divisionId,
+                                    items: items,
+                                    onChanged: (val) {
+                                      final div = divisions
+                                          .where((d) => d.id == val)
+                                          .firstOrNull;
+                                      setState(() {
+                                        _divisionId = val;
+                                        _divisionName = div?.name;
+                                        _districtId = null;
+                                        _districtName = null;
+                                        _thanaId = null;
+                                        _thanaName = null;
+                                        _facilityTestsMap.clear();
+                                      });
+                                      _fetchTests(page: 1);
+                                    },
+                                  );
+                                },
+                                loading: () =>
+                                    const SkeletonRow(height: 48),
+                                error: (_, __) => const SizedBox.shrink(),
+                              ),
+                              const SizedBox(height: 8),
+                              // District Dropdown
+                              districtsAsync.when(
+                                data: (districts) {
+                                  final items = [
+                                    DhDropdownItem<int?>(
+                                      value: null,
+                                      label: isBn
+                                          ? 'সকল জেলা'
+                                          : 'All Districts',
+                                    ),
+                                    ...districts.map(
+                                      (d) => DhDropdownItem<int?>(
+                                        value: d.id,
+                                        label: d.localizedName(
+                                            isBn ? 'bn' : 'en'),
+                                      ),
+                                    ),
+                                  ];
+                                  return DhDropdown<int?>(
+                                    value: _districtId,
+                                    items: items,
+                                    onChanged: (val) {
+                                      final dist = districts
+                                          .where((d) => d.id == val)
+                                          .firstOrNull;
+                                      setState(() {
+                                        _districtId = val;
+                                        _districtName = dist?.name;
+                                        _thanaId = null;
+                                        _thanaName = null;
+                                        _facilityTestsMap.clear();
+                                      });
+                                      _fetchTests(page: 1);
+                                    },
+                                  );
+                                },
+                                loading: () =>
+                                    const SkeletonRow(height: 48),
+                                error: (_, __) => const SizedBox.shrink(),
+                              ),
+                              const SizedBox(height: 8),
+                              // Thana / Area Dropdown
+                              thanasAsync.when(
+                                data: (thanas) {
+                                  final items = [
+                                    DhDropdownItem<int?>(
+                                      value: null,
+                                      label: isBn
+                                          ? 'সকল এলাকা / থানা'
+                                          : 'All Areas / Thanas',
+                                    ),
+                                    ...thanas.map(
+                                      (t) => DhDropdownItem<int?>(
+                                        value: t.id,
+                                        label: t.localizedName(
+                                            isBn ? 'bn' : 'en'),
+                                      ),
+                                    ),
+                                  ];
+                                  return DhDropdown<int?>(
+                                    value: _thanaId,
+                                    items: items,
+                                    onChanged: (val) {
+                                      final thana = thanas
+                                          .where((t) => t.id == val)
+                                          .firstOrNull;
+                                      setState(() {
+                                        _thanaId = val;
+                                        _thanaName = thana?.name;
+                                        _facilityTestsMap.clear();
+                                      });
+                                      _fetchTests(page: 1);
+                                    },
+                                  );
+                                },
+                                loading: () =>
+                                    const SkeletonRow(height: 48),
+                                error: (_, __) => const SizedBox.shrink(),
+                              ),
+                              const SizedBox(height: 14),
+
+                              // 2. FULFILLMENT
+                              Row(
+                                children: [
+                                  const Icon(Icons.local_shipping,
+                                      size: 15, color: AppColors.ink),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    isBn
+                                        ? 'পরিসেবার ধরণ (ফুলফিলমেন্ট)'
+                                        : 'FULFILLMENT',
+                                    style: AppTypography.kicker
+                                        .copyWith(fontSize: 11),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              Row(
+                                children: _fulfillmentOptions.map((fOpt) {
+                                  final isActive =
+                                      _fulfillment.toLowerCase() ==
+                                          fOpt.toLowerCase();
+                                  return Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 2.0),
+                                      child: InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            _fulfillment = fOpt;
+                                            _facilityTestsMap.clear();
+                                          });
+                                          for (final test in _tests.take(5)) {
+                                            _loadLabsForTest(test.id);
+                                          }
+                                        },
+                                        child: Container(
+                                          height: 36,
+                                          decoration: BoxDecoration(
+                                            color: isActive
+                                                ? AppColors.ink
+                                                : AppColors.paper,
+                                            border: Border.all(
+                                              color: AppColors.ink,
+                                              width: 1.5,
+                                            ),
+                                          ),
+                                          alignment: Alignment.center,
+                                          child: Text(
+                                            _fulfillmentLabel(fOpt, isBn),
+                                            style: AppTypography.tag.copyWith(
+                                              color: isActive
+                                                  ? AppColors.paper
+                                                  : AppColors.ink,
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 11,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                              const SizedBox(height: 14),
+
+                              // 3. OWNERSHIP TYPE
+                              Row(
+                                children: [
+                                  const Icon(Icons.domain,
+                                      size: 15, color: AppColors.ink),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    isBn
+                                        ? 'মালিকানার ধরণ'
+                                        : 'OWNERSHIP TYPE',
+                                    style: AppTypography.kicker
+                                        .copyWith(fontSize: 11),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              Wrap(
+                                spacing: 6,
+                                runSpacing: 6,
+                                children: _ownershipOptions.map((oOpt) {
+                                  final isActive =
+                                      _ownershipType.toLowerCase() ==
+                                          oOpt.toLowerCase();
+                                  return InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        _ownershipType = oOpt;
+                                        _facilityTestsMap.clear();
+                                      });
+                                      for (final test in _tests.take(5)) {
+                                        _loadLabsForTest(test.id);
+                                      }
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10, vertical: 8),
+                                      decoration: BoxDecoration(
+                                        color: isActive
+                                            ? AppColors.ink
+                                            : AppColors.paper,
+                                        border: Border.all(
+                                          color: AppColors.ink,
+                                          width: 1.5,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        _ownershipLabel(oOpt, isBn),
+                                        style: AppTypography.tag.copyWith(
+                                          color: isActive
+                                              ? AppColors.paper
+                                              : AppColors.ink,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                              const SizedBox(height: 14),
+
+                              // Apply Filters CTA Button
+                              InkWell(
+                                onTap: () =>
+                                    setState(() => _showFilters = false),
+                                child: Container(
+                                  height: 44,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.accent,
+                                    border: Border.all(
+                                      color: AppColors.ink,
+                                      width: AppColors.borderWidth,
+                                    ),
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Icon(Icons.check,
+                                          size: 16, color: AppColors.paper),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        isBn
+                                            ? 'ফিল্টার প্রয়োগ করুন ($_totalCount)'
+                                            : 'Apply Filters ($_totalCount)',
+                                        style: AppTypography.button.copyWith(
+                                          color: AppColors.paper,
+                                          fontSize: 13,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+
+                      // Active Filter Chips
+                      if (_hasActiveFilters) ...[
+                        const SizedBox(height: 10),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            if (_category != null && _category!.isNotEmpty)
+                              FilterChipDark(
+                                label: _category!,
+                                onDeleted: () {
+                                  setState(() => _category = null);
+                                  _fetchTests(page: 1);
+                                },
+                              ),
+                            if (_divisionName != null &&
+                                _divisionName!.isNotEmpty &&
+                                _divisionName != 'All Bangladesh')
+                              FilterChipDark(
+                                label: 'Div: $_divisionName',
+                                onDeleted: () {
+                                  setState(() {
+                                    _divisionId = null;
+                                    _divisionName = null;
+                                    _districtId = null;
+                                    _districtName = null;
+                                    _thanaId = null;
+                                    _thanaName = null;
+                                    _facilityTestsMap.clear();
+                                  });
+                                  _fetchTests(page: 1);
+                                },
+                              ),
+                            if (_districtName != null &&
+                                _districtName!.isNotEmpty &&
+                                _districtName != 'All Districts')
+                              FilterChipDark(
+                                label: 'Dist: $_districtName',
+                                onDeleted: () {
+                                  setState(() {
+                                    _districtId = null;
+                                    _districtName = null;
+                                    _thanaId = null;
+                                    _thanaName = null;
+                                    _facilityTestsMap.clear();
+                                  });
+                                  _fetchTests(page: 1);
+                                },
+                              ),
+                            if (_thanaName != null &&
+                                _thanaName!.isNotEmpty &&
+                                _thanaName != 'All Areas')
+                              FilterChipDark(
+                                label: 'Area: $_thanaName',
+                                onDeleted: () {
+                                  setState(() {
+                                    _thanaId = null;
+                                    _thanaName = null;
+                                    _facilityTestsMap.clear();
+                                  });
+                                  _fetchTests(page: 1);
+                                },
+                              ),
+                            if (_fulfillment != 'all')
+                              FilterChipDark(
+                                label: _fulfillmentLabel(_fulfillment, isBn),
+                                onDeleted: () {
+                                  setState(() {
+                                    _fulfillment = 'all';
+                                    _facilityTestsMap.clear();
+                                  });
+                                  for (final test in _tests.take(5)) {
+                                    _loadLabsForTest(test.id);
+                                  }
+                                },
+                              ),
+                            if (_ownershipType != 'all')
+                              FilterChipDark(
+                                label: _ownershipLabel(_ownershipType, isBn),
+                                onDeleted: () {
+                                  setState(() {
+                                    _ownershipType = 'all';
+                                    _facilityTestsMap.clear();
+                                  });
+                                  for (final test in _tests.take(5)) {
+                                    _loadLabsForTest(test.id);
+                                  }
+                                },
+                              ),
+                            InkWell(
+                              onTap: _clearAll,
+                              child: Container(
+                                height: 32,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: AppColors.fill,
+                                  border: Border.all(
+                                    color: AppColors.ink,
+                                    width: 1.5,
+                                  ),
+                                ),
+                                child: Text(
+                                  isBn ? 'সব মুছুন' : 'Clear all',
+                                  style: AppTypography.tag.copyWith(
+                                    color: AppColors.accent,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
               ),
             ),
             const Divider(color: AppColors.ink, height: 1),
@@ -267,15 +1006,7 @@ class _TestsCatalogueScreenState extends ConsumerState<TestsCatalogueScreen> {
             ? 'অন্য কোনো টেস্টের নাম দিয়ে খুঁজুন।'
             : 'Try adjusting your search query or category.',
         actionLabel: isBn ? 'ফিল্টার মুছুন' : 'Clear filters',
-        onAction: () {
-          setState(() {
-            _category = null;
-            _division = null;
-            _searchQuery = '';
-            _searchController.clear();
-          });
-          _fetchTests(page: 1);
-        },
+        onAction: _clearAll,
       );
     }
 

@@ -91,7 +91,16 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,
         path: '/hospitals',
-        builder: (context, state) => const HospitalsScreen(),
+        builder: (context, state) {
+          final category = state.uri.queryParameters['category'];
+          final division = state.uri.queryParameters['division'];
+          final search = state.uri.queryParameters['search'];
+          return HospitalsScreen(
+            initialCategory: category,
+            initialDivision: division,
+            initialSearch: search,
+          );
+        },
       ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,

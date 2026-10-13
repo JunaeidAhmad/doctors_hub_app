@@ -46,6 +46,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get allSpecialties => 'All Specialties';
 
   @override
+  String get selectSpecialty => 'Select Specialty';
+
+  @override
+  String get searchSpecialtyHint => 'Search specialty...';
+
+  @override
+  String get noSpecialtiesFound => 'No specialties found';
+
+  @override
+  String get otherSpecialties => 'Other';
+
+  @override
   String get allCategories => 'All Categories';
 
   @override
@@ -86,6 +98,104 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get filterSpecialty => 'Specialty';
+
+  @override
+  String get filters => 'Filters';
+
+  @override
+  String get hideFilters => 'Hide Filters';
+
+  @override
+  String get filterOptions => 'Filter Options';
+
+  @override
+  String get selectFacility => 'Select Hospital & Diagnostic Center';
+
+  @override
+  String get allFacilities => 'All Hospitals & Diagnostics';
+
+  @override
+  String get filterLocation => 'Location';
+
+  @override
+  String get filterDistrict => 'District';
+
+  @override
+  String get filterThanaArea => 'Thana / Area';
+
+  @override
+  String get allDistricts => 'All Districts';
+
+  @override
+  String get allAreas => 'All Areas';
+
+  @override
+  String get clearLocation => 'Clear';
+
+  @override
+  String get visitingDays => 'Visiting Days';
+
+  @override
+  String get allDays => 'All Days';
+
+  @override
+  String get doctorGender => 'Doctor Gender';
+
+  @override
+  String get allGenders => 'All';
+
+  @override
+  String get genderMale => 'Male';
+
+  @override
+  String get genderFemale => 'Female';
+
+  @override
+  String get fulfillment => 'Fulfillment';
+
+  @override
+  String get allFulfillments => 'All';
+
+  @override
+  String get homeSamplePickup => 'Home Sample Pickup';
+
+  @override
+  String get centerVisitOnly => 'Center Visit Only';
+
+  @override
+  String get ownershipType => 'Ownership Type';
+
+  @override
+  String get anyOwnership => 'Any';
+
+  @override
+  String get privateOwnership => 'Private';
+
+  @override
+  String get govtOwnership => 'Government';
+
+  @override
+  String get hospitalAffiliatedOwnership => 'Hospital Affiliated';
+
+  @override
+  String get ngoOwnership => 'NGO';
+
+  @override
+  String get allFacilityCategories => 'All Facility Categories';
+
+  @override
+  String get allTestCategories => 'All Test Categories';
+
+  @override
+  String get activeFilters => 'Active Filters:';
+
+  @override
+  String applyFiltersWithCount(int count) {
+    return 'Apply Filters ($count)';
+  }
+
+  @override
+  String get resetAll => 'Reset All';
 
   @override
   String get clearAllFilters => 'Clear filters';

@@ -60,13 +60,26 @@ class TestRepository {
   Future<List<FacilityTest>> getFacilityTestsForTest(
     String testId, {
     String? division,
+    int? divisionId,
+    String? district,
+    int? districtId,
+    String? area,
+    int? thanaId,
+    String? fulfillment,
+    String? ownership,
   }) async {
+    final queryParams = <String, dynamic>{
+      'test': testId,
+      'page_size': 100,
+    };
+
+    if (fulfillment == 'home') {
+      queryParams['home_sample_collection'] = true;
+    }
+
     final response = await _apiClient.get(
       '/facility-tests/',
-      queryParameters: {
-        'test': testId,
-        'page_size': 100,
-      },
+      queryParameters: queryParams,
     );
 
     final paginated = unwrapList<FacilityTest>(
@@ -76,11 +89,57 @@ class TestRepository {
 
     var list = paginated.results;
 
-    // Filter by division client-side if specified
-    if (division != null && division.isNotEmpty && division != 'all') {
+    // Filter by division
+    if (divisionId != null) {
+      list = list.where((ft) => ft.divisionId == null || ft.divisionId == divisionId).toList();
+    } else if (division != null && division.isNotEmpty && division != 'all' && division != 'All Bangladesh') {
+      final cleanDiv = division.replaceAll(RegExp(r'\s*Division$', caseSensitive: false), '').trim().toLowerCase();
       list = list.where((ft) {
         if (ft.facilityDivision == null) return true;
-        return ft.facilityDivision!.toLowerCase() == division.toLowerCase();
+        return ft.facilityDivision!.toLowerCase().contains(cleanDiv);
+      }).toList();
+    }
+
+    // Filter by district
+    if (districtId != null) {
+      list = list.where((ft) => ft.districtId == null || ft.districtId == districtId).toList();
+    } else if (district != null && district.isNotEmpty && district != 'all' && district != 'All Districts') {
+      final cleanDist = district.replaceAll(RegExp(r'\s*District$', caseSensitive: false), '').trim().toLowerCase();
+      list = list.where((ft) {
+        final d = ft.facilityDistrict?.toLowerCase() ?? '';
+        final addr = ft.facilityAddress?.toLowerCase() ?? '';
+        return d.contains(cleanDist) || addr.contains(cleanDist);
+      }).toList();
+    }
+
+    // Filter by thana / area
+    if (thanaId != null) {
+      list = list.where((ft) => ft.thanaId == null || ft.thanaId == thanaId).toList();
+    } else if (area != null && area.isNotEmpty && area != 'all' && area != 'All Areas') {
+      final cleanArea = area.replaceAll(RegExp(r'\s*(Thana|Area)s?$', caseSensitive: false), '').trim().toLowerCase();
+      list = list.where((ft) {
+        final a = ft.facilityArea?.toLowerCase() ?? '';
+        final b = ft.facilityBranch?.toLowerCase() ?? '';
+        final addr = ft.facilityAddress?.toLowerCase() ?? '';
+        return a.contains(cleanArea) || b.contains(cleanArea) || addr.contains(cleanArea);
+      }).toList();
+    }
+
+    // Filter by fulfillment
+    if (fulfillment != null && fulfillment != 'all') {
+      if (fulfillment == 'home') {
+        list = list.where((ft) => ft.homeSampleCollection).toList();
+      } else if (fulfillment == 'center') {
+        list = list.where((ft) => !ft.homeSampleCollection).toList();
+      }
+    }
+
+    // Filter by ownership
+    if (ownership != null && ownership.isNotEmpty && ownership != 'all') {
+      final cleanOwn = ownership.toLowerCase();
+      list = list.where((ft) {
+        final own = ft.facilityOwnershipType?.toLowerCase() ?? '';
+        return own == cleanOwn || own.contains(cleanOwn);
       }).toList();
     }
 

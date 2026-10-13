@@ -59,8 +59,10 @@ class DiagnosticTest {
       name: json['name'] as String? ?? '',
       bnName: json['bn_name'] as String?,
       slug: json['slug'] as String? ?? '',
-      categoryName: json['category_name'] as String? ?? json['category']?['name'] as String?,
-      categoryId: json['category']?['id']?.toString() ?? json['category_id']?.toString(),
+      categoryName: json['category_name'] as String? ??
+          (json['category'] is Map ? (json['category'] as Map)['name'] as String? : (json['category'] is String ? json['category'] as String : null)),
+      categoryId: (json['category'] is Map ? (json['category'] as Map)['id']?.toString() : null) ??
+          json['category_id']?.toString(),
       description: json['description'] as String?,
       fastingRequired: json['fasting_required'] == true,
       reportTimeHours: (json['report_time_hours'] as num?)?.toInt(),

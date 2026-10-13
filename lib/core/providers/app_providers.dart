@@ -9,8 +9,11 @@ import '../../features/tests/data/test_repository.dart';
 import '../../features/hospitals/data/hospital_repository.dart';
 import '../../features/booking/data/booking_repository.dart';
 import '../../features/location/domain/models/division.dart';
+import '../../features/location/domain/models/district.dart';
+import '../../features/location/domain/models/thana.dart';
 import '../../features/doctors/domain/models/specialty.dart';
 import '../../features/tests/domain/models/test_category.dart';
+import '../../features/hospitals/domain/models/hospital.dart';
 import '../../features/hospitals/domain/models/hospital_category.dart';
 import '../../features/bookings/domain/models/booking_item.dart';
 
@@ -135,3 +138,20 @@ final hospitalCategoriesProvider =
     FutureProvider<List<HospitalCategory>>((ref) async {
   return ref.watch(hospitalRepositoryProvider).getCategories();
 });
+
+final districtsProvider =
+    FutureProvider.family<List<District>, int?>((ref, divisionId) async {
+  return ref
+      .watch(locationRepositoryProvider)
+      .getDistricts(divisionId: divisionId);
+});
+
+final thanasProvider =
+    FutureProvider.family<List<Thana>, int?>((ref, districtId) async {
+  return ref.watch(locationRepositoryProvider).getThanas(districtId: districtId);
+});
+
+final facilitiesProvider = FutureProvider<List<Hospital>>((ref) async {
+  return ref.watch(hospitalRepositoryProvider).getAllFacilities();
+});
+

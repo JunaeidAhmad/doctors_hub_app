@@ -31,7 +31,15 @@ class DoctorRepository {
     String? search,
     String? specialty,
     String? division,
+    int? divisionId,
+    String? district,
+    int? districtId,
+    String? area,
+    int? thanaId,
     String? hospital,
+    String? facility,
+    String? day,
+    String? gender,
     int page = 1,
     int pageSize = 20,
   }) async {
@@ -43,14 +51,52 @@ class DoctorRepository {
     if (search != null && search.trim().isNotEmpty) {
       queryParams['search'] = search.trim();
     }
-    if (specialty != null && specialty.isNotEmpty && specialty != 'all') {
+    if (specialty != null && specialty.isNotEmpty && specialty.toLowerCase() != 'all') {
       queryParams['specialty'] = specialty;
     }
-    if (division != null && division.isNotEmpty && division != 'all') {
+    if (division != null &&
+        division.isNotEmpty &&
+        division.toLowerCase() != 'all' &&
+        division.toLowerCase() != 'all bangladesh') {
       queryParams['division'] = division;
     }
-    if (hospital != null && hospital.isNotEmpty) {
-      queryParams['hospital'] = hospital;
+    if (divisionId != null) {
+      queryParams['division_id'] = divisionId;
+    }
+    if (district != null &&
+        district.isNotEmpty &&
+        district.toLowerCase() != 'all' &&
+        district.toLowerCase() != 'all districts') {
+      queryParams['district'] = district;
+    }
+    if (districtId != null) {
+      queryParams['district_id'] = districtId;
+    }
+    if (area != null &&
+        area.isNotEmpty &&
+        area.toLowerCase() != 'all' &&
+        area.toLowerCase() != 'all areas') {
+      queryParams['area'] = area;
+    }
+    if (thanaId != null) {
+      queryParams['thana_id'] = thanaId;
+    }
+    final effectiveFacility = facility ?? hospital;
+    if (effectiveFacility != null &&
+        effectiveFacility.isNotEmpty &&
+        effectiveFacility.toLowerCase() != 'all') {
+      queryParams['facility'] = effectiveFacility;
+    }
+    if (day != null &&
+        day.isNotEmpty &&
+        day.toLowerCase() != 'all' &&
+        day.toLowerCase() != 'all days') {
+      queryParams['day'] = day;
+    }
+    if (gender != null &&
+        gender.isNotEmpty &&
+        gender.toLowerCase() != 'all') {
+      queryParams['gender'] = gender;
     }
 
     final response = await _apiClient.get(

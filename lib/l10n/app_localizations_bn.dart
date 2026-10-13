@@ -46,6 +46,18 @@ class AppLocalizationsBn extends AppLocalizations {
   String get allSpecialties => 'সকল বিশেষজ্ঞ';
 
   @override
+  String get selectSpecialty => 'বিশেষজ্ঞ নির্বাচন করুন';
+
+  @override
+  String get searchSpecialtyHint => 'বিশেষজ্ঞ খুঁজুন...';
+
+  @override
+  String get noSpecialtiesFound => 'কোন বিশেষজ্ঞ পাওয়া যায়নি';
+
+  @override
+  String get otherSpecialties => 'অন্যান্য';
+
+  @override
   String get allCategories => 'সকল ক্যাটাগরি';
 
   @override
@@ -86,6 +98,104 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get filterSpecialty => 'বিশেষজ্ঞ';
+
+  @override
+  String get filters => 'ফিল্টার';
+
+  @override
+  String get hideFilters => 'ফিল্টার লুকান';
+
+  @override
+  String get filterOptions => 'ফিল্টার অপশন';
+
+  @override
+  String get selectFacility => 'হাসপাতাল ও ডায়াগনস্টিক সেন্টার নির্বাচন করুন';
+
+  @override
+  String get allFacilities => 'সকল হাসপাতাল ও ডায়াগনস্টিক';
+
+  @override
+  String get filterLocation => 'অবস্থান';
+
+  @override
+  String get filterDistrict => 'জেলা';
+
+  @override
+  String get filterThanaArea => 'থানা / এলাকা';
+
+  @override
+  String get allDistricts => 'সকল জেলা';
+
+  @override
+  String get allAreas => 'সকল এলাকা';
+
+  @override
+  String get clearLocation => 'মুছুন';
+
+  @override
+  String get visitingDays => 'রোগী দেখার দিন';
+
+  @override
+  String get allDays => 'সকল দিন';
+
+  @override
+  String get doctorGender => 'ডাক্তারের লিঙ্গ';
+
+  @override
+  String get allGenders => 'সকল';
+
+  @override
+  String get genderMale => 'পুরুষ';
+
+  @override
+  String get genderFemale => 'মহিলা';
+
+  @override
+  String get fulfillment => 'পরিসেবার ধরণ';
+
+  @override
+  String get allFulfillments => 'সকল';
+
+  @override
+  String get homeSamplePickup => 'হোম স্যাম্পল কালেকশন';
+
+  @override
+  String get centerVisitOnly => 'সেন্টারে এসে টেস্ট';
+
+  @override
+  String get ownershipType => 'মালিকানার ধরণ';
+
+  @override
+  String get anyOwnership => 'সকল';
+
+  @override
+  String get privateOwnership => 'বেসরকারি';
+
+  @override
+  String get govtOwnership => 'সরকারি';
+
+  @override
+  String get hospitalAffiliatedOwnership => 'হাসপাতাল অনুমোদিত';
+
+  @override
+  String get ngoOwnership => 'এনজিও';
+
+  @override
+  String get allFacilityCategories => 'সকল ক্যাটাগরি';
+
+  @override
+  String get allTestCategories => 'সকল টেস্ট ক্যাটাগরি';
+
+  @override
+  String get activeFilters => 'সক্রিয় ফিল্টার:';
+
+  @override
+  String applyFiltersWithCount(int count) {
+    return 'ফিল্টার প্রয়োগ করুন ($count)';
+  }
+
+  @override
+  String get resetAll => 'সব রিসেট করুন';
 
   @override
   String get clearAllFilters => 'ফিল্টার মুছুন';

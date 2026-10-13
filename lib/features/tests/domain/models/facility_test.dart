@@ -8,6 +8,12 @@ class FacilityTest {
     this.facilityBranch,
     this.facilityAddress,
     this.facilityDivision,
+    this.facilityDistrict,
+    this.facilityArea,
+    this.facilityOwnershipType,
+    this.divisionId,
+    this.districtId,
+    this.thanaId,
     this.facilityPhone,
     required this.price,
     this.discountPercent,
@@ -25,6 +31,12 @@ class FacilityTest {
   final String? facilityBranch;
   final String? facilityAddress;
   final String? facilityDivision;
+  final String? facilityDistrict;
+  final String? facilityArea;
+  final String? facilityOwnershipType;
+  final int? divisionId;
+  final int? districtId;
+  final int? thanaId;
   final String? facilityPhone;
   final double price;
   final double? discountPercent;
@@ -57,6 +69,16 @@ class FacilityTest {
       homeCharge = double.tryParse(json['home_sample_charge'].toString()) ?? 0.0;
     }
 
+    final facilityDivision = json['facility_division'] as String? ?? facility?['division'] as String? ?? locationDetails?['division'] as String?;
+    final facilityDistrict = json['facility_district'] as String? ?? facility?['district'] as String? ?? locationDetails?['district'] as String?;
+    final facilityArea = json['facility_area'] as String? ?? facility?['area'] as String? ?? locationDetails?['area'] as String?;
+    final facilityOwnershipType = json['facility_ownership_type'] as String? ?? facility?['ownership_type'] as String? ?? locationDetails?['ownership_type'] as String?;
+
+    final thanaDetails = locationDetails?['thana_details'] as Map<String, dynamic>?;
+    final int? divisionId = (thanaDetails?['division_id'] as num?)?.toInt() ?? (locationDetails?['division_id'] as num?)?.toInt();
+    final int? districtId = (thanaDetails?['district_id'] as num?)?.toInt() ?? (locationDetails?['district_id'] as num?)?.toInt();
+    final int? thanaId = (thanaDetails?['id'] as num?)?.toInt() ?? (locationDetails?['thana'] as num?)?.toInt();
+
     return FacilityTest(
       id: json['id']?.toString() ?? '',
       testId: json['test_id']?.toString() ?? testObj?['id']?.toString() ?? '',
@@ -65,7 +87,13 @@ class FacilityTest {
       facilityName: json['facility_name'] as String? ?? facility?['name'] as String? ?? locationDetails?['name'] as String? ?? 'Diagnostic Lab',
       facilityBranch: json['facility_branch'] as String? ?? facility?['branch'] as String? ?? locationDetails?['branch'] as String?,
       facilityAddress: json['facility_address'] as String? ?? facility?['address_line'] as String? ?? locationDetails?['address_line'] as String?,
-      facilityDivision: json['facility_division'] as String? ?? facility?['division'] as String? ?? locationDetails?['division'] as String?,
+      facilityDivision: facilityDivision,
+      facilityDistrict: facilityDistrict,
+      facilityArea: facilityArea,
+      facilityOwnershipType: facilityOwnershipType,
+      divisionId: divisionId,
+      districtId: districtId,
+      thanaId: thanaId,
       facilityPhone: json['facility_phone'] as String? ?? facility?['phone'] as String? ?? locationDetails?['phone'] as String?,
       price: price,
       discountPercent: (json['discount_percent'] as num?)?.toDouble(),
@@ -85,6 +113,12 @@ class FacilityTest {
     'facility_branch': facilityBranch,
     'facility_address': facilityAddress,
     'facility_division': facilityDivision,
+    'facility_district': facilityDistrict,
+    'facility_area': facilityArea,
+    'facility_ownership_type': facilityOwnershipType,
+    'division_id': divisionId,
+    'district_id': districtId,
+    'thana_id': thanaId,
     'facility_phone': facilityPhone,
     'price': price,
     'discount_percent': discountPercent,

@@ -14,6 +14,7 @@ class Hospital {
     this.doctorCount,
     this.rating,
     this.reviewsCount,
+    this.ownershipType,
   });
 
   final String id;
@@ -30,6 +31,7 @@ class Hospital {
   final int? doctorCount;
   final double? rating;
   final int? reviewsCount;
+  final String? ownershipType;
 
   String localizedName(String locale) {
     if (locale == 'bn' && bnName != null && bnName!.isNotEmpty) {
@@ -65,7 +67,20 @@ class Hospital {
     final district = json['district'] as String? ?? loc?['district'] as String?;
     final division = json['division'] as String? ?? loc?['division'] as String?;
     final phone = json['phone'] as String? ?? loc?['phone'] as String?;
-    final category = json['category'] as String? ?? json['location_type'] as String? ?? loc?['location_type'] as String?;
+
+    String? category;
+    if (json['category'] is Map) {
+      category = (json['category'] as Map)['name']?.toString() ??
+          (json['category'] as Map)['slug']?.toString();
+    } else if (json['category'] is String) {
+      category = json['category'] as String;
+    } else if (json['location_type'] is String) {
+      category = json['location_type'] as String;
+    } else if (loc?['location_type'] is String) {
+      category = loc!['location_type'] as String;
+    }
+
+    final ownershipType = json['ownership_type'] as String? ?? loc?['ownership_type'] as String?;
 
     return Hospital(
       id: json['id']?.toString() ?? loc?['id']?.toString() ?? '',
@@ -82,6 +97,7 @@ class Hospital {
       doctorCount: (json['doctor_count'] as num?)?.toInt() ?? (json['doctors_count'] as num?)?.toInt(),
       rating: (json['rating'] as num?)?.toDouble() ?? (loc?['rating'] as num?)?.toDouble(),
       reviewsCount: (json['reviews_count'] as num?)?.toInt() ?? (loc?['reviews_count'] as num?)?.toInt(),
+      ownershipType: ownershipType,
     );
   }
 
@@ -100,5 +116,6 @@ class Hospital {
     'doctor_count': doctorCount,
     'rating': rating,
     'reviews_count': reviewsCount,
+    'ownership_type': ownershipType,
   };
 }

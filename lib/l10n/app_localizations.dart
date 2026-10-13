@@ -170,6 +170,30 @@ abstract class AppLocalizations {
   /// **'All Specialties'**
   String get allSpecialties;
 
+  /// No description provided for @selectSpecialty.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Specialty'**
+  String get selectSpecialty;
+
+  /// No description provided for @searchSpecialtyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search specialty...'**
+  String get searchSpecialtyHint;
+
+  /// No description provided for @noSpecialtiesFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No specialties found'**
+  String get noSpecialtiesFound;
+
+  /// No description provided for @otherSpecialties.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get otherSpecialties;
+
   /// No description provided for @allCategories.
   ///
   /// In en, this message translates to:
@@ -247,6 +271,198 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Specialty'**
   String get filterSpecialty;
+
+  /// No description provided for @filters.
+  ///
+  /// In en, this message translates to:
+  /// **'Filters'**
+  String get filters;
+
+  /// No description provided for @hideFilters.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide Filters'**
+  String get hideFilters;
+
+  /// No description provided for @filterOptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter Options'**
+  String get filterOptions;
+
+  /// No description provided for @selectFacility.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Hospital & Diagnostic Center'**
+  String get selectFacility;
+
+  /// No description provided for @allFacilities.
+  ///
+  /// In en, this message translates to:
+  /// **'All Hospitals & Diagnostics'**
+  String get allFacilities;
+
+  /// No description provided for @filterLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get filterLocation;
+
+  /// No description provided for @filterDistrict.
+  ///
+  /// In en, this message translates to:
+  /// **'District'**
+  String get filterDistrict;
+
+  /// No description provided for @filterThanaArea.
+  ///
+  /// In en, this message translates to:
+  /// **'Thana / Area'**
+  String get filterThanaArea;
+
+  /// No description provided for @allDistricts.
+  ///
+  /// In en, this message translates to:
+  /// **'All Districts'**
+  String get allDistricts;
+
+  /// No description provided for @allAreas.
+  ///
+  /// In en, this message translates to:
+  /// **'All Areas'**
+  String get allAreas;
+
+  /// No description provided for @clearLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get clearLocation;
+
+  /// No description provided for @visitingDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Visiting Days'**
+  String get visitingDays;
+
+  /// No description provided for @allDays.
+  ///
+  /// In en, this message translates to:
+  /// **'All Days'**
+  String get allDays;
+
+  /// No description provided for @doctorGender.
+  ///
+  /// In en, this message translates to:
+  /// **'Doctor Gender'**
+  String get doctorGender;
+
+  /// No description provided for @allGenders.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get allGenders;
+
+  /// No description provided for @genderMale.
+  ///
+  /// In en, this message translates to:
+  /// **'Male'**
+  String get genderMale;
+
+  /// No description provided for @genderFemale.
+  ///
+  /// In en, this message translates to:
+  /// **'Female'**
+  String get genderFemale;
+
+  /// No description provided for @fulfillment.
+  ///
+  /// In en, this message translates to:
+  /// **'Fulfillment'**
+  String get fulfillment;
+
+  /// No description provided for @allFulfillments.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get allFulfillments;
+
+  /// No description provided for @homeSamplePickup.
+  ///
+  /// In en, this message translates to:
+  /// **'Home Sample Pickup'**
+  String get homeSamplePickup;
+
+  /// No description provided for @centerVisitOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Center Visit Only'**
+  String get centerVisitOnly;
+
+  /// No description provided for @ownershipType.
+  ///
+  /// In en, this message translates to:
+  /// **'Ownership Type'**
+  String get ownershipType;
+
+  /// No description provided for @anyOwnership.
+  ///
+  /// In en, this message translates to:
+  /// **'Any'**
+  String get anyOwnership;
+
+  /// No description provided for @privateOwnership.
+  ///
+  /// In en, this message translates to:
+  /// **'Private'**
+  String get privateOwnership;
+
+  /// No description provided for @govtOwnership.
+  ///
+  /// In en, this message translates to:
+  /// **'Government'**
+  String get govtOwnership;
+
+  /// No description provided for @hospitalAffiliatedOwnership.
+  ///
+  /// In en, this message translates to:
+  /// **'Hospital Affiliated'**
+  String get hospitalAffiliatedOwnership;
+
+  /// No description provided for @ngoOwnership.
+  ///
+  /// In en, this message translates to:
+  /// **'NGO'**
+  String get ngoOwnership;
+
+  /// No description provided for @allFacilityCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'All Facility Categories'**
+  String get allFacilityCategories;
+
+  /// No description provided for @allTestCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'All Test Categories'**
+  String get allTestCategories;
+
+  /// No description provided for @activeFilters.
+  ///
+  /// In en, this message translates to:
+  /// **'Active Filters:'**
+  String get activeFilters;
+
+  /// No description provided for @applyFiltersWithCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply Filters ({count})'**
+  String applyFiltersWithCount(int count);
+
+  /// No description provided for @resetAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset All'**
+  String get resetAll;
 
   /// No description provided for @clearAllFilters.
   ///

@@ -5,6 +5,7 @@ import '../../../core/providers/app_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/widgets/dh_dropdown.dart';
+import '../../../core/widgets/specialty_dropdown.dart';
 import '../../../core/widgets/dh_scaffold.dart';
 import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/photo_placeholder.dart';
@@ -190,22 +191,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 if (_searchTabIndex == 0)
                   specialtiesAsync.when(
                     data: (specialties) {
-                      final items = [
-                        DhDropdownItem<String>(
-                          value: '',
-                          label: isBn ? 'সকল বিশেষজ্ঞ' : 'All Specialties',
-                        ),
-                        ...specialties.map(
-                          (s) => DhDropdownItem<String>(
-                            value: s.slug,
-                            label: s.localizedName(isBn ? 'bn' : 'en'),
-                          ),
-                        ),
-                      ];
-                      return DhDropdown<String>(
-                        value: _selectedCategory ?? '',
-                        items: items,
-                        onChanged: (val) => setState(() => _selectedCategory = val),
+                      return SpecialtyDropdown(
+                        specialties: specialties,
+                        selectedSlug: _selectedCategory ?? '',
+                        onChanged: (val) => setState(() => _selectedCategory =
+                            val.isEmpty ? null : val),
+                        isBn: isBn,
+                        allLabel:
+                            isBn ? 'সকল বিশেষজ্ঞ' : 'All Specialties',
+                        otherLabel: isBn ? 'অন্যান্য' : 'Other',
                       );
                     },
                     loading: () => const SkeletonRow(height: 48),
