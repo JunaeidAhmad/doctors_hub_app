@@ -7,11 +7,37 @@ class LocalBookingStore {
 
   final SharedPreferences _prefs;
 
-  static const String _bookingsKey = 'dh_saved_bookings_v1';
+  static const String _bookingsKey = 'dh_saved_bookings_v2';
+  static const String _legacyBookingsKey = 'dh_saved_bookings_v1';
   static const String _lastPatientNameKey = 'dh_last_patient_name';
   static const String _lastPatientPhoneKey = 'dh_last_patient_phone';
 
+  /// Moves v1 entries to the v2 key with `status: unknown`, then drops the
+  /// v1 key. Runs once per install.
+  void _migrateLegacyIfNeeded() {
+    final legacy = _prefs.getStringList(_legacyBookingsKey);
+    if (legacy == null) return;
+
+    final existing = _prefs.getStringList(_bookingsKey) ?? const [];
+    final migrated = <String>[];
+    for (final raw in legacy) {
+      try {
+        final map = jsonDecode(raw) as Map<String, dynamic>;
+        // v1 entries had no status/mode; keep them as unknown.
+        map.putIfAbsent('status', () => '');
+        map.putIfAbsent('booking_mode', () => '');
+        migrated.add(jsonEncode(map));
+      } catch (_) {
+        // Skip corrupted entries
+      }
+    }
+    _prefs.setStringList(_bookingsKey, [...existing, ...migrated]);
+    _prefs.remove(_legacyBookingsKey);
+  }
+
   List<BookingItem> getBookings() {
+    _migrateLegacyIfNeeded();
+
     final rawList = _prefs.getStringList(_bookingsKey);
     if (rawList == null || rawList.isEmpty) return [];
 

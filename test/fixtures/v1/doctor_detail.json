@@ -1,0 +1,197 @@
+{
+  "id": "c067135b-2ab0-54d1-8b67-58ce852add2b",
+  "name": "A. B. M. Abdullah",
+  "bn_name": "এ. বি. এম. আব্দুল্লাহ",
+  "slug": "prof-dr-a-b-m-abdullah",
+  "old_slugs": [],
+  "academic_title": "",
+  "institution": "Bangabandhu Sheikh Mujib Medical University (BSMMU)",
+  "specialty_source": "General Medicine",
+  "specialty_source_bn": "",
+  "specialty_display": {
+    "en": "General Medicine",
+    "bn": "মেডিসিন বিশেষজ্ঞ"
+  },
+  "primary_specialty": {
+    "id": "f3bc33be-f77c-4a0a-bc6d-aca6b3aaaa77",
+    "slug": "medicine-specialist",
+    "name": "Medicine Specialist",
+    "bn_name": "মেডিসিন বিশেষজ্ঞ"
+  },
+  "specialties": [
+    {
+      "id": "f3bc33be-f77c-4a0a-bc6d-aca6b3aaaa77",
+      "slug": "medicine-specialist",
+      "name": "Medicine Specialist",
+      "bn_name": "মেডিসিন বিশেষজ্ঞ"
+    }
+  ],
+  "qualification": "MBBS, FCPS (Medicine), FRCP (Edin)",
+  "experience": "35 Years Exp.",
+  "about": "",
+  "clinical_services": "",
+  "bmdc_number": null,
+  "is_verified": false,
+  "image": null,
+  "gender": "Male",
+  "rating": "4.90",
+  "review_count": 120,
+  "status": "Active",
+  "chambers": [
+    {
+      "id": "1c5ccd06-0079-55db-b1f0-9cea39c0d632",
+      "doctor": "c067135b-2ab0-54d1-8b67-58ce852add2b",
+      "facility": {
+        "id": "42e93c99-d8db-5d1f-b8af-59838b290646",
+        "slug": "square-hospital-panthapath-main",
+        "location_type": "hospital",
+        "ownership_type": "private",
+        "name": "Square Hospital",
+        "branch": "Panthapath Main",
+        "display_name": "Square Hospital (Panthapath Main)",
+        "address": "18/F, Bir Uttam Qazi Nuruzzaman Sarak, Panthapath",
+        "thana_id": 6,
+        "area": "Panthapath",
+        "area_bn": "পান্থপথ",
+        "district_id": 1,
+        "district": "Dhaka",
+        "district_bn": "ঢাকা",
+        "division_id": 1,
+        "division": "Dhaka",
+        "division_bn": "ঢাকা",
+        "phone": "+8801713377775",
+        "email": "info@squarehospital.com",
+        "logo": null,
+        "image": null,
+        "rating": 4.85,
+        "reviews_count": 340,
+        "is_verified": true,
+        "is_active": true
+      },
+      "fee": "2000.00",
+      "booking_mode": "instant",
+      "schedules": [
+        {
+          "id": "296362be-be99-50ef-a3ee-029af6b56118",
+          "day_of_week": "Saturday",
+          "start_time": "17:00:00",
+          "end_time": "20:00:00",
+          "max_patients": 30,
+          "avg_consult_minutes": 10
+        },
+        {
+          "id": "3b856815-aa90-52c1-ad55-cfc8cc8a2f90",
+          "day_of_week": "Monday",
+          "start_time": "17:00:00",
+          "end_time": "20:00:00",
+          "max_patients": 30,
+          "avg_consult_minutes": 10
+        },
+        {
+          "id": "e2db71ac-bd31-55ff-8f9a-12247d7fe32c",
+          "day_of_week": "Wednesday",
+          "start_time": "17:00:00",
+          "end_time": "20:00:00",
+          "max_patients": 30,
+          "avg_consult_minutes": 10
+        }
+      ],
+      "is_active": true,
+      "chamber_type": "Primary Chamber",
+      "advance_booking_days": 14,
+      "next_available": {
+        "date": "2026-10-14",
+        "session_key": "s:e2db71ac-bd31-55ff-8f9a-12247d7fe32c",
+        "session_start": "17:00",
+        "start_time": "17:00",
+        "estimated_time": "17:00",
+        "remaining": 30,
+        "capacity_remaining": 30
+      },
+      "doctor_name": "A. B. M. Abdullah",
+      "doctor_bn_name": "এ. বি. এম. আব্দুল্লাহ",
+      "academic_title": "",
+      "institution": "Bangabandhu Sheikh Mujib Medical University (BSMMU)",
+      "qualification": "MBBS, FCPS (Medicine), FRCP (Edin)",
+      "experience": "35 Years Exp."
+    },
+    {
+      "id": "a7ef7792-8a1b-547c-baf7-78148a70b789",
+      "doctor": "c067135b-2ab0-54d1-8b67-58ce852add2b",
+      "facility": {
+        "id": "98847d9f-2a66-5378-85a0-1a94843eef55",
+        "slug": "prof-abdullah-consultation-chamber-green-road",
+        "location_type": "chamber",
+        "ownership_type": "private",
+        "name": "Prof. Abdullah Consultation Chamber",
+        "branch": "Green Road",
+        "display_name": "Prof. Abdullah Consultation Chamber (Green Road)",
+        "address": "18/F, Bir Uttam Qazi Nuruzzaman Sarak, Panthapath",
+        "thana_id": 6,
+        "area": "Panthapath",
+        "area_bn": "পান্থপথ",
+        "district_id": 1,
+        "district": "Dhaka",
+        "district_bn": "ঢাকা",
+        "division_id": 1,
+        "division": "Dhaka",
+        "division_bn": "ঢাকা",
+        "phone": "+8801711223344",
+        "email": "",
+        "logo": null,
+        "image": null,
+        "rating": 4.9,
+        "reviews_count": 95,
+        "is_verified": true,
+        "is_active": true
+      },
+      "fee": "1500.00",
+      "booking_mode": "instant",
+      "schedules": [
+        {
+          "id": "e836922c-e6d9-52df-ac1d-d948bfe75731",
+          "day_of_week": "Sunday",
+          "start_time": "18:00:00",
+          "end_time": "21:00:00",
+          "max_patients": 30,
+          "avg_consult_minutes": 10
+        },
+        {
+          "id": "689e30d7-af42-5455-8dc5-cdf15b51105e",
+          "day_of_week": "Tuesday",
+          "start_time": "18:00:00",
+          "end_time": "21:00:00",
+          "max_patients": 30,
+          "avg_consult_minutes": 10
+        },
+        {
+          "id": "d890e5e1-f115-5bf3-95bc-cb898e4171c1",
+          "day_of_week": "Thursday",
+          "start_time": "18:00:00",
+          "end_time": "21:00:00",
+          "max_patients": 30,
+          "avg_consult_minutes": 10
+        }
+      ],
+      "is_active": true,
+      "chamber_type": "Primary Chamber",
+      "advance_booking_days": 14,
+      "next_available": {
+        "date": "2026-10-13",
+        "session_key": "s:689e30d7-af42-5455-8dc5-cdf15b51105e",
+        "session_start": "18:00",
+        "start_time": "18:00",
+        "estimated_time": "18:00",
+        "remaining": 30,
+        "capacity_remaining": 30
+      },
+      "doctor_name": "A. B. M. Abdullah",
+      "doctor_bn_name": "এ. বি. এম. আব্দুল্লাহ",
+      "academic_title": "",
+      "institution": "Bangabandhu Sheikh Mujib Medical University (BSMMU)",
+      "qualification": "MBBS, FCPS (Medicine), FRCP (Edin)",
+      "experience": "35 Years Exp."
+    }
+  ],
+  "match_rank": null
+}

@@ -6,9 +6,12 @@ import '../../../core/providers/app_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/currency_formatter.dart';
+import '../../../core/utils/phone_launcher.dart';
 import '../../../core/widgets/dh_scaffold.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/kicker.dart';
+import '../../../l10n/app_localizations.dart';
+import '../../booking/domain/models/booking_result.dart';
 import '../domain/models/booking_item.dart';
 
 class BookingsScreen extends ConsumerWidget {
@@ -20,7 +23,8 @@ class BookingsScreen extends ConsumerWidget {
     BookingItem booking,
     bool isBn,
   ) {
-    final facilityPhone = booking.facilityPhone ?? '10636';
+    final l10n = AppLocalizations.of(context)!;
+    final facilityPhone = booking.facilityPhone;
 
     showDialog(
       context: context,
@@ -37,31 +41,34 @@ class BookingsScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                isBn
-                    ? 'চেম্বারের সাথে অ্যাপয়েন্টমেন্ট বাতিল করতে অনুগ্রহ করে সরাসরি চেম্বারে যোগাযোগ করুন:'
-                    : 'To cancel your appointment with the facility, please contact them directly:',
+                l10n.toCancelCall(booking.facilityName),
                 style: AppTypography.body,
               ),
-              const SizedBox(height: 10),
-              Container(
-                padding: const EdgeInsets.all(12),
-                color: AppColors.fill,
-                child: Row(
-                  children: [
-                    const Icon(Icons.phone, size: 18, color: AppColors.ink),
-                    const SizedBox(width: 8),
-                    Text(
-                      facilityPhone,
-                      style: const TextStyle(
-                        fontFamily: AppTypography.fontMono,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.ink,
-                      ),
+              if (facilityPhone != null && facilityPhone.isNotEmpty) ...[
+                const SizedBox(height: 10),
+                InkWell(
+                  onTap: () => launchPhone(facilityPhone),
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    color: AppColors.fill,
+                    child: Row(
+                      children: [
+                        const Icon(Icons.phone, size: 18, color: AppColors.ink),
+                        const SizedBox(width: 8),
+                        Text(
+                          facilityPhone,
+                          style: const TextStyle(
+                            fontFamily: AppTypography.fontMono,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.ink,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
               const SizedBox(height: 12),
               Text(
                 isBn
@@ -105,6 +112,31 @@ class BookingsScreen extends ConsumerWidget {
         );
       },
     );
+  }
+
+  String? _statusTag(BookingItem booking, AppLocalizations l10n) {
+    if (booking.status == BookingStatus.confirmed &&
+        booking.type == 'doctor') {
+      return l10n.statusConfirmedTag;
+    }
+    if (booking.status == BookingStatus.pending) {
+      if (booking.type == 'doctor') return l10n.awaitingConfirmationTag;
+      if (booking.type == 'test') return l10n.awaitingLabTag;
+      if (booking.type == 'service') return l10n.awaitingHospitalTag;
+    }
+    return null;
+  }
+
+  bool _isPastDeadline(BookingItem booking) {
+    final deadline = booking.confirmDeadline;
+    if (booking.status != BookingStatus.pending ||
+        booking.type != 'doctor' ||
+        deadline == null ||
+        deadline.isEmpty) {
+      return false;
+    }
+    final parsed = DateTime.tryParse(deadline);
+    return parsed != null && parsed.isBefore(DateTime.now());
   }
 
   @override
@@ -214,7 +246,9 @@ class BookingsScreen extends ConsumerWidget {
                       child: Text(
                         isDoctor
                             ? (isBn ? 'ডাক্তার অ্যাপয়েন্টমেন্ট' : 'DOCTOR VISIT')
-                            : (isBn ? 'ল্যাব টেস্ট' : 'LAB TEST'),
+                            : booking.type == 'service'
+                                ? (isBn ? 'হাসপাতাল সেবা' : 'HOSPITAL SERVICE')
+                                : (isBn ? 'ল্যাব টেস্ট' : 'LAB TEST'),
                         style: TextStyle(
                           fontFamily: AppTypography.fontMono,
                           fontSize: 10,
@@ -223,7 +257,10 @@ class BookingsScreen extends ConsumerWidget {
                         ),
                       ),
                     ),
-                    if (booking.serialDisplay != null) ...[
+                    if (booking.status == BookingStatus.confirmed &&
+                        booking.type == 'doctor' &&
+                        booking.serialDisplay != null &&
+                        booking.serialDisplay!.isNotEmpty) ...[
                       const SizedBox(width: 8),
                       Text(
                         booking.serialDisplay!,
@@ -232,6 +269,16 @@ class BookingsScreen extends ConsumerWidget {
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
                           color: AppColors.accent,
+                        ),
+                      ),
+                    ],
+                    if (_statusTag(booking, AppLocalizations.of(context)!) !=
+                        null) ...[
+                      const SizedBox(width: 8),
+                      Text(
+                        _statusTag(booking, AppLocalizations.of(context)!)!,
+                        style: AppTypography.tag.copyWith(
+                          color: AppColors.muted,
                         ),
                       ),
                     ],
@@ -322,12 +369,25 @@ class BookingsScreen extends ConsumerWidget {
                         children: [
                           const Icon(Icons.access_time, size: 14, color: AppColors.muted),
                           const SizedBox(width: 4),
-                          Text(
-                            booking.timeSlot,
-                            style: AppTypography.bodyMedium.copyWith(fontSize: 12),
+                          Flexible(
+                            child: Text(
+                              booking.estimatedTime == null ||
+                                      booking.estimatedTime!.isEmpty
+                                  ? booking.timeSlot
+                                  : '${booking.timeSlot} · ${AppLocalizations.of(context)!.approxTime(booking.estimatedTime!)}',
+                              style: AppTypography.bodyMedium
+                                  .copyWith(fontSize: 12),
+                            ),
                           ),
                         ],
                       ),
+                      if (_isPastDeadline(booking)) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          AppLocalizations.of(context)!.notConfirmedInTime,
+                          style: AppTypography.tagAccent,
+                        ),
+                      ],
                       const SizedBox(height: 6),
                       Text(
                         'For: ${booking.patientName} (${booking.patientPhone})',
@@ -348,12 +408,16 @@ class BookingsScreen extends ConsumerWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  isBn
-                      ? 'ফি: ${CurrencyFormatter.format(booking.fee, locale: 'bn')}'
-                      : 'Fee: ${CurrencyFormatter.format(booking.fee, locale: 'en')}',
-                  style: AppTypography.secondaryBold.copyWith(color: AppColors.accent),
-                ),
+                if (booking.fee != null)
+                  Text(
+                    isBn
+                        ? 'ফি: ${CurrencyFormatter.format(booking.fee, locale: 'bn')}'
+                        : 'Fee: ${CurrencyFormatter.format(booking.fee, locale: 'en')}',
+                    style: AppTypography.secondaryBold
+                        .copyWith(color: AppColors.accent),
+                  )
+                else
+                  const SizedBox.shrink(),
                 InkWell(
                   onTap: () => _showCancelDialog(context, ref, booking, isBn),
                   child: Padding(

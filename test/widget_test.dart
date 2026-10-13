@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:doctors_hub_app/app.dart';
+import 'package:doctors_hub_app/core/app_config/app_config_providers.dart';
 import 'package:doctors_hub_app/core/providers/app_providers.dart';
 import 'package:doctors_hub_app/features/doctors/domain/models/doctor.dart';
 import 'package:doctors_hub_app/features/doctors/domain/models/specialty.dart';
@@ -45,6 +46,7 @@ void main() {
     final testHospitals = [
       const Hospital(
         id: 'hosp-1',
+        displayName: 'Dhaka Medical Center',
         name: 'Dhaka Medical Center',
         slug: 'dhaka-medical-center',
         category: 'Hospital',
@@ -57,6 +59,7 @@ void main() {
       ProviderScope(
         overrides: [
           sharedPreferencesProvider.overrideWithValue(prefs),
+          appConfigProvider.overrideWith((ref) async => null),
           divisionsProvider.overrideWith((ref) => Future.value(testDivisions)),
           specialtiesProvider.overrideWith((ref) => Future.value(testSpecialties)),
           homePopularDoctorsProvider.overrideWith((ref) => Future.value(testDoctors)),
@@ -76,6 +79,6 @@ void main() {
     expect(find.text('DOCTORS HUB'), findsOneWidget);
     expect(find.text('Specialties'), findsOneWidget);
     expect(find.text('Cardiology'), findsOneWidget);
-    expect(find.text('Hospitals'), findsNWidgets(2));
+    expect(find.text('Hospitals'), findsNWidgets(3));
   });
 }

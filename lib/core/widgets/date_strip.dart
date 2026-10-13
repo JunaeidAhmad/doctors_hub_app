@@ -7,10 +7,14 @@ class DateStripItem {
   const DateStripItem({
     required this.date,
     required this.isAvailable,
+    this.label,
   });
 
   final DateTime date;
   final bool isAvailable;
+
+  /// Optional small status label under the day number ("Full", "Not at...").
+  final String? label;
 }
 
 class DateStrip extends StatelessWidget {
@@ -91,6 +95,22 @@ class DateStrip extends StatelessWidget {
                       color: textColor,
                     ),
                   ),
+                  if (item.label != null && item.label!.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 2),
+                      child: Text(
+                        item.label!,
+                        style: TextStyle(
+                          fontFamily: AppTypography.fontArchivo,
+                          fontSize: 8,
+                          fontWeight: FontWeight.w600,
+                          color: textColor,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
                 ],
               ),
             ),

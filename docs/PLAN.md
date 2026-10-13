@@ -3,8 +3,9 @@
 Source of truth for this build:
 
 - **Design:** "Doctors Hub / Patient app v2" — https://claude.ai/artifact/2VJAmF6MhXPryKgWwesXPC (iOS + Android frames, interactive prototype)
-- **Backend:** Django 5 + DRF, repo `JunaeidAhmad/doctors_hub`, folder `doctors_hub_backend/`. OpenAPI schema at `GET /api/schema/`, Swagger at `/api/docs/`. Prod base URL `https://doctors-hub.onrender.com/api`.
+- **Backend:** Django 5 + DRF, repo `JunaeidAhmad/doctors_hub`, folder `doctors_hub_backend/`. v1 contract at `openapi/openapi.v1.json` (source of truth), backend instructions in `docs/API_VERSIONING.md`. OpenAPI schema at `GET /api/schema/`, Swagger at `/api/docs/`. Prod base URL `https://doctors-hub.onrender.com/api/v1` (app-config stays at `/api/app-config/`).
 - **Scope:** patient-facing mobile app only. No admin, doctor, or facility-staff features. No backend changes except the optional ones listed in §4.
+- **Migration:** the app is being brought onto the v1 contract; see `docs/v1-migration-plan.md` for the phased work and current status.
 
 The plan is split into phases an agent can run one at a time. Each phase lists its tasks, the files it touches, and a **Done when** checklist the agent must verify before stopping.
 
@@ -21,7 +22,9 @@ Screens (from the prototype's navigation stack):
 | `/` | **Home** — 3-way search card (Doctors / Diagnostics / Hospitals tabs, category dropdown, division dropdown, red search button), Specialties grid (2 col, numbered 01–08), Popular doctors (horizontal cards), Diagnostic test categories (3 col), Hospitals (category chips + 3 rows) | Tab bar |
 | `/doctors` | **Find a doctor** — kicker "N DOCTORS · SPECIALTY", specialty dropdown, search input with Clear, removable filter chips (division, "At <hospital>"), doctor rows (photo, name, specialty · degree, primary chamber, "+ N more chambers", ★ rating, years, "from ৳fee"), empty state | Tab bar, Home |
 | `/tests` | **Diagnostics** — test-type dropdown, search, division chip, test cards (category tag, report time, fasting tag, name, description, usual price range, top 2 labs with price + "Home pickup / At lab only", "+ N more labs" toggle) | Tab bar, Home |
-| `/hospitals` | **Hospitals** — category dropdown, search, division chip, hospital rows (initials tile, name, category · area, division, doctor count) → opens `/doctors?hospital=<id>` | Home |
+| `/hospitals` | **Hospitals** — category dropdown, search, division chip, hospital rows (initials tile, name, category · area, division, doctor count) → opens `/hospitals/:idOrSlug` | Tab bar, Home |
+| `/hospitals/:idOrSlug` | **Hospital page** — name, category, area/district, address, open timing, call buttons (phone / emergency / ambulance), description, services with "Book", "Doctors here" and "Tests here" links | Hospital rows |
+| `/hospitals/:idOrSlug/services/:serviceId/book` | **Book a hospital service** — date strip, preferred time chips, patient details, OTP; hospital contacts the patient to confirm | Hospital page service "Book" |
 | `/doctors/:id` | **Doctor profile** — portrait, specialty kicker, name, degrees, stats row (years / rating+reviews / chambers), About, Chambers list (days · hours · fee). Sticky CTA "Visit fee from ৳X — Book a visit" | Doctor rows/cards |
 | `/doctors/:id/book` | **Step 1 of 2: Where and when?** — chamber radio list, 7-day date strip (off-days greyed, "Not at this chamber that day"), slot grid grouped by shift (booked slots struck through). Sticky CTA "Continue" (disabled until slot chosen) | Profile |
 | `/doctors/:id/confirm` | **Step 2 of 2: Almost there** — summary (Doctor / When / Where), patient name, `+88` phone with inline validation, payment choice (Pay at counter / Pay now with bKash·Nagad·Card). CTA "Confirm booking" or "Pay ৳X with bKash" | Step 1 |
@@ -29,7 +32,7 @@ Screens (from the prototype's navigation stack):
 | `/success` | **You're booked** — red status bar, booking ref, For / At / When / Pay, contextual note, "See my bookings" / "Back to home". Clears the back stack | After booking |
 | `/bookings` | **Bookings** — "N UPCOMING", "Saved on this phone", list with date tile, kind label (DOCTOR VISIT / LAB TEST), title, time · place, pay tag, Cancel; empty state with "Find a doctor" | Tab bar (badge = count) |
 
-Bottom tab bar (Home, Doctors, Tests, Bookings) shows only on the root screens. Tapping a tab resets that stack and its filters.
+Bottom tab bar (Home, Doctors, Tests, Hospitals, Bookings) shows only on the root screens. Tapping a tab resets that stack and its filters.
 
 ---
 
@@ -70,8 +73,10 @@ Scale used in the design: H1 32/800 tracking −0.025em line-height 1.02–1.05;
 - **State:** `flutter_riverpod` + `riverpod_annotation`/`riverpod_generator`.
 - **Routing:** `go_router` with a `StatefulShellRoute` for the 4 tabs; booking flow routes are pushed above the shell so the tab bar hides.
 - **Network:** `dio` with interceptors: base URL from `--dart-define=API_BASE_URL`, `Accept-Language` (en/bn), timeouts (15s connect / 30s receive; Render cold starts are slow), retry once on timeout for GETs, error mapping to a sealed `AppFailure`.
-- **Models:** `freezed` + `json_serializable`. Hand-write DTOs only for the endpoints in §4, check them against `openapi/schema.yaml` (commit a copy fetched from `/api/schema/`). Map DTOs to domain models in the data layer; UI never sees DTOs.
+- **Models:** `freezed` + `json_serializable`. Hand-write DTOs only for the endpoints in §4, check them against `openapi/openapi.v1.json`. Map DTOs to domain models in the data layer; UI never sees DTOs.
 - **Local storage:** `shared_preferences` for locale and last-used patient (name, phone); a small JSON store (or `hive_ce`) for the bookings list.
+- **Device/build info:** `package_info_plus` for the integer build number sent as `X-App-Build`.
+- **Links:** `url_launcher` for `tel:` links (call mode, "Call the chamber").
 - **i18n:** `flutter_localizations` + `gen-l10n` with `app_en.arb` and `app_bn.arb`. Show `bn_name` fields from the API when locale is `bn`, falling back to `name`. Bangla digits for numbers and ৳ amounts in `bn` via `intl` `NumberFormat`.
 - **Quality:** `very_good_analysis` (or `flutter_lints` strict), `mocktail`, `golden_toolkit`/`alchemist` for goldens, `integration_test`.
 
@@ -90,32 +95,42 @@ lib/
     bookings/    (local history)
     location/    (divisions/districts cache)
 l10n/app_en.arb, app_bn.arb
-openapi/schema.yaml
+openapi/openapi.v1.json
 test/  integration_test/
 ```
 
 ---
 
-## 4. Backend contract (verified against the repo)
+## 4. Backend contract (v1 patient surface)
 
-All list endpoints use DRF `PageNumberPagination`: `?page=&page_size=` (max 100), response `{count, next, previous, results}`. Handle both paginated and bare-list responses in one `unwrapList()` helper (the web client does this too).
+All paths are under `/api/v1` unless noted. List endpoints use DRF `PageNumberPagination` (`?page=&page_size=`, max 100; `/facility-tests/search/` caps `page_size` at 50): response `{count, next, previous, results}`. Handle both paginated and bare-list responses in one `unwrapList()` helper. Field names come from `openapi/openapi.v1.json` only. The frozen list is in `docs/API_VERSIONING.md`.
 
-| App need | Endpoint | Notes |
+| App need | Endpoint | v1 notes |
 |---|---|---|
-| Home counts, dropdown options | `GET /search-metadata/`, `GET /search-facets/` | Check shape in schema; use for specialty/test counts on Home |
-| Divisions | `GET /divisions/` (districts: `/districts/?division=`) | Cache 24h. "All Bangladesh" is client-side = no param |
-| Specialties | `GET /specialties/?canonical_only=true` | Has `bn_name` |
-| Doctor search | `GET /doctors/?specialty=&division=&district=&area=&hospital=&search=&gender=&fee_max=&day=&page=` | `search` matches English and Bangla names, specialty, facility, about |
-| Doctor detail | `GET /doctors/{id-or-slug}/` | Includes affiliations (chambers) with schedules (`day_of_week`, `start_time`, `end_time`) and fee |
-| Test categories | `GET /test-categories/?page_size=100` | |
-| Tests | `GET /tests/?category=&search=` | `fasting_required`, `report_time_hours`, `preparation_instructions` |
-| Labs offering a test | `GET /facility-tests/?test=&category=&location=&search=` | `price`, `discount_percent`, `report_time`, `home_sample_collection`, `home_sample_charge`, `home_sample_note`. **No division filter** — filter by the nested location's division client-side |
+| App config, update gate | `GET /api/app-config/` | Unversioned, permanent. `client.status`, `platforms.<platform>`, `update_message`, `api.deprecations`. Failing this call never blocks the app |
+| Home counts, dropdown options | `GET /search-metadata/` | Numbers + filter options; includes `facilities` for the hospital picker |
+| Facets | `GET /search-facets/` | Facet counts |
+| Divisions / districts / thanas | `GET /divisions/`, `GET /districts/?division=<id>`, `GET /thanas/?district=<id>` | IDs everywhere; cache 24h. "All Bangladesh" is client-side = no param |
+| Specialties | `GET /specialties/` | Plain array; has `bn_name`. No filter params in v1 |
+| Specialty suggest | `GET /specialties/suggest/?q=` | |
+| Doctor search | `GET /doctors/?specialty=<slug>&division_id=&district_id=&thana_id=&facility_id=&search=&gender=&day=&page=&page_size=` | All filters are IDs; unknown params are ignored by the server (fails silently) |
+| Doctor detail | `GET /doctors/{id-or-slug}/` | `chambers[]`: `fee`, `booking_mode`, `facility`, `schedules`, `next_available` |
+| Availability | `GET /affiliations/{id}/availability/?from=YYYY-MM-DD&days=N` | Sessions carry `session_key`, capacity, `next_serial`, `estimated_time`, `status` |
 | Hospital categories | `GET /hospital-categories/` | |
-| Hospitals | `GET /hospitals/?category=&division=&search=&page=` | Facility objects are nested under `location_details`; port the web's `flattenFacility` logic into the mapper |
-| OTP | `POST /bookings/otp/send/ {phone, purpose}`, `POST /bookings/otp/verify/` | Use purpose `doctor_booking` / `test_booking` — the booking serializer checks OTP under those purposes |
-| Returning patient prefill | `GET /bookings/patients/lookup/?phone=` | Returns `{found, ...}` |
-| Book doctor | `POST /bookings/doctor/ {affiliation_id, date: YYYY-MM-DD, slot: "HH:MM", patient_name, patient_phone, otp_code?, patient_age?, gender?, notes?}` | Server validates slot is inside schedule hours and assigns `serial_number` / `serial_display` (e.g. `SL-004`) — show this on Success |
-| Book test | `POST /bookings/test/ {facility_test_id, pickup_date, patient_name, patient_phone, pickup_address_line?, otp_code?, notes?}` | Response includes `price`, `test_name`, `center_name` |
+| Hospitals | `GET /hospitals/?category=<slug-or-id>&division_id=&district_id=&thana_id=&ownership_type=&search=&page=&page_size=` | Flat facility summary at the top level (`display_name`, `address`, `area`, `_bn` fields); `id` is the location id |
+| Hospital detail | `GET /hospitals/{location}/` | Accepts slug or id; adds `description`, `open_timing`, phone numbers, `services[]` |
+| Hospital doctors / tests | `GET /hospitals/{location}/doctors/`, `GET /hospitals/{location}/tests/` | |
+| Diagnostic centers | `GET /diagnostic-centers/`, `GET /diagnostic-centers/{location}/`, `.../doctors/`, `.../tests/` | Same shape as hospitals |
+| Diagnostic center categories | `GET /diagnostic-center-categories/` | |
+| Test categories | `GET /test-categories/` | |
+| Test search | `GET /facility-tests/search/?q=&testcat=&division_id=&district_id=&thana_id=&location_id=&fulfillment=&ownership=&ordering=&page=&page_size=` | One call returns test groups with `offerings[]` and `facets`; server-side filters |
+| Hospital services | `GET /hospital-services/` | `{id, name, icon}` for the hospital page |
+| OTP | `POST /bookings/otp/send/ {phone, purpose}`, `POST /bookings/otp/verify/` | Purposes: `doctor_booking`, `test_booking`, `hospital_service_booking`, `call_lead`. The code goes on the booking/lead POST as `otp_code`; never verify first |
+| Returning patient prefill | `GET /bookings/patients/lookup/?phone=` | Returns `{found, patient: {name, age, gender}}` |
+| Book doctor | `POST /bookings/doctor/ {affiliation_id, date, session_key, patient_name, patient_phone, patient_age?, patient_gender?, notes?, otp_code?}` | `instant` → `confirmed` + serial, `estimated_time`; `request` → `pending`, `serial_number: null` |
+| Book test | `POST /bookings/test/ {facility_test_id, pickup_date, collection_type, pickup_thana_id?, pickup_address_line?, patient_name, patient_phone, patient_age?, patient_gender?, notes?, otp_code?}` | `collection_type` `center`/`home`; home needs thana + address line; date ≤ 30 days ahead |
+| Book hospital service | `POST /bookings/hospital-service/ {hospital_id, service_id, booking_date, preferred_time, patient_name, patient_phone, patient_age?, patient_gender?, notes?, otp_code?}` | Created `pending` |
+| Call lead | `POST /bookings/call-leads/ {affiliation_id, patient_name, patient_phone, patient_age?, patient_gender?, otp_code}` | Returns `numbers[]`; no booking is created |
 
 Phone rule (matches backend validator and design): `^01[3-9]\d{8}$` after stripping spaces; send without `+88`.
 
@@ -123,14 +138,14 @@ Phone rule (matches backend validator and design): `^01[3-9]\d{8}$` after stripp
 
 Build around these. Don't invent endpoints.
 
-1. **Booked-slot availability.** No endpoint returns taken slots; the backend assigns serial numbers. **v1:** generate 30-minute slots client-side from the chamber's schedule for that weekday and show all as open. If the server rejects a slot, show its message and return to the picker. *Optional backend add:* `GET /affiliations/{id}/availability/?date=` to enable strike-through.
-2. **Payments.** No payment endpoints. **v1:** ship "Pay at the counter" only. Keep the "Pay now" UI behind a `kPayInAppEnabled = false` flag.
-3. **My bookings and cancel.** Booking list/update endpoints are admin-only (`PublicCreateAdminManage`). The design already says "Saved on this phone", so store the POST response locally. **Cancel** removes the booking locally and shows "Call the chamber to cancel" with the facility phone if one is available. Server-side cancel needs a new endpoint (e.g. phone + OTP-verified cancel).
-4. **Test time window.** `TestBooking` has `pickup_date` but no time field. Send the chosen window in `notes` (`"Window: 7:00–9:00 am"`) and keep it in the local record.
-5. **OTP.** The design has no OTP step, but the backend supports it. Add a bottom sheet on the Confirm CTA: send OTP, then 6-digit input with a 60-second resend timer, then POST the booking with `otp_code`. Put this behind a `kRequireOtp` flag (default `true` for prod).
+1. **Booked-slot availability.** *Closed, see `docs/v1-migration-plan.md`:* the backend now exposes `GET /affiliations/{id}/availability/` with sessions, capacity, `next_serial` and `estimated_time`.
+2. **Payments.** *Still open.* No payment endpoints. Ship "Pay at the counter" only. Keep the "Pay now" UI behind a `kPayInAppEnabled = false` flag.
+3. **My bookings and cancel.** *Still open.* Booking list/update endpoints are admin-only (`PublicCreateAdminManage`). Store the POST response locally. **Cancel** removes the booking locally and shows "To cancel, call {facility}" with the facility phone if known. Server-side cancel needs a new endpoint (phone + OTP-verified cancel).
+4. **Test collection type.** *Closed, see `docs/v1-migration-plan.md`:* `POST /bookings/test/` now takes `collection_type` (`center`/`home`), plus `pickup_thana_id` and `pickup_address_line` for home pickup.
+5. **OTP.** *Closed, see `docs/v1-migration-plan.md`:* send then post `otp_code` with the booking or lead on all four flows; no `kRequireOtp` flag, every flow asks.
 6. **Home sample charge.** Add `home_sample_charge` to the total when Home pickup is chosen, and show it as a line in the CTA sub-text.
 
-**Backend issues to fix before launch** (outside this app's scope, flag to the owner): `verify_otp` and `verify_otp_helper` accept `123` / `123456` as a universal code; `send_otp` returns the OTP in the response when `DEBUG` is on, and the default is `True` if the setting is missing. Also `/bookings/patients/lookup/` returns patient data for any phone number without verification.
+**Backend issues to fix before launch** (outside this app's scope, flag to the owner): `verify_otp` and `verify_otp_helper` accept `123` / `123456` as a universal code; `send_otp` returns the OTP in the response when `DEBUG` is on, and the default is `True` if the setting is missing. Also `/bookings/patients/lookup/` returns patient data for any phone number without verification. The full list of open gaps is in `docs/BACKEND_GAPS.md`.
 
 ---
 
@@ -141,7 +156,7 @@ Each phase = one agent session. At the end of every phase the agent runs `dart r
 ### Phase 0 — Scaffold (small)
 - `flutter create --org com.doctorshub --platforms android,ios doctors_hub_app`; set min iOS 13, Android minSdk 23.
 - Add dependencies from §3; configure `analysis_options.yaml`, `l10n.yaml`, flavors via `--dart-define` (`API_BASE_URL`, `REQUIRE_OTP`, `PAY_IN_APP`).
-- Fetch `/api/schema/` into `openapi/schema.yaml`.
+- Fetch `/api/schema/` into `openapi/openapi.v1.json` (v1 snapshot; see `docs/v1-migration-plan.md` for the current contract).
 - Add `CLAUDE.md` (see §7).
 - **Done when:** app launches to a placeholder, CI script `tool/check.sh` runs analyze + test green.
 
@@ -211,20 +226,9 @@ Each phase = one agent session. At the end of every phase the agent runs `dart r
 
 ---
 
-## 7. Agent operating rules (put in `CLAUDE.md` at repo root)
+## 7. Agent operating rules
 
-```md
-# Doctors Hub patient app — rules for coding agents
-- Read docs/PLAN.md first. Work one phase at a time; don't start the next phase unasked.
-- The design artifact is the visual spec. Match spacing, borders (2px ink, no radius), and copy exactly.
-- Never hard-code colours or text styles in features; use core/theme tokens.
-- All user-facing strings go in l10n/app_en.arb and app_bn.arb.
-- Only call endpoints listed in PLAN.md §4. If you need data that isn't there, stop and write the gap in docs/BACKEND_GAPS.md.
-- Check DTO fields against openapi/schema.yaml before writing them. Don't guess field names.
-- After each task: build_runner, flutter analyze (0 issues), flutter test. Fix before moving on.
-- Small commits, conventional messages. Don't edit generated files by hand.
-- Don't add packages outside PLAN.md §3 without noting why in the commit message.
-```
+See `CLAUDE.md` at the repo root. The v1 migration adds its own rules at the top of that file (see `docs/v1-migration-plan.md`).
 
 ---
 

@@ -1,6 +1,6 @@
 import '../../../core/network/api_client.dart';
 import '../domain/models/booking_request.dart';
-import '../domain/models/booking_response.dart';
+import '../domain/models/booking_result.dart';
 
 class PatientLookupResult {
   const PatientLookupResult({
@@ -18,12 +18,19 @@ class PatientLookupResult {
   final String? gender;
 
   factory PatientLookupResult.fromJson(Map<String, dynamic> json) {
+    final patientRaw = json['patient'];
+    final patient = patientRaw is Map
+        ? Map<String, dynamic>.from(patientRaw)
+        : const <String, dynamic>{};
+    final gender = patient['gender'] is String
+        ? (patient['gender'] as String).toLowerCase()
+        : null;
     return PatientLookupResult(
       found: json['found'] == true,
-      name: json['patient_name'] as String? ?? json['name'] as String?,
-      phone: json['phone'] as String?,
-      age: (json['patient_age'] as num?)?.toInt() ?? (json['age'] as num?)?.toInt(),
-      gender: json['gender'] as String?,
+      name: patient['name'] as String?,
+      phone: patient['phone'] as String?,
+      age: (patient['age'] as num?)?.toInt(),
+      gender: gender == null || gender.isEmpty ? null : gender,
     );
   }
 }
@@ -33,9 +40,13 @@ class BookingRepository {
 
   final ApiClient _apiClient;
 
-  Future<bool> sendOtp({
+  /// Sends a real OTP and returns its `expires_in` seconds.
+  ///
+  /// The code goes on the booking or call-lead POST as `otp_code`; the app
+  /// never calls the verify endpoint first.
+  Future<int?> sendOtp({
     required String phone,
-    required String purpose, // 'doctor_booking' or 'test_booking'
+    required String purpose,
   }) async {
     final response = await _apiClient.post(
       '/bookings/otp/send/',
@@ -44,23 +55,11 @@ class BookingRepository {
         'purpose': purpose,
       },
     );
-    return response.statusCode == 200 || response.statusCode == 201;
-  }
-
-  Future<bool> verifyOtp({
-    required String phone,
-    required String code,
-    required String purpose,
-  }) async {
-    final response = await _apiClient.post(
-      '/bookings/otp/verify/',
-      data: {
-        'phone': phone,
-        'code': code,
-        'purpose': purpose,
-      },
-    );
-    return response.statusCode == 200;
+    final data = response.data;
+    if (data is Map && data['expires_in'] != null) {
+      return (data['expires_in'] as num?)?.toInt();
+    }
+    return null;
   }
 
   Future<PatientLookupResult> lookupPatient(String phone) async {
@@ -70,7 +69,9 @@ class BookingRepository {
         queryParameters: {'phone': phone},
       );
       if (response.data is Map<String, dynamic>) {
-        return PatientLookupResult.fromJson(response.data as Map<String, dynamic>);
+        return PatientLookupResult.fromJson(
+          response.data as Map<String, dynamic>,
+        );
       }
     } catch (_) {
       // Lookup is best-effort
@@ -78,19 +79,85 @@ class BookingRepository {
     return const PatientLookupResult(found: false);
   }
 
-  Future<BookingResponse> bookDoctor(DoctorBookingRequest request) async {
+  Future<DoctorBookingResult> bookDoctor(DoctorBookingRequest request) async {
     final response = await _apiClient.post(
       '/bookings/doctor/',
       data: request.toJson(),
     );
-    return BookingResponse.fromJson(response.data as Map<String, dynamic>);
+    return DoctorBookingResult.fromJson(
+      response.data as Map<String, dynamic>,
+    );
   }
 
-  Future<BookingResponse> bookTest(TestBookingRequest request) async {
+  Future<TestBookingResult> bookTest(TestBookingRequest request) async {
     final response = await _apiClient.post(
       '/bookings/test/',
       data: request.toJson(),
     );
-    return BookingResponse.fromJson(response.data as Map<String, dynamic>);
+    return TestBookingResult.fromJson(
+      response.data as Map<String, dynamic>,
+    );
+  }
+
+  /// Books one of a hospital's services. Created `pending`; the hospital
+  /// contacts the patient to confirm.
+  Future<HospitalServiceBookingResult> bookHospitalService({
+    required String hospitalId,
+    required String serviceId,
+    required String bookingDate,
+    required String preferredTime,
+    required String patientName,
+    required String patientPhone,
+    required String otpCode,
+    int? patientAge,
+    String? patientGender,
+    String? notes,
+  }) async {
+    final response = await _apiClient.post(
+      '/bookings/hospital-service/',
+      data: {
+        'hospital_id': hospitalId,
+        'service_id': serviceId,
+        'booking_date': bookingDate,
+        'preferred_time': preferredTime,
+        'patient_name': patientName,
+        'patient_phone': patientPhone,
+        'otp_code': otpCode,
+        if (patientAge != null) 'patient_age': patientAge,
+        if (patientGender != null && patientGender.isNotEmpty)
+          'patient_gender': patientGender,
+        if (notes != null && notes.isNotEmpty) 'notes': notes,
+      },
+    );
+    return HospitalServiceBookingResult.fromJson(
+      response.data as Map<String, dynamic>,
+    );
+  }
+
+  /// `call_only` chambers: logs the lead and returns the chamber's numbers.
+  /// No booking is created.
+  Future<CallLeadResult> createCallLead({
+    required String affiliationId,
+    required String patientName,
+    required String patientPhone,
+    required String otpCode,
+    int? patientAge,
+    String? patientGender,
+  }) async {
+    final response = await _apiClient.post(
+      '/bookings/call-leads/',
+      data: {
+        'affiliation_id': affiliationId,
+        'patient_name': patientName,
+        'patient_phone': patientPhone,
+        'otp_code': otpCode,
+        if (patientAge != null) 'patient_age': patientAge,
+        if (patientGender != null && patientGender.isNotEmpty)
+          'patient_gender': patientGender,
+      },
+    );
+    return CallLeadResult.fromJson(
+      response.data as Map<String, dynamic>,
+    );
   }
 }

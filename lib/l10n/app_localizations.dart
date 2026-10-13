@@ -740,6 +740,324 @@ abstract class AppLocalizations {
   /// **'Resend in {seconds}s'**
   String resendIn(int seconds);
 
+  /// No description provided for @otpInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the 6-digit code'**
+  String get otpInvalid;
+
+  /// No description provided for @otpTooManyAttempts.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many attempts. Please wait a minute.'**
+  String get otpTooManyAttempts;
+
+  /// No description provided for @badgeInstantBooking.
+  ///
+  /// In en, this message translates to:
+  /// **'Instant booking'**
+  String get badgeInstantBooking;
+
+  /// No description provided for @badgeBookingByRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking by request'**
+  String get badgeBookingByRequest;
+
+  /// No description provided for @badgeBookByPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Book by phone'**
+  String get badgeBookByPhone;
+
+  /// No description provided for @ctaBookAppointment.
+  ///
+  /// In en, this message translates to:
+  /// **'Book appointment'**
+  String get ctaBookAppointment;
+
+  /// No description provided for @ctaRequestAppointment.
+  ///
+  /// In en, this message translates to:
+  /// **'Request appointment'**
+  String get ctaRequestAppointment;
+
+  /// No description provided for @ctaGetPhoneNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Get phone number'**
+  String get ctaGetPhoneNumber;
+
+  /// No description provided for @ctaSendRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Send request'**
+  String get ctaSendRequest;
+
+  /// No description provided for @selectSession.
+  ///
+  /// In en, this message translates to:
+  /// **'Select session'**
+  String get selectSession;
+
+  /// No description provided for @selectASession.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a session'**
+  String get selectASession;
+
+  /// No description provided for @noSessionsForDay.
+  ///
+  /// In en, this message translates to:
+  /// **'No sessions available for this day'**
+  String get noSessionsForDay;
+
+  /// No description provided for @noChambers.
+  ///
+  /// In en, this message translates to:
+  /// **'No chambers listed'**
+  String get noChambers;
+
+  /// No description provided for @noChambersDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'This doctor has no chambers listed yet.'**
+  String get noChambersDesc;
+
+  /// No description provided for @goBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Go back'**
+  String get goBack;
+
+  /// No description provided for @sessionFull.
+  ///
+  /// In en, this message translates to:
+  /// **'Full'**
+  String get sessionFull;
+
+  /// No description provided for @sessionEnded.
+  ///
+  /// In en, this message translates to:
+  /// **'Ended'**
+  String get sessionEnded;
+
+  /// No description provided for @sessionClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'Closed'**
+  String get sessionClosed;
+
+  /// No description provided for @sessionSeatsLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} left'**
+  String sessionSeatsLeft(int count);
+
+  /// No description provided for @nextSerialNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Next serial #{number}'**
+  String nextSerialNumber(int number);
+
+  /// No description provided for @approxTime.
+  ///
+  /// In en, this message translates to:
+  /// **'approx. {time}'**
+  String approxTime(String time);
+
+  /// No description provided for @tooLateToRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Too late to request — call the chamber'**
+  String get tooLateToRequest;
+
+  /// No description provided for @morningSession.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning'**
+  String get morningSession;
+
+  /// No description provided for @eveningSession.
+  ///
+  /// In en, this message translates to:
+  /// **'Evening'**
+  String get eveningSession;
+
+  /// No description provided for @requestSentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Request sent'**
+  String get requestSentTitle;
+
+  /// No description provided for @requestWillCall.
+  ///
+  /// In en, this message translates to:
+  /// **'{facility} will call you at {phone} to confirm. You\'ll also get an SMS.'**
+  String requestWillCall(String facility, String phone);
+
+  /// No description provided for @expectCallBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Expect a call by {deadline}'**
+  String expectCallBy(String deadline);
+
+  /// No description provided for @beforeSessionStarts.
+  ///
+  /// In en, this message translates to:
+  /// **'before the session starts'**
+  String get beforeSessionStarts;
+
+  /// No description provided for @confirmedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re booked'**
+  String get confirmedTitle;
+
+  /// No description provided for @serialBySms.
+  ///
+  /// In en, this message translates to:
+  /// **'Your serial will come by SMS'**
+  String get serialBySms;
+
+  /// No description provided for @bookingIdLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking ID'**
+  String get bookingIdLabel;
+
+  /// No description provided for @bookingNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'This booking isn\'t loaded'**
+  String get bookingNotFound;
+
+  /// No description provided for @bookingNotLoadedDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the booking again from the doctor\'s profile.'**
+  String get bookingNotLoadedDesc;
+
+  /// No description provided for @backToDoctors.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to doctors'**
+  String get backToDoctors;
+
+  /// No description provided for @genderOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get genderOther;
+
+  /// No description provided for @patientAge.
+  ///
+  /// In en, this message translates to:
+  /// **'Age (optional)'**
+  String get patientAge;
+
+  /// No description provided for @patientAgeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Years'**
+  String get patientAgeHint;
+
+  /// No description provided for @patientGender.
+  ///
+  /// In en, this message translates to:
+  /// **'Gender (optional)'**
+  String get patientGender;
+
+  /// No description provided for @sendRequestNote.
+  ///
+  /// In en, this message translates to:
+  /// **'The chamber will call {phone} to confirm'**
+  String sendRequestNote(String phone);
+
+  /// No description provided for @nextAvailableShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Next: {day} {time} · {count} left'**
+  String nextAvailableShort(String day, String time, int count);
+
+  /// No description provided for @callToBook.
+  ///
+  /// In en, this message translates to:
+  /// **'Call'**
+  String get callToBook;
+
+  /// No description provided for @callDuringHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Call during these hours'**
+  String get callDuringHours;
+
+  /// No description provided for @weeklyHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly hours'**
+  String get weeklyHours;
+
+  /// No description provided for @labWillContact.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking received — the lab will contact you to confirm'**
+  String get labWillContact;
+
+  /// No description provided for @serviceNotOffered.
+  ///
+  /// In en, this message translates to:
+  /// **'This hospital doesn\'t offer this service'**
+  String get serviceNotOffered;
+
+  /// No description provided for @preferredTimeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferred time'**
+  String get preferredTimeLabel;
+
+  /// No description provided for @prefTimeMorning.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning (9 am–12 pm)'**
+  String get prefTimeMorning;
+
+  /// No description provided for @prefTimeAfternoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Afternoon (12–4 pm)'**
+  String get prefTimeAfternoon;
+
+  /// No description provided for @prefTimeEvening.
+  ///
+  /// In en, this message translates to:
+  /// **'Evening (4–8 pm)'**
+  String get prefTimeEvening;
+
+  /// No description provided for @prefTimeAny.
+  ///
+  /// In en, this message translates to:
+  /// **'Any time'**
+  String get prefTimeAny;
+
+  /// No description provided for @notesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes (optional)'**
+  String get notesLabel;
+
+  /// No description provided for @serviceRequestReceived.
+  ///
+  /// In en, this message translates to:
+  /// **'Request received — {facility} will contact you to confirm'**
+  String serviceRequestReceived(String facility);
+
+  /// No description provided for @sessionWindow.
+  ///
+  /// In en, this message translates to:
+  /// **'{start}–{end}'**
+  String sessionWindow(String start, String end);
+
   /// No description provided for @bookedSuccessTitle.
   ///
   /// In en, this message translates to:
@@ -878,6 +1196,24 @@ abstract class AppLocalizations {
   /// **'Home pickup (+৳{charge})'**
   String homePickupOption(String charge);
 
+  /// No description provided for @pickupThana.
+  ///
+  /// In en, this message translates to:
+  /// **'Pickup thana'**
+  String get pickupThana;
+
+  /// No description provided for @selectThana.
+  ///
+  /// In en, this message translates to:
+  /// **'Select thana'**
+  String get selectThana;
+
+  /// No description provided for @pickupThanaRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Pickup thana is required'**
+  String get pickupThanaRequired;
+
   /// No description provided for @pickupAddress.
   ///
   /// In en, this message translates to:
@@ -901,6 +1237,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Preferred Time Window'**
   String get timeWindow;
+
+  /// No description provided for @hospitalNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Hospital not found'**
+  String get hospitalNotFound;
+
+  /// No description provided for @hospitalNotFoundDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'It may have been removed. Go back and try another hospital.'**
+  String get hospitalNotFoundDesc;
+
+  /// No description provided for @doctorsHere.
+  ///
+  /// In en, this message translates to:
+  /// **'Doctors here ({count})'**
+  String doctorsHere(int count);
+
+  /// No description provided for @testsHere.
+  ///
+  /// In en, this message translates to:
+  /// **'Tests here ({count})'**
+  String testsHere(int count);
+
+  /// No description provided for @servicesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Services'**
+  String get servicesTitle;
+
+  /// No description provided for @phoneLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get phoneLabel;
+
+  /// No description provided for @emergencyPhoneLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Emergency'**
+  String get emergencyPhoneLabel;
+
+  /// No description provided for @ambulancePhoneLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Ambulance'**
+  String get ambulancePhoneLabel;
 
   /// No description provided for @hospitalsTitle.
   ///
@@ -943,6 +1327,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'LAB TEST'**
   String get labTestTag;
+
+  /// No description provided for @hospitalServiceTag.
+  ///
+  /// In en, this message translates to:
+  /// **'HOSPITAL SERVICE'**
+  String get hospitalServiceTag;
+
+  /// No description provided for @statusConfirmedTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmed'**
+  String get statusConfirmedTag;
+
+  /// No description provided for @awaitingConfirmationTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Awaiting confirmation'**
+  String get awaitingConfirmationTag;
+
+  /// No description provided for @awaitingLabTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Awaiting lab'**
+  String get awaitingLabTag;
+
+  /// No description provided for @awaitingHospitalTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Awaiting hospital'**
+  String get awaitingHospitalTag;
+
+  /// No description provided for @notConfirmedInTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Not confirmed in time. If you didn\'t get an SMS, call the chamber.'**
+  String get notConfirmedInTime;
+
+  /// No description provided for @toCancelCall.
+  ///
+  /// In en, this message translates to:
+  /// **'To cancel, call {facility}'**
+  String toCancelCall(String facility);
 
   /// No description provided for @cancelBooking.
   ///
@@ -1027,6 +1453,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'বাংলা'**
   String get bangla;
+
+  /// No description provided for @updateRequiredTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Update required'**
+  String get updateRequiredTitle;
+
+  /// No description provided for @updateRequiredFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'Please update the app to continue.'**
+  String get updateRequiredFallback;
+
+  /// No description provided for @updateAvailableMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'A new version of the app is available.'**
+  String get updateAvailableMessage;
+
+  /// No description provided for @updateSoonMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This version will stop working soon. Please update.'**
+  String get updateSoonMessage;
+
+  /// No description provided for @updateNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Update now'**
+  String get updateNow;
+
+  /// No description provided for @errBookingModeCallOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'This chamber takes bookings by phone only. Please call the chamber.'**
+  String get errBookingModeCallOnly;
+
+  /// No description provided for @errRequestTooLate.
+  ///
+  /// In en, this message translates to:
+  /// **'Too late to request this session. Please call the chamber.'**
+  String get errRequestTooLate;
+
+  /// No description provided for @errNotCallMode.
+  ///
+  /// In en, this message translates to:
+  /// **'This chamber no longer takes phone bookings.'**
+  String get errNotCallMode;
+
+  /// No description provided for @errNoNumbers.
+  ///
+  /// In en, this message translates to:
+  /// **'This chamber has no phone number listed yet. Please try another chamber.'**
+  String get errNoNumbers;
+
+  /// No description provided for @usualPriceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Usual price: {price}'**
+  String usualPriceLabel(String price);
+
+  /// No description provided for @priceAtCounter.
+  ///
+  /// In en, this message translates to:
+  /// **'Price at counter'**
+  String get priceAtCounter;
+
+  /// No description provided for @priceConfirmedAtLab.
+  ///
+  /// In en, this message translates to:
+  /// **'Price confirmed at the lab'**
+  String get priceConfirmedAtLab;
+
+  /// No description provided for @currentlyUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Currently unavailable'**
+  String get currentlyUnavailable;
+
+  /// No description provided for @testNotLoaded.
+  ///
+  /// In en, this message translates to:
+  /// **'This test isn\'t loaded'**
+  String get testNotLoaded;
+
+  /// No description provided for @testNotLoadedDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Open it again from the tests list.'**
+  String get testNotLoadedDesc;
+
+  /// No description provided for @backToTests.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to tests'**
+  String get backToTests;
 }
 
 class _AppLocalizationsDelegate

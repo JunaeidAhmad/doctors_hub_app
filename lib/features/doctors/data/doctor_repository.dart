@@ -1,5 +1,6 @@
 import '../../../core/network/api_client.dart';
 import '../../../core/network/unwrap_list.dart';
+import '../domain/models/availability.dart';
 import '../domain/models/doctor.dart';
 import '../domain/models/specialty.dart';
 
@@ -14,10 +15,7 @@ class DoctorRepository {
       return _cachedSpecialties!;
     }
 
-    final response = await _apiClient.get(
-      '/specialties/',
-      queryParameters: {'canonical_only': true},
-    );
+    final response = await _apiClient.get('/specialties/');
 
     final paginated = unwrapList<Specialty>(
       response.data,
@@ -30,14 +28,10 @@ class DoctorRepository {
   Future<PaginatedList<Doctor>> searchDoctors({
     String? search,
     String? specialty,
-    String? division,
     int? divisionId,
-    String? district,
     int? districtId,
-    String? area,
     int? thanaId,
-    String? hospital,
-    String? facility,
+    String? facilityId,
     String? day,
     String? gender,
     int page = 1,
@@ -51,51 +45,25 @@ class DoctorRepository {
     if (search != null && search.trim().isNotEmpty) {
       queryParams['search'] = search.trim();
     }
-    if (specialty != null && specialty.isNotEmpty && specialty.toLowerCase() != 'all') {
+    if (specialty != null && specialty.isNotEmpty) {
       queryParams['specialty'] = specialty;
-    }
-    if (division != null &&
-        division.isNotEmpty &&
-        division.toLowerCase() != 'all' &&
-        division.toLowerCase() != 'all bangladesh') {
-      queryParams['division'] = division;
     }
     if (divisionId != null) {
       queryParams['division_id'] = divisionId;
     }
-    if (district != null &&
-        district.isNotEmpty &&
-        district.toLowerCase() != 'all' &&
-        district.toLowerCase() != 'all districts') {
-      queryParams['district'] = district;
-    }
     if (districtId != null) {
       queryParams['district_id'] = districtId;
-    }
-    if (area != null &&
-        area.isNotEmpty &&
-        area.toLowerCase() != 'all' &&
-        area.toLowerCase() != 'all areas') {
-      queryParams['area'] = area;
     }
     if (thanaId != null) {
       queryParams['thana_id'] = thanaId;
     }
-    final effectiveFacility = facility ?? hospital;
-    if (effectiveFacility != null &&
-        effectiveFacility.isNotEmpty &&
-        effectiveFacility.toLowerCase() != 'all') {
-      queryParams['facility'] = effectiveFacility;
+    if (facilityId != null && facilityId.isNotEmpty) {
+      queryParams['facility_id'] = facilityId;
     }
-    if (day != null &&
-        day.isNotEmpty &&
-        day.toLowerCase() != 'all' &&
-        day.toLowerCase() != 'all days') {
+    if (day != null && day.isNotEmpty) {
       queryParams['day'] = day;
     }
-    if (gender != null &&
-        gender.isNotEmpty &&
-        gender.toLowerCase() != 'all') {
+    if (gender != null && gender.isNotEmpty) {
       queryParams['gender'] = gender;
     }
 
@@ -113,5 +81,22 @@ class DoctorRepository {
   Future<Doctor> getDoctorDetails(String idOrSlug) async {
     final response = await _apiClient.get('/doctors/$idOrSlug/');
     return Doctor.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  Future<AffiliationAvailability> getAvailability(
+    String chamberId, {
+    required String from,
+    int days = 14,
+  }) async {
+    final response = await _apiClient.get(
+      '/affiliations/$chamberId/availability/',
+      queryParameters: {
+        'from': from,
+        'days': days,
+      },
+    );
+    return AffiliationAvailability.fromJson(
+      response.data as Map<String, dynamic>,
+    );
   }
 }

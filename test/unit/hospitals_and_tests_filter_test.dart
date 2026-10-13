@@ -10,7 +10,7 @@ import 'package:doctors_hub_app/features/hospitals/domain/models/hospital.dart';
 import 'package:doctors_hub_app/features/hospitals/domain/models/hospital_category.dart';
 import 'package:doctors_hub_app/features/hospitals/presentation/hospitals_screen.dart';
 import 'package:doctors_hub_app/features/tests/data/test_repository.dart';
-import 'package:doctors_hub_app/features/tests/domain/models/diagnostic_test.dart';
+import 'package:doctors_hub_app/features/tests/domain/models/test_search.dart';
 import 'package:doctors_hub_app/features/tests/domain/models/test_category.dart';
 import 'package:doctors_hub_app/features/tests/presentation/tests_catalogue_screen.dart';
 import 'package:doctors_hub_app/features/location/domain/models/division.dart';
@@ -24,11 +24,8 @@ class MockHospitalRepository extends HospitalRepository {
   Future<PaginatedList<Hospital>> getHospitals({
     String? search,
     String? category,
-    String? division,
     int? divisionId,
-    String? district,
     int? districtId,
-    String? area,
     int? thanaId,
     String? ownershipType,
     int page = 1,
@@ -47,13 +44,26 @@ class MockTestRepository extends TestRepository {
   MockTestRepository() : super(ApiClient());
 
   @override
-  Future<PaginatedList<DiagnosticTest>> getTests({
-    String? category,
-    String? search,
+  Future<TestSearchPage> searchTests({
+    String? q,
+    String? testcat,
+    int? divisionId,
+    int? districtId,
+    int? thanaId,
+    String? locationId,
+    String? locationName,
+    String? fulfillment,
+    String? ownership,
+    String ordering = 'price',
     int page = 1,
     int pageSize = 20,
   }) async {
-    return const PaginatedList(results: [], count: 0);
+    return const TestSearchPage(
+      groups: [],
+      count: 0,
+      next: null,
+      facets: TestSearchFacets(),
+    );
   }
 
   @override

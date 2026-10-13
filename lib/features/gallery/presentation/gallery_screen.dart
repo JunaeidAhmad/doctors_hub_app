@@ -15,7 +15,6 @@ import '../../../core/widgets/primary_cta_button.dart';
 import '../../../core/widgets/radio_row.dart';
 import '../../../core/widgets/rule_grid.dart';
 import '../../../core/widgets/skeleton_row.dart';
-import '../../../core/widgets/slot_grid.dart';
 
 class GalleryScreen extends StatefulWidget {
   const GalleryScreen({super.key});
@@ -27,7 +26,6 @@ class GalleryScreen extends StatefulWidget {
 class _GalleryScreenState extends State<GalleryScreen> {
   String? _dropdownVal = '1';
   int _radioVal = 1;
-  String? _selectedSlot = '18:00';
   DateTime _selectedDate = DateTime.now();
 
   @override
@@ -130,25 +128,6 @@ class _GalleryScreenState extends State<GalleryScreen> {
               }),
               selectedDate: _selectedDate,
               onDateSelected: (d) => setState(() => _selectedDate = d),
-            ),
-            const SizedBox(height: 16),
-
-            const Kicker('SLOT GRID'),
-            const SizedBox(height: 10),
-            SlotGrid(
-              groups: const [
-                ShiftSlotGroup(
-                  shiftName: 'Evening Shift',
-                  slots: [
-                    TimeSlot(timeString: '18:00', displayLabel: '06:00 PM'),
-                    TimeSlot(timeString: '18:30', displayLabel: '06:30 PM'),
-                    TimeSlot(timeString: '19:00', displayLabel: '07:00 PM', isBooked: true),
-                    TimeSlot(timeString: '19:30', displayLabel: '07:30 PM'),
-                  ],
-                ),
-              ],
-              selectedSlot: _selectedSlot,
-              onSlotSelected: (s) => setState(() => _selectedSlot = s.timeString),
             ),
             const SizedBox(height: 16),
 

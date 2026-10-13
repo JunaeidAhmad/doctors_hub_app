@@ -173,6 +173,110 @@
     }
   },
 
+  "otpInvalid": "Enter the 6-digit code",
+  "otpTooManyAttempts": "Too many attempts. Please wait a minute.",
+
+  "badgeInstantBooking": "Instant booking",
+  "badgeBookingByRequest": "Booking by request",
+  "badgeBookByPhone": "Book by phone",
+  "ctaBookAppointment": "Book appointment",
+  "ctaRequestAppointment": "Request appointment",
+  "ctaGetPhoneNumber": "Get phone number",
+  "ctaSendRequest": "Send request",
+  "selectSession": "Select session",
+  "selectASession": "Select a session",
+  "noSessionsForDay": "No sessions available for this day",
+  "noChambers": "No chambers listed",
+  "noChambersDesc": "This doctor has no chambers listed yet.",
+  "goBack": "Go back",
+  "sessionFull": "Full",
+  "sessionEnded": "Ended",
+  "sessionClosed": "Closed",
+  "sessionSeatsLeft": "{count} left",
+  "@sessionSeatsLeft": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "nextSerialNumber": "Next serial #{number}",
+  "@nextSerialNumber": {
+    "placeholders": {
+      "number": {"type": "int"}
+    }
+  },
+  "approxTime": "approx. {time}",
+  "@approxTime": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "tooLateToRequest": "Too late to request — call the chamber",
+  "morningSession": "Morning",
+  "eveningSession": "Evening",
+  "requestSentTitle": "Request sent",
+  "requestWillCall": "{facility} will call you at {phone} to confirm. You'll also get an SMS.",
+  "@requestWillCall": {
+    "placeholders": {
+      "facility": {"type": "String"},
+      "phone": {"type": "String"}
+    }
+  },
+  "expectCallBy": "Expect a call by {deadline}",
+  "@expectCallBy": {
+    "placeholders": {
+      "deadline": {"type": "String"}
+    }
+  },
+  "beforeSessionStarts": "before the session starts",
+  "confirmedTitle": "You're booked",
+  "serialBySms": "Your serial will come by SMS",
+  "bookingIdLabel": "Booking ID",
+  "bookingNotFound": "This booking isn't loaded",
+  "bookingNotLoadedDesc": "Open the booking again from the doctor's profile.",
+  "backToDoctors": "Back to doctors",
+  "genderOther": "Other",
+  "patientAge": "Age (optional)",
+  "patientAgeHint": "Years",
+  "patientGender": "Gender (optional)",
+  "sendRequestNote": "The chamber will call {phone} to confirm",
+  "@sendRequestNote": {
+    "placeholders": {
+      "phone": {"type": "String"}
+    }
+  },
+  "nextAvailableShort": "Next: {day} {time} · {count} left",
+  "@nextAvailableShort": {
+    "placeholders": {
+      "day": {"type": "String"},
+      "time": {"type": "String"},
+      "count": {"type": "int"}
+    }
+  },
+  "callToBook": "Call",
+  "callDuringHours": "Call during these hours",
+  "weeklyHours": "Weekly hours",
+  "labWillContact": "Booking received — the lab will contact you to confirm",
+  "serviceNotOffered": "This hospital doesn't offer this service",
+  "preferredTimeLabel": "Preferred time",
+  "prefTimeMorning": "Morning (9 am–12 pm)",
+  "prefTimeAfternoon": "Afternoon (12–4 pm)",
+  "prefTimeEvening": "Evening (4–8 pm)",
+  "prefTimeAny": "Any time",
+  "notesLabel": "Notes (optional)",
+  "serviceRequestReceived": "Request received — {facility} will contact you to confirm",
+  "@serviceRequestReceived": {
+    "placeholders": {
+      "facility": {"type": "String"}
+    }
+  },
+  "sessionWindow": "{start}–{end}",
+  "@sessionWindow": {
+    "placeholders": {
+      "start": {"type": "String"},
+      "end": {"type": "String"}
+    }
+  },
+
   "bookedSuccessTitle": "You're booked!",
   "bookingRef": "Booking Ref",
   "serialNumber": "Serial Number",
@@ -218,11 +322,32 @@
       "charge": {"type": "String"}
     }
   },
+  "pickupThana": "Pickup thana",
+  "selectThana": "Select thana",
+  "pickupThanaRequired": "Pickup thana is required",
   "pickupAddress": "Home Pickup Address",
   "pickupAddressHint": "House, Road, Area, Landmark...",
   "addressRequired": "Pickup address is required for home collection",
   "timeWindow": "Preferred Time Window",
 
+  "hospitalNotFound": "Hospital not found",
+  "hospitalNotFoundDesc": "It may have been removed. Go back and try another hospital.",
+  "doctorsHere": "Doctors here ({count})",
+  "@doctorsHere": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "testsHere": "Tests here ({count})",
+  "@testsHere": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "servicesTitle": "Services",
+  "phoneLabel": "Phone",
+  "emergencyPhoneLabel": "Emergency",
+  "ambulancePhoneLabel": "Ambulance",
   "hospitalsTitle": "Hospitals & Diagnostic Centers",
   "searchHospitalsPlaceholder": "Search hospital name or area...",
 
@@ -236,6 +361,18 @@
   "savedOnPhone": "Saved on this phone",
   "doctorVisitTag": "DOCTOR VISIT",
   "labTestTag": "LAB TEST",
+  "hospitalServiceTag": "HOSPITAL SERVICE",
+  "statusConfirmedTag": "Confirmed",
+  "awaitingConfirmationTag": "Awaiting confirmation",
+  "awaitingLabTag": "Awaiting lab",
+  "awaitingHospitalTag": "Awaiting hospital",
+  "notConfirmedInTime": "Not confirmed in time. If you didn't get an SMS, call the chamber.",
+  "toCancelCall": "To cancel, call {facility}",
+  "@toCancelCall": {
+    "placeholders": {
+      "facility": {"type": "String"}
+    }
+  },
   "cancelBooking": "Cancel",
   "cancelDialogTitle": "Cancel Appointment",
   "cancelDialogMessage": "To cancel your appointment with the chamber, please call the facility directly at {phone}.",
@@ -255,5 +392,29 @@
   "networkError": "Unable to connect. Please check your internet connection.",
   "language": "Language",
   "english": "English",
-  "bangla": "বাংলা"
+  "bangla": "বাংলা",
+
+  "updateRequiredTitle": "Update required",
+  "updateRequiredFallback": "Please update the app to continue.",
+  "updateAvailableMessage": "A new version of the app is available.",
+  "updateSoonMessage": "This version will stop working soon. Please update.",
+  "updateNow": "Update now",
+
+  "errBookingModeCallOnly": "This chamber takes bookings by phone only. Please call the chamber.",
+  "errRequestTooLate": "Too late to request this session. Please call the chamber.",
+  "errNotCallMode": "This chamber no longer takes phone bookings.",
+  "errNoNumbers": "This chamber has no phone number listed yet. Please try another chamber.",
+
+  "usualPriceLabel": "Usual price: {price}",
+  "@usualPriceLabel": {
+    "placeholders": {
+      "price": {"type": "String"}
+    }
+  },
+  "priceAtCounter": "Price at counter",
+  "priceConfirmedAtLab": "Price confirmed at the lab",
+  "currentlyUnavailable": "Currently unavailable",
+  "testNotLoaded": "This test isn't loaded",
+  "testNotLoadedDesc": "Open it again from the tests list.",
+  "backToTests": "Back to tests"
 }

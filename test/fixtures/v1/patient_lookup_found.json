@@ -1,0 +1,13 @@
+{
+  "found": true,
+  "patient": {
+    "id": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
+    "name": "Rahim Uddin",
+    "phone": "01712345678",
+    "age": 34,
+    "gender": "male",
+    "blood_group": "B+",
+    "address": "Dhanmondi, Dhaka",
+    "created_at": "2026-09-01T10:00:00+06:00"
+  }
+}

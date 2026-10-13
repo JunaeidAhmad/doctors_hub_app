@@ -10,6 +10,9 @@ import '../../../core/widgets/kicker.dart';
 import '../../../core/widgets/photo_placeholder.dart';
 import '../../../core/widgets/skeleton_row.dart';
 import '../../../core/widgets/sticky_cta_bar.dart';
+import '../../../l10n/app_localizations.dart';
+import '../../booking/domain/booking_mode.dart';
+import '../domain/models/chamber.dart';
 import '../domain/models/doctor.dart';
 
 final doctorDetailsProvider =
@@ -64,6 +67,11 @@ class DoctorProfileScreen extends ConsumerWidget {
 
   Widget _buildProfile(BuildContext context, Doctor doctor, bool isBn) {
     final minFee = doctor.minFee;
+    final l10n = AppLocalizations.of(context)!;
+    final primaryChamber = doctor.primaryChamber;
+    final view = primaryChamber == null
+        ? null
+        : bookingModeView(primaryChamber);
 
     return DhScaffold(
       body: SafeArea(
@@ -171,21 +179,22 @@ class DoctorProfileScreen extends ConsumerWidget {
                         children: [
                           _buildStatItem(
                             label: isBn ? 'অভিজ্ঞতা' : 'EXPERIENCE',
-                            value: doctor.experience != null && doctor.experience!.isNotEmpty
-                                ? '${doctor.experience} yrs'
-                                : '10+ yrs',
+                            value: doctor.experience != null &&
+                                    doctor.experience!.isNotEmpty
+                                ? doctor.experience!
+                                : '—',
                           ),
                           _buildStatDivider(),
                           _buildStatItem(
                             label: isBn ? 'রেটিং' : 'RATING',
                             value: doctor.rating != null && doctor.rating! > 0
                                 ? '★ ${doctor.rating!.toStringAsFixed(1)}'
-                                : '★ 4.8',
+                                : '—',
                           ),
                           _buildStatDivider(),
                           _buildStatItem(
                             label: isBn ? 'চেম্বার' : 'CHAMBERS',
-                            value: '${doctor.affiliations.length}',
+                            value: '${doctor.chambers.length}',
                           ),
                         ],
                       ),
@@ -227,7 +236,7 @@ class DoctorProfileScreen extends ConsumerWidget {
                             style: AppTypography.h2,
                           ),
                           const SizedBox(height: 14),
-                          ...doctor.affiliations.map((aff) {
+                          ...doctor.chambers.map((aff) {
                             return Container(
                               margin: const EdgeInsets.only(bottom: 12),
                               decoration: BoxDecoration(
@@ -249,20 +258,45 @@ class DoctorProfileScreen extends ConsumerWidget {
                                           style: AppTypography.h2.copyWith(fontSize: 16),
                                         ),
                                       ),
-                                      Text(
-                                        '৳${aff.fee.toInt()}',
-                                        style: AppTypography.h2.copyWith(
-                                          fontSize: 16,
-                                          color: AppColors.accent,
+                                      if (aff.fee != null)
+                                        Text(
+                                          '৳${aff.fee!.toInt()}',
+                                          style: AppTypography.h2.copyWith(
+                                            fontSize: 16,
+                                            color: AppColors.accent,
+                                          ),
                                         ),
-                                      ),
                                     ],
                                   ),
-                                  if (aff.addressLine != null) ...[
+                                  if (aff.facility.address != null &&
+                                      aff.facility.address!.isNotEmpty) ...[
                                     const SizedBox(height: 4),
                                     Text(
-                                      aff.addressLine!,
+                                      aff.facility.address!,
                                       style: AppTypography.secondary,
+                                    ),
+                                  ],
+                                  if (bookingModeLabel(
+                                        bookingModeView(aff).badgeKey,
+                                        l10n,
+                                      ) !=
+                                      null) ...[
+                                    const SizedBox(height: 6),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 6,
+                                        vertical: 2,
+                                      ),
+                                      decoration: const BoxDecoration(
+                                        color: AppColors.fill,
+                                      ),
+                                      child: Text(
+                                        bookingModeLabel(
+                                          bookingModeView(aff).badgeKey,
+                                          l10n,
+                                        )!,
+                                        style: AppTypography.tag,
+                                      ),
                                     ),
                                   ],
                                   const SizedBox(height: 10),
@@ -326,17 +360,31 @@ class DoctorProfileScreen extends ConsumerWidget {
               ),
             ),
 
-            // Sticky Bottom CTA Bar
-            StickyCtaBar(
-              kicker: minFee != null
-                  ? (isBn ? 'ভিজিট ফি ৳${minFee.toInt()} থেকে' : 'Visit fee from ৳${minFee.toInt()}')
-                  : null,
-              subtitle: doctor.localizedName(isBn ? 'bn' : 'en'),
-              buttonLabel: isBn ? 'অ্যাপয়েন্টমেন্ট নিন' : 'Book a visit',
-              onPressed: () {
-                context.push('/doctors/${doctor.id}/book');
-              },
-            ),
+            // Sticky Bottom CTA Bar (no CTA for unknown booking modes)
+            if (view != null &&
+                primaryChamber != null &&
+                (view.canBook || view.mode == BookingMode.callOnly))
+              StickyCtaBar(
+                kicker: minFee != null
+                    ? (isBn
+                        ? 'ভিজিট ফি ৳${minFee.toInt()} থেকে'
+                        : 'Visit fee from ৳${minFee.toInt()}')
+                    : null,
+                subtitle: doctor.localizedName(isBn ? 'bn' : 'en'),
+                buttonLabel: bookingModeLabel(view.buttonKey, l10n) ??
+                    (isBn ? 'অ্যাপয়েন্টমেন্ট নিন' : 'Book a visit'),
+                onPressed: () {
+                  if (view.canBook) {
+                    context.push(
+                      '/doctors/${doctor.id}/book?chamber=${primaryChamber.id}',
+                    );
+                  } else {
+                    context.push(
+                      '/doctors/${doctor.id}/call?chamber=${primaryChamber.id}',
+                    );
+                  }
+                },
+              ),
           ],
         ),
       ),

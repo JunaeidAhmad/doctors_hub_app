@@ -1,0 +1,269 @@
+{
+  "count": 1581,
+  "next": "https://doctors-hub.onrender.com/api/v1/doctors/?page=2&page_size=50",
+  "previous": null,
+  "results": [
+    {
+      "id": "f137add8-4da6-4cbc-b4ab-3b5713bdda8b",
+      "slug": "a-b-siddique",
+      "name": "A B Siddique",
+      "bn_name": "এ বি সিদ্দিক",
+      "academic_title": "Associate Professor",
+      "qualification": "MBBS (DMCH), MRCS (England), FCPS (Surgery), MS (Urology)",
+      "institution": "Dhaka Medical College Hospital",
+      "experience": "",
+      "image": null,
+      "gender": "Male",
+      "bmdc_number": null,
+      "rating": null,
+      "review_count": 0,
+      "is_verified": true,
+      "primary_specialty": {
+        "id": "1932fda0-2ee7-4b66-a1ef-26d388ea1ffd",
+        "slug": "urologist",
+        "name": "Urologist",
+        "bn_name": "ইউরোলজিস্ট"
+      },
+      "specialties": [
+        {
+          "id": "1932fda0-2ee7-4b66-a1ef-26d388ea1ffd",
+          "slug": "urologist",
+          "name": "Urologist",
+          "bn_name": "ইউরোলজিস্ট"
+        }
+      ],
+      "chambers": [
+        {
+          "id": "755cb36e-8c8f-4249-b54e-c603cd573677",
+          "fee": "1200.00",
+          "chamber_type": "Visiting Consultant",
+          "booking_mode": "instant",
+          "facility": {
+            "id": "e4c14486-db00-40ef-b846-54486e036c7a",
+            "slug": "popular-diagnostic-centre-ltd-dhanmondi",
+            "display_name": "Popular Diagnostic Centre Ltd. (Dhanmondi)",
+            "area": "Dhanmondi",
+            "district": "Dhaka",
+            "address": "House 16, Road 2, Dhanmondi, Dhaka"
+          },
+          "schedules": [
+            {
+              "day_of_week": "Saturday",
+              "start_time": "18:00:00",
+              "end_time": "21:00:00"
+            },
+            {
+              "day_of_week": "Sunday",
+              "start_time": "18:00:00",
+              "end_time": "21:00:00"
+            },
+            {
+              "day_of_week": "Monday",
+              "start_time": "18:00:00",
+              "end_time": "21:00:00"
+            },
+            {
+              "day_of_week": "Tuesday",
+              "start_time": "18:00:00",
+              "end_time": "21:00:00"
+            },
+            {
+              "day_of_week": "Wednesday",
+              "start_time": "18:00:00",
+              "end_time": "21:00:00"
+            },
+            {
+              "day_of_week": "Thursday",
+              "start_time": "18:00:00",
+              "end_time": "21:00:00"
+            }
+          ],
+          "next_available": {
+            "date": "2026-10-13",
+            "session_key": "s:fa555d97-63a0-4feb-a539-af8219bc468d",
+            "session_start": "18:00",
+            "start_time": "18:00",
+            "estimated_time": "18:00",
+            "remaining": 30,
+            "capacity_remaining": 30
+          }
+        }
+      ],
+      "match_rank": null
+    },
+    {
+      "id": "01a0e8c3-64b1-7937-ab41-d7bc9524a901",
+      "slug": "dr-a-f-m-ariful-islam-nabin",
+      "name": "A F M Ariful Islam (Nabin)",
+      "bn_name": "এ এফ এম আরিফুল ইসলাম (নাবীন)",
+      "academic_title": "Assistant Professor",
+      "qualification": "MBBS, BCS (Health), FCPS (Surgery), FCPS (Plastic & Reconstructive Surgery)",
+      "institution": "Dhaka Medical College & Hospital (DMCH)",
+      "experience": "",
+      "image": null,
+      "gender": "Male",
+      "bmdc_number": null,
+      "rating": "4.90",
+      "review_count": 120,
+      "is_verified": true,
+      "primary_specialty": {
+        "id": "94d933c9-f0da-4ae4-9cdd-bf5173f657ee",
+        "slug": "plastic-surgeon",
+        "name": "Plastic Surgeon",
+        "bn_name": "প্লাস্টিক সার্জন"
+      },
+      "specialties": [
+        {
+          "id": "94d933c9-f0da-4ae4-9cdd-bf5173f657ee",
+          "slug": "plastic-surgeon",
+          "name": "Plastic Surgeon",
+          "bn_name": "প্লাস্টিক সার্জন"
+        },
+        {
+          "id": "5a22d5f1-41ef-4597-88f5-2d31947ce2cf",
+          "slug": "general-surgeon",
+          "name": "General Surgeon",
+          "bn_name": "জেনারেল সার্জন"
+        },
+        {
+          "id": "741fbc33-33fa-4db2-85db-0cff605f620e",
+          "slug": "laparoscopic-surgeon",
+          "name": "Laparoscopic Surgeon",
+          "bn_name": "ল্যাপারোস্কোপিক সার্জন"
+        }
+      ],
+      "chambers": [
+        {
+          "id": "01a0e8c3-679b-71ce-a5da-e71b4a83e679",
+          "fee": "1000.00",
+          "chamber_type": "Primary Chamber",
+          "booking_mode": "instant",
+          "facility": {
+            "id": "01a0e8c3-3529-712e-9a48-d82d4ba55f99",
+            "slug": "comfort-diagnostic-center-dhanmondi",
+            "display_name": "Comfort Diagnostic Center (Dhanmondi)",
+            "area": "Adabor",
+            "district": "Dhaka",
+            "address": "Comfort Tower, 167/B Green Road, Dhanmondi, Dhaka-1205, Bangladesh"
+          },
+          "schedules": [
+            {
+              "day_of_week": "Saturday",
+              "start_time": "19:00:00",
+              "end_time": "21:00:00"
+            },
+            {
+              "day_of_week": "Sunday",
+              "start_time": "19:00:00",
+              "end_time": "21:00:00"
+            },
+            {
+              "day_of_week": "Monday",
+              "start_time": "19:00:00",
+              "end_time": "21:00:00"
+            },
+            {
+              "day_of_week": "Tuesday",
+              "start_time": "19:00:00",
+              "end_time": "21:00:00"
+            },
+            {
+              "day_of_week": "Wednesday",
+              "start_time": "19:00:00",
+              "end_time": "21:00:00"
+            }
+          ],
+          "next_available": {
+            "date": "2026-10-13",
+            "session_key": "s:01a0e8c3-6a2e-7325-a36e-da6242c08f14",
+            "session_start": "19:00",
+            "start_time": "19:00",
+            "estimated_time": "19:00",
+            "remaining": 30,
+            "capacity_remaining": 30
+          }
+        }
+      ],
+      "match_rank": null
+    },
+    {
+      "id": "5271db17-447e-4f20-adda-1facc181c80c",
+      "slug": "a-f-m-khalilur-rahman",
+      "name": "A F M Khalilur Rahman",
+      "bn_name": "আ ফ ম খলিলুর রহমান",
+      "academic_title": "General Physician",
+      "qualification": "MBBS, PGT (Neurology, BSMMU)",
+      "institution": "Bangabandhu Sheikh Mujib Medical University",
+      "experience": "Former House Physician, City Migraine Clinic, Lond",
+      "image": null,
+      "gender": "Male",
+      "bmdc_number": null,
+      "rating": null,
+      "review_count": 0,
+      "is_verified": true,
+      "primary_specialty": {
+        "id": "f13b5384-1864-4225-b532-8c10895c41f9",
+        "slug": "family-physician-gp",
+        "name": "Family Physician / GP",
+        "bn_name": "জেনারেল প্র্যাকটিশনার"
+      },
+      "specialties": [
+        {
+          "id": "f13b5384-1864-4225-b532-8c10895c41f9",
+          "slug": "family-physician-gp",
+          "name": "Family Physician / GP",
+          "bn_name": "জেনারেল প্র্যাকটিশনার"
+        },
+        {
+          "id": "6448b750-6150-4b97-b7f8-6c6fa8a089cc",
+          "slug": "neurologist",
+          "name": "Neurologist",
+          "bn_name": "নিউরোলজিস্ট"
+        }
+      ],
+      "chambers": [
+        {
+          "id": "a27bb200-553a-4f3c-943e-8e843a129efc",
+          "fee": "1000.00",
+          "chamber_type": "Visiting Consultant",
+          "booking_mode": "instant",
+          "facility": {
+            "id": "81cd3496-e50e-4111-8a44-cd66e2ee08c1",
+            "slug": "ibn-sina-medical-imaging-center-dhanmondi",
+            "display_name": "Ibn Sina Medical Imaging Center (Zigatola / Road 2/A)",
+            "area": "Dhanmondi",
+            "district": "Dhaka",
+            "address": "House 58, Road 2/A, Dhanmondi R/A, Dhaka-1209"
+          },
+          "schedules": [
+            {
+              "day_of_week": "Sunday",
+              "start_time": "09:00:00",
+              "end_time": "13:00:00"
+            },
+            {
+              "day_of_week": "Monday",
+              "start_time": "09:00:00",
+              "end_time": "13:00:00"
+            },
+            {
+              "day_of_week": "Tuesday",
+              "start_time": "09:00:00",
+              "end_time": "13:00:00"
+            }
+          ],
+          "next_available": {
+            "date": "2026-10-18",
+            "session_key": "s:8986e8ff-da37-4a98-826f-392653a39795",
+            "session_start": "09:00",
+            "start_time": "09:00",
+            "estimated_time": "09:00",
+            "remaining": 30,
+            "capacity_remaining": 30
+          }
+        }
+      ],
+      "match_rank": null
+    }
+  ]
+}

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/app_config/update_banner.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
+import '../../booking/domain/booking_mode.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/widgets/dh_dropdown.dart';
 import '../../../core/widgets/specialty_dropdown.dart';
@@ -38,7 +41,8 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _searchTabIndex = 0; // 0 = Doctors, 1 = Diagnostics, 2 = Hospitals
   String? _selectedCategory;
-  String? _selectedDivision;
+  int? _selectedDivision;
+  bool _updateBannerDismissed = false;
 
   @override
   Widget build(BuildContext context) {
@@ -63,6 +67,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 _buildHeader(context, isBn),
+                if (!_updateBannerDismissed)
+                  UpdateBanner(
+                    onDismiss: () =>
+                        setState(() => _updateBannerDismissed = true),
+                  ),
                 _buildSearchCard(context, isBn),
                 const SizedBox(height: 24),
                 _buildSpecialtiesSection(context, isBn),
@@ -260,19 +269,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 divisionsAsync.when(
                   data: (divisions) {
                     final items = [
-                      DhDropdownItem<String>(
-                        value: '',
-                        label: isBn ? 'সমগ্র বাংলাদেশ' : 'All Bangladesh',
+                      const DhDropdownItem<int?>(
+                        value: null,
+                        label: 'All Bangladesh',
                       ),
                       ...divisions.map(
-                        (d) => DhDropdownItem<String>(
-                          value: d.name,
+                        (d) => DhDropdownItem<int?>(
+                          value: d.id,
                           label: d.localizedName(isBn ? 'bn' : 'en'),
                         ),
                       ),
                     ];
-                    return DhDropdown<String>(
-                      value: _selectedDivision ?? '',
+                    return DhDropdown<int?>(
+                      value: _selectedDivision,
                       items: items,
                       onChanged: (val) => setState(() => _selectedDivision = val),
                     );
@@ -297,8 +306,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         queryParams['category'] = _selectedCategory!;
                       }
                     }
-                    if (_selectedDivision != null && _selectedDivision!.isNotEmpty) {
-                      queryParams['division'] = _selectedDivision!;
+                    if (_selectedDivision != null) {
+                      queryParams['division_id'] = _selectedDivision!.toString();
                     }
 
                     if (_searchTabIndex == 0) {
@@ -528,13 +537,31 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             ],
                           ),
                           const Spacer(),
-                          if (doc.primaryChamber != null)
+                          if (doc.primaryChamber != null) ...[
                             Text(
                               doc.primaryChamber!.fullDisplayName,
                               style: AppTypography.secondary,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
+                            if (nextAvailableLabel(
+                                  doc.primaryChamber!,
+                                  AppLocalizations.of(context)!,
+                                ) !=
+                                null)
+                              Text(
+                                nextAvailableLabel(
+                                  doc.primaryChamber!,
+                                  AppLocalizations.of(context)!,
+                                )!,
+                                style: AppTypography.secondary.copyWith(
+                                  fontSize: 11,
+                                  color: AppColors.accentLink,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                          ],
                           const SizedBox(height: 6),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -682,7 +709,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     child: Material(
                       color: AppColors.paper,
                       child: ListTile(
-                      onTap: () => context.push('/doctors?hospital=${Uri.encodeComponent(h.name)}'),
+                      onTap: () => context.push(
+                        '/hospitals/${h.slug ?? h.id}',
+                      ),
                       leading: Container(
                         width: 40,
                         height: 40,

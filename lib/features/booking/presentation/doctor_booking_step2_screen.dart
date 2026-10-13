@@ -1,24 +1,30 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/network/app_failure.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/validators.dart';
 import '../../../core/widgets/dh_scaffold.dart';
+import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/kicker.dart';
+import '../../../core/widgets/otp_sheet.dart';
 import '../../../core/widgets/phone_field.dart';
 import '../../../core/widgets/primary_cta_button.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../bookings/domain/models/booking_item.dart';
-import '../../doctors/domain/models/affiliation.dart';
+import '../../doctors/domain/models/chamber.dart';
+import '../../doctors/domain/models/doctor.dart';
 import '../../doctors/presentation/doctor_profile_screen.dart';
+import '../domain/booking_mode.dart';
 import '../domain/models/booking_request.dart';
 import 'booking_success_screen.dart';
 
-const bool kRequireOtp = bool.fromEnvironment('REQUIRE_OTP', defaultValue: false);
-const bool kPayInAppEnabled = bool.fromEnvironment('PAY_IN_APP', defaultValue: false);
+const bool kPayInAppEnabled =
+    bool.fromEnvironment('PAY_IN_APP', defaultValue: false);
 
 class DoctorBookingStep2Screen extends ConsumerStatefulWidget {
   const DoctorBookingStep2Screen({
@@ -37,52 +43,61 @@ class _DoctorBookingStep2ScreenState
     extends ConsumerState<DoctorBookingStep2Screen> {
   late final TextEditingController _nameController;
   late final TextEditingController _phoneController;
+  late final TextEditingController _ageController;
 
   String? _nameError;
   String? _phoneError;
-  bool _isSubmitting = false;
+  String? _gender;
   String _paymentChoice = 'counter'; // 'counter' or 'online'
 
   @override
   void initState() {
     super.initState();
     final store = ref.read(localBookingStoreProvider);
-    _nameController = TextEditingController(text: store.getLastPatientName() ?? '');
-    _phoneController = TextEditingController(text: store.getLastPatientPhone() ?? '');
+    _nameController =
+        TextEditingController(text: store.getLastPatientName() ?? '');
+    _phoneController =
+        TextEditingController(text: store.getLastPatientPhone() ?? '');
+    _ageController = TextEditingController();
   }
 
   @override
   void dispose() {
     _nameController.dispose();
     _phoneController.dispose();
+    _ageController.dispose();
     super.dispose();
   }
 
   void _onPhoneChanged(String phone) async {
     if (phone.length == 11 && Validators.isValidBdPhone(phone)) {
       final res = await ref.read(bookingRepositoryProvider).lookupPatient(phone);
-      if (res.found && res.name != null && _nameController.text.isEmpty) {
-        setState(() {
+      if (!mounted || !res.found) return;
+      setState(() {
+        if (_nameController.text.isEmpty && res.name != null) {
           _nameController.text = res.name!;
-        });
-      }
+        }
+        if (_ageController.text.isEmpty && res.age != null) {
+          _ageController.text = res.age.toString();
+        }
+        if (_gender == null && res.gender != null) {
+          _gender = res.gender;
+        }
+      });
     }
   }
 
-  bool _validateForm() {
+  bool _validateForm(AppLocalizations l10n) {
     bool valid = true;
-    final name = _nameController.text.trim();
-    final phone = _phoneController.text.trim();
-
-    if (name.isEmpty) {
-      setState(() => _nameError = 'Patient name is required');
+    if (_nameController.text.trim().isEmpty) {
+      setState(() => _nameError = l10n.nameRequired);
       valid = false;
     } else {
       setState(() => _nameError = null);
     }
 
-    if (!Validators.isValidBdPhone(phone)) {
-      setState(() => _phoneError = 'Valid 11-digit mobile number required');
+    if (!Validators.isValidBdPhone(_phoneController.text.trim())) {
+      setState(() => _phoneError = l10n.invalidPhone);
       valid = false;
     } else {
       setState(() => _phoneError = null);
@@ -91,164 +106,55 @@ class _DoctorBookingStep2ScreenState
     return valid;
   }
 
-  Future<void> _handleConfirmBooking({
-    required String doctorName,
-    required String specialty,
-    required DoctorAffiliation affiliation,
-    required String dateStr,
-    required String slotStr,
-    required String displaySlot,
-  }) async {
-    if (!_validateForm()) return;
-
-    if (kRequireOtp) {
-      _showOtpModal(
-        doctorName: doctorName,
-        specialty: specialty,
-        affiliation: affiliation,
-        dateStr: dateStr,
-        slotStr: slotStr,
-        displaySlot: displaySlot,
-      );
-      return;
-    }
-
-    await _executeBooking(
-      doctorName: doctorName,
-      specialty: specialty,
-      affiliation: affiliation,
-      dateStr: dateStr,
-      slotStr: slotStr,
-      displaySlot: displaySlot,
-      otpCode: null,
-    );
-  }
-
-  Future<void> _executeBooking({
-    required String doctorName,
-    required String specialty,
-    required DoctorAffiliation affiliation,
-    required String dateStr,
-    required String slotStr,
-    required String displaySlot,
-    String? otpCode,
-  }) async {
-    setState(() => _isSubmitting = true);
-
-    try {
-      final repo = ref.read(bookingRepositoryProvider);
-      final rawPhone = Validators.normalizePhone(_phoneController.text.trim());
-
-      final request = DoctorBookingRequest(
-        affiliationId: affiliation.id,
-        date: dateStr,
-        slot: slotStr,
-        patientName: _nameController.text.trim(),
-        patientPhone: rawPhone,
-        otpCode: otpCode,
-      );
-
-      final response = await repo.bookDoctor(request);
-
-      final bookingItem = BookingItem(
-        id: response.id.isNotEmpty ? response.id : 'DH-${DateTime.now().millisecondsSinceEpoch}',
-        bookingRef: response.bookingRef,
-        serialDisplay: response.serialDisplay,
-        serialNumber: response.serialNumber,
-        type: 'doctor',
-        title: doctorName,
-        subtitle: specialty,
-        facilityName: affiliation.fullDisplayName,
-        appointmentDate: DateTime.parse(dateStr),
-        timeSlot: displaySlot,
-        patientName: _nameController.text.trim(),
-        patientPhone: rawPhone,
-        fee: affiliation.fee,
-        paymentMethod: _paymentChoice,
-        facilityPhone: affiliation.phone,
-        createdAt: DateTime.now(),
-      );
-
-      // Save to local bookings
-      await ref.read(localBookingsProvider.notifier).addBooking(bookingItem);
-
-      ref.read(lastBookingSuccessProvider.notifier).state = bookingItem;
-
-      if (mounted) {
-        context.go('/success');
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString()),
-            backgroundColor: AppColors.accent,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isSubmitting = false);
-      }
-    }
-  }
-
-  void _showOtpModal({
-    required String doctorName,
-    required String specialty,
-    required DoctorAffiliation affiliation,
-    required String dateStr,
-    required String slotStr,
-    required String displaySlot,
-  }) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-      builder: (context) {
-        return _OtpVerificationModal(
-          phone: _phoneController.text.trim(),
-          onVerified: (otpCode) {
-            Navigator.pop(context);
-            _executeBooking(
-              doctorName: doctorName,
-              specialty: specialty,
-              affiliation: affiliation,
-              dateStr: dateStr,
-              slotStr: slotStr,
-              displaySlot: displaySlot,
-              otpCode: otpCode,
-            );
-          },
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final state = GoRouterState.of(context);
-    final chamberId = state.uri.queryParameters['chamber'];
-    final dateStr = state.uri.queryParameters['date'] ?? '2024-01-01';
-    final slotStr = state.uri.queryParameters['slot'] ?? '18:00';
-    final displaySlot = state.uri.queryParameters['displaySlot'] ?? slotStr;
-
-    final doctorAsync = ref.watch(doctorDetailsProvider(widget.doctorId));
+    final q = state.uri.queryParameters;
+    final chamberId = q['chamber'];
+    final date = q['date'];
+    final sessionKey = q['session_key'];
+    final displaySlot = q['displaySlot'] ?? '';
+    final l10n = AppLocalizations.of(context)!;
     final locale = ref.watch(localeProvider);
     final isBn = locale.languageCode == 'bn';
 
+    if (chamberId == null || date == null || sessionKey == null) {
+      return DhScaffold(
+        body: SafeArea(
+          child: EmptyState(
+            title: l10n.bookingNotFound,
+            message: l10n.bookingNotLoadedDesc,
+            actionLabel: l10n.backToDoctors,
+            onAction: () => context.go('/doctors'),
+          ),
+        ),
+      );
+    }
+
+    final doctorAsync = ref.watch(doctorDetailsProvider(widget.doctorId));
+
     return doctorAsync.when(
       data: (doctor) {
-        final affiliation = doctor.affiliations.firstWhere(
-          (a) => a.id == chamberId,
-          orElse: () => doctor.affiliations.isNotEmpty
-              ? doctor.affiliations.first
-              : const DoctorAffiliation(
-                  id: 'default',
-                  facilityName: 'Chamber',
-                  fee: 1000,
-                ),
-        );
+        final chamber = doctor.chambers
+            .where((c) => c.id == chamberId)
+            .firstOrNull;
+        if (chamber == null) {
+          return DhScaffold(
+            body: SafeArea(
+              child: EmptyState(
+                title: l10n.bookingNotFound,
+                actionLabel: l10n.retry,
+                onAction: () =>
+                    ref.invalidate(doctorDetailsProvider(widget.doctorId)),
+              ),
+            ),
+          );
+        }
+
+        final view = bookingModeView(chamber);
+        final buttonLabel = bookingModeLabel(view.buttonKey, l10n) ??
+            (isBn ? 'বুকিং নিশ্চিত করুন' : 'Confirm booking');
+        final phone = _phoneController.text.trim();
 
         return DhScaffold(
           body: SafeArea(
@@ -320,21 +226,24 @@ class _DoctorBookingStep2ScreenState
                               const SizedBox(height: 12),
                               _buildSummaryRow(
                                 label: isBn ? 'সময়' : 'WHEN',
-                                value: '$dateStr — $displaySlot',
+                                value: displaySlot.isEmpty
+                                    ? date
+                                    : '$date · $displaySlot',
                               ),
                               const SizedBox(height: 12),
                               const Divider(color: AppColors.lineSoft, height: 1),
                               const SizedBox(height: 12),
                               _buildSummaryRow(
                                 label: isBn ? 'স্থান' : 'WHERE',
-                                value: affiliation.fullDisplayName,
-                                subtitle: affiliation.addressLine,
+                                value: chamber.fullDisplayName,
+                                subtitle: chamber.facility.address,
                               ),
                               const SizedBox(height: 12),
                               const Divider(color: AppColors.lineSoft, height: 1),
                               const SizedBox(height: 12),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     isBn ? 'ভিজিট ফি' : 'CONSULTATION FEE',
@@ -343,16 +252,17 @@ class _DoctorBookingStep2ScreenState
                                       fontSize: 11,
                                     ),
                                   ),
-                                  Text(
-                                    CurrencyFormatter.format(
-                                      affiliation.fee,
-                                      locale: isBn ? 'bn' : 'en',
+                                  if (chamber.fee != null)
+                                    Text(
+                                      CurrencyFormatter.format(
+                                        chamber.fee,
+                                        locale: isBn ? 'bn' : 'en',
+                                      ),
+                                      style: AppTypography.h2.copyWith(
+                                        fontSize: 18,
+                                        color: AppColors.accent,
+                                      ),
                                     ),
-                                    style: AppTypography.h2.copyWith(
-                                      fontSize: 18,
-                                      color: AppColors.accent,
-                                    ),
-                                  ),
                                 ],
                               ),
                             ],
@@ -367,32 +277,10 @@ class _DoctorBookingStep2ScreenState
                           style: AppTypography.secondaryBold,
                         ),
                         const SizedBox(height: 6),
-                        Container(
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: AppColors.paper,
-                            border: Border.all(
-                              color: _nameError != null
-                                  ? AppColors.accent
-                                  : AppColors.ink,
-                              width: AppColors.borderWidth,
-                            ),
-                          ),
-                          child: TextField(
-                            controller: _nameController,
-                            style: AppTypography.body,
-                            decoration: InputDecoration(
-                              hintText: isBn ? 'নাম লিখুন' : 'Enter full name',
-                              isDense: true,
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 14,
-                              ),
-                              border: InputBorder.none,
-                              enabledBorder: InputBorder.none,
-                              focusedBorder: InputBorder.none,
-                            ),
-                          ),
+                        _buildTextField(
+                          controller: _nameController,
+                          hintText: isBn ? 'নাম লিখুন' : 'Enter full name',
+                          hasError: _nameError != null,
                         ),
                         if (_nameError != null) ...[
                           const SizedBox(height: 4),
@@ -413,6 +301,58 @@ class _DoctorBookingStep2ScreenState
                           onChanged: _onPhoneChanged,
                         ),
 
+                        const SizedBox(height: 16),
+
+                        // Optional age and gender
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    l10n.patientAge,
+                                    style: AppTypography.secondaryBold,
+                                  ),
+                                  const SizedBox(height: 6),
+                                  _buildTextField(
+                                    controller: _ageController,
+                                    hintText: l10n.patientAgeHint,
+                                    keyboardType: TextInputType.number,
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.digitsOnly,
+                                      LengthLimitingTextInputFormatter(3),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    l10n.patientGender,
+                                    style: AppTypography.secondaryBold,
+                                  ),
+                                  const SizedBox(height: 6),
+                                  _buildGenderChips(l10n),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        if (view.mode == BookingMode.request) ...[
+                          const SizedBox(height: 12),
+                          Text(
+                            l10n.sendRequestNote(phone.isEmpty ? '01XXXXXXXXX' : phone),
+                            style: AppTypography.secondary,
+                          ),
+                        ],
+
                         const SizedBox(height: 24),
 
                         // Payment Section
@@ -421,8 +361,6 @@ class _DoctorBookingStep2ScreenState
                           style: AppTypography.h2.copyWith(fontSize: 16),
                         ),
                         const SizedBox(height: 10),
-
-                        // Option 1: Pay at counter
                         InkWell(
                           onTap: () => setState(() => _paymentChoice = 'counter'),
                           child: Container(
@@ -440,34 +378,12 @@ class _DoctorBookingStep2ScreenState
                             ),
                             child: Row(
                               children: [
-                                Container(
-                                  width: 20,
-                                  height: 20,
-                                  decoration: BoxDecoration(
-                                    color: _paymentChoice == 'counter'
-                                        ? AppColors.accent
-                                        : AppColors.paper,
-                                    border: Border.all(
-                                      color: _paymentChoice == 'counter'
-                                          ? AppColors.accent
-                                          : AppColors.ink,
-                                      width: 2,
-                                    ),
-                                  ),
-                                  child: _paymentChoice == 'counter'
-                                      ? const Center(
-                                          child: Icon(
-                                            Icons.check,
-                                            size: 14,
-                                            color: AppColors.paper,
-                                          ),
-                                        )
-                                      : null,
-                                ),
+                                _buildRadio(_paymentChoice == 'counter'),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         isBn
@@ -489,8 +405,6 @@ class _DoctorBookingStep2ScreenState
                             ),
                           ),
                         ),
-
-                        // Option 2: Pay now (disabled / behind flag)
                         if (kPayInAppEnabled) ...[
                           const SizedBox(height: 8),
                           InkWell(
@@ -510,30 +424,7 @@ class _DoctorBookingStep2ScreenState
                               ),
                               child: Row(
                                 children: [
-                                  Container(
-                                    width: 20,
-                                    height: 20,
-                                    decoration: BoxDecoration(
-                                      color: _paymentChoice == 'online'
-                                          ? AppColors.accent
-                                          : AppColors.paper,
-                                      border: Border.all(
-                                        color: _paymentChoice == 'online'
-                                            ? AppColors.accent
-                                            : AppColors.ink,
-                                        width: 2,
-                                      ),
-                                    ),
-                                    child: _paymentChoice == 'online'
-                                        ? const Center(
-                                            child: Icon(
-                                              Icons.check,
-                                              size: 14,
-                                              color: AppColors.paper,
-                                            ),
-                                          )
-                                        : null,
-                                  ),
+                                  _buildRadio(_paymentChoice == 'online'),
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: Text(
@@ -571,14 +462,12 @@ class _DoctorBookingStep2ScreenState
                     ),
                   ),
                   child: PrimaryCtaButton(
-                    label: isBn ? 'বুকিং নিশ্চিত করুন' : 'Confirm booking',
-                    isLoading: _isSubmitting,
+                    label: buttonLabel,
                     onPressed: () => _handleConfirmBooking(
-                      doctorName: doctor.localizedName(isBn ? 'bn' : 'en'),
-                      specialty: doctor.primarySpecialtyName,
-                      affiliation: affiliation,
-                      dateStr: dateStr,
-                      slotStr: slotStr,
+                      doctor: doctor,
+                      chamber: chamber,
+                      date: date,
+                      sessionKey: sessionKey,
                       displaySlot: displaySlot,
                     ),
                   ),
@@ -601,6 +490,225 @@ class _DoctorBookingStep2ScreenState
     );
   }
 
+  Widget _buildTextField({
+    required TextEditingController controller,
+    String? hintText,
+    bool hasError = false,
+    TextInputType? keyboardType,
+    List<TextInputFormatter>? inputFormatters,
+  }) {
+    return Container(
+      height: 48,
+      decoration: BoxDecoration(
+        color: AppColors.paper,
+        border: Border.all(
+          color: hasError ? AppColors.accent : AppColors.ink,
+          width: AppColors.borderWidth,
+        ),
+      ),
+      child: TextField(
+        controller: controller,
+        keyboardType: keyboardType,
+        inputFormatters: inputFormatters,
+        style: AppTypography.body,
+        decoration: InputDecoration(
+          hintText: hintText,
+          isDense: true,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 14,
+          ),
+          border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGenderChips(AppLocalizations l10n) {
+    final options = <String, String>{
+      'male': l10n.genderMale,
+      'female': l10n.genderFemale,
+      'other': l10n.genderOther,
+    };
+    return SizedBox(
+      height: 48,
+      child: Row(
+        children: options.entries.map((entry) {
+          final selected = _gender == entry.key;
+          return Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(right: 4),
+              child: InkWell(
+                onTap: () => setState(
+                  () => _gender = selected ? null : entry.key,
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: selected ? AppColors.ink : AppColors.paper,
+                    border: Border.all(
+                      color: AppColors.ink,
+                      width: 1.5,
+                    ),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    entry.value,
+                    style: AppTypography.tag.copyWith(
+                      color: selected ? AppColors.paper : AppColors.ink,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildRadio(bool selected) {
+    return Container(
+      width: 20,
+      height: 20,
+      decoration: BoxDecoration(
+        color: selected ? AppColors.accent : AppColors.paper,
+        border: Border.all(
+          color: selected ? AppColors.accent : AppColors.ink,
+          width: 2,
+        ),
+      ),
+      child: selected
+          ? const Center(
+              child: Icon(Icons.check, size: 14, color: AppColors.paper),
+            )
+          : null,
+    );
+  }
+
+  Future<void> _handleConfirmBooking({
+    required Doctor doctor,
+    required Chamber chamber,
+    required String date,
+    required String sessionKey,
+    required String displaySlot,
+  }) async {
+    final l10n = AppLocalizations.of(context)!;
+    if (!_validateForm(l10n)) return;
+
+    final phone = Validators.normalizePhone(_phoneController.text.trim());
+    await OtpSheet.show(
+      context,
+      phone: phone,
+      purpose: 'doctor_booking',
+      onSubmit: (code) => _submitBooking(
+        doctor: doctor,
+        chamber: chamber,
+        date: date,
+        sessionKey: sessionKey,
+        displaySlot: displaySlot,
+        otpCode: code,
+      ),
+    );
+  }
+
+  Future<AppFailure?> _submitBooking({
+    required Doctor doctor,
+    required Chamber chamber,
+    required String date,
+    required String sessionKey,
+    required String displaySlot,
+    required String otpCode,
+  }) async {
+    final l10n = AppLocalizations.of(context)!;
+    final rawPhone = Validators.normalizePhone(_phoneController.text.trim());
+    final age = int.tryParse(_ageController.text.trim());
+
+    try {
+      final repo = ref.read(bookingRepositoryProvider);
+      final response = await repo.bookDoctor(
+        DoctorBookingRequest(
+          affiliationId: chamber.id,
+          date: date,
+          sessionKey: sessionKey,
+          patientName: _nameController.text.trim(),
+          patientPhone: rawPhone,
+          patientAge: age,
+          patientGender: _gender,
+          otpCode: otpCode,
+        ),
+      );
+
+      final bookingItem = BookingItem(
+        id: response.id,
+        bookingRef: response.shortRef,
+        serialDisplay: response.serialDisplay,
+        serialNumber: response.serialNumber,
+        type: 'doctor',
+        title: doctor.localizedName('en'),
+        subtitle: doctor.primarySpecialtyName,
+        facilityName: chamber.fullDisplayName,
+        appointmentDate: DateTime.parse(date),
+        timeSlot: displaySlot,
+        patientName: _nameController.text.trim(),
+        patientPhone: rawPhone,
+        fee: response.fee ?? chamber.fee,
+        paymentMethod: _paymentChoice,
+        facilityPhone: chamber.facility.phone,
+        createdAt: DateTime.now(),
+        status: response.status,
+        bookingMode: chamber.bookingMode,
+        affiliationId: chamber.id,
+        doctorSlug: doctor.slug,
+        sessionStart: response.sessionStart ?? sessionKey,
+        sessionEnd: response.sessionEnd,
+        estimatedTime: response.estimatedTime,
+        confirmDeadline: response.confirmDeadline,
+        isUrgent: response.isUrgent,
+      );
+
+      await ref.read(localBookingsProvider.notifier).addBooking(bookingItem);
+      ref.read(lastBookingSuccessProvider.notifier).state = bookingItem;
+      if (mounted) context.go('/success');
+      return null;
+    } on AppFailure catch (failure) {
+      if (failure is ValidationFailure) {
+        if (failure.code == 'request_too_late') {
+          _returnToStep1(l10n.errRequestTooLate);
+          return null;
+        }
+        if (failure.code == 'booking_mode_call_only') {
+          if (mounted) {
+            context.pushReplacement(
+              '/doctors/${doctor.id}/call?chamber=${chamber.id}',
+            );
+          }
+          return null;
+        }
+        final sessionError = failure.firstErrorFor('session_key') ??
+            failure.firstErrorFor('date');
+        if (sessionError != null) {
+          _returnToStep1(sessionError);
+          return null;
+        }
+      }
+      return failure;
+    }
+  }
+
+  void _returnToStep1(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: AppColors.accent,
+      ),
+    );
+    context.pop();
+  }
+
   Widget _buildSummaryRow({
     required String label,
     required String value,
@@ -621,7 +729,7 @@ class _DoctorBookingStep2ScreenState
           value,
           style: AppTypography.bodyMedium.copyWith(fontSize: 15),
         ),
-        if (subtitle != null) ...[
+        if (subtitle != null && subtitle.isNotEmpty) ...[
           const SizedBox(height: 2),
           Text(
             subtitle,
@@ -629,132 +737,6 @@ class _DoctorBookingStep2ScreenState
           ),
         ],
       ],
-    );
-  }
-}
-
-class _OtpVerificationModal extends StatefulWidget {
-  const _OtpVerificationModal({
-    required this.phone,
-    required this.onVerified,
-  });
-
-  final String phone;
-  final ValueChanged<String> onVerified;
-
-  @override
-  State<_OtpVerificationModal> createState() => _OtpVerificationModalState();
-}
-
-class _OtpVerificationModalState extends State<_OtpVerificationModal> {
-  final TextEditingController _otpController = TextEditingController();
-  int _secondsLeft = 60;
-  Timer? _timer;
-
-  @override
-  void initState() {
-    super.initState();
-    _startTimer();
-  }
-
-  void _startTimer() {
-    _timer?.cancel();
-    setState(() => _secondsLeft = 60);
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_secondsLeft <= 1) {
-        timer.cancel();
-        setState(() => _secondsLeft = 0);
-      } else {
-        setState(() => _secondsLeft--);
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    _otpController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        left: 20,
-        right: 20,
-        top: 24,
-        bottom: 24 + MediaQuery.of(context).viewInsets.bottom,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const Text('Verify Phone Number', style: AppTypography.h2),
-          const SizedBox(height: 8),
-          Text(
-            'We sent a 6-digit verification code to ${widget.phone}',
-            style: AppTypography.secondary,
-          ),
-          const SizedBox(height: 20),
-          Container(
-            height: 48,
-            decoration: BoxDecoration(
-              color: AppColors.paper,
-              border: Border.all(color: AppColors.ink, width: AppColors.borderWidth),
-            ),
-            child: TextField(
-              controller: _otpController,
-              keyboardType: TextInputType.number,
-              maxLength: 6,
-              style: const TextStyle(
-                fontFamily: AppTypography.fontMono,
-                fontSize: 18,
-                letterSpacing: 8,
-                fontWeight: FontWeight.w700,
-              ),
-              textAlign: TextAlign.center,
-              decoration: const InputDecoration(
-                counterText: '',
-                border: InputBorder.none,
-                hintText: '• • • • • •',
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                _secondsLeft > 0 ? 'Resend in ${_secondsLeft}s' : 'Didn\'t get code?',
-                style: AppTypography.secondary,
-              ),
-              if (_secondsLeft == 0)
-                InkWell(
-                  onTap: _startTimer,
-                  child: const Text(
-                    'Resend code',
-                    style: TextStyle(
-                      fontFamily: AppTypography.fontArchivo,
-                      color: AppColors.accentLink,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          PrimaryCtaButton(
-            label: 'Verify & Confirm',
-            onPressed: () {
-              final code = _otpController.text.trim();
-              if (code.length == 6) {
-                widget.onVerified(code);
-              }
-            },
-          ),
-        ],
-      ),
     );
   }
 }

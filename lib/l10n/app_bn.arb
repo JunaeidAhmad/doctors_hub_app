@@ -173,6 +173,110 @@
     }
   },
 
+  "otpInvalid": "৬ ডিজিটের কোডটি লিখুন",
+  "otpTooManyAttempts": "অনেকবার চেষ্টা করা হয়েছে। এক মিনিট অপেক্ষা করুন।",
+
+  "badgeInstantBooking": "সাথে সাথে বুকিং",
+  "badgeBookingByRequest": "অনুরোধে বুকিং",
+  "badgeBookByPhone": "ফোনে বুকিং",
+  "ctaBookAppointment": "অ্যাপয়েন্টমেন্ট বুক করুন",
+  "ctaRequestAppointment": "অ্যাপয়েন্টমেন্টের অনুরোধ করুন",
+  "ctaGetPhoneNumber": "ফোন নম্বর নিন",
+  "ctaSendRequest": "অনুরোধ পাঠান",
+  "selectSession": "সেশন নির্বাচন করুন",
+  "selectASession": "একটি সেশন নির্বাচন করুন",
+  "noSessionsForDay": "এই দিনে কোন সেশন নেই",
+  "noChambers": "কোন চেম্বার নেই",
+  "noChambersDesc": "এই ডাক্তারের চেম্বারের তথ্য এখনো যোগ করা হয়নি।",
+  "goBack": "ফিরে যান",
+  "sessionFull": "পূর্ণ",
+  "sessionEnded": "শেষ",
+  "sessionClosed": "বন্ধ",
+  "sessionSeatsLeft": "{count} টি বাকি",
+  "@sessionSeatsLeft": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "nextSerialNumber": "পরবর্তী সিরিয়াল #{number}",
+  "@nextSerialNumber": {
+    "placeholders": {
+      "number": {"type": "int"}
+    }
+  },
+  "approxTime": "আনুমানিক {time}",
+  "@approxTime": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "tooLateToRequest": "অনুরোধ করার সময় পার হয়ে গেছে — চেম্বারে কল করুন",
+  "morningSession": "সকাল",
+  "eveningSession": "বিকাল",
+  "requestSentTitle": "অনুরোধ পাঠানো হয়েছে",
+  "requestWillCall": "{facility} নিশ্চিত করতে {phone} নম্বরে কল করবে। একটি এসএমএসও পাবেন।",
+  "@requestWillCall": {
+    "placeholders": {
+      "facility": {"type": "String"},
+      "phone": {"type": "String"}
+    }
+  },
+  "expectCallBy": "{deadline} এর মধ্যে কল আশা করুন",
+  "@expectCallBy": {
+    "placeholders": {
+      "deadline": {"type": "String"}
+    }
+  },
+  "beforeSessionStarts": "সেশন শুরুর আগে",
+  "confirmedTitle": "আপনি বুক হয়ে গেছেন",
+  "serialBySms": "আপনার সিরিয়াল এসএমএসে জানানো হবে",
+  "bookingIdLabel": "বুকিং আইডি",
+  "bookingNotFound": "এই বুকিংটি লোড হয়নি",
+  "bookingNotLoadedDesc": "ডাক্তারের প্রোফাইল থেকে আবার বুকিং শুরু করুন।",
+  "backToDoctors": "ডাক্তার তালিকায় ফিরুন",
+  "genderOther": "অন্যান্য",
+  "patientAge": "বয়স (ঐচ্ছিক)",
+  "patientAgeHint": "বছর",
+  "patientGender": "লিঙ্গ (ঐচ্ছিক)",
+  "sendRequestNote": "নিশ্চিত করতে চেম্বার {phone} নম্বরে কল করবে",
+  "@sendRequestNote": {
+    "placeholders": {
+      "phone": {"type": "String"}
+    }
+  },
+  "nextAvailableShort": "পরবর্তী: {day} {time} · {count} টি বাকি",
+  "@nextAvailableShort": {
+    "placeholders": {
+      "day": {"type": "String"},
+      "time": {"type": "String"},
+      "count": {"type": "int"}
+    }
+  },
+  "callToBook": "কল করুন",
+  "callDuringHours": "এই সময়ে কল করুন",
+  "weeklyHours": "সাপ্তাহিক সময়সূচি",
+  "labWillContact": "বুকিং পেয়েছি — নিশ্চিত করতে ল্যাব যোগাযোগ করবে",
+  "serviceNotOffered": "এই হাসপাতালে এই সেবাটি নেই",
+  "preferredTimeLabel": "পছন্দের সময়",
+  "prefTimeMorning": "সকাল (৯টা–১২টা)",
+  "prefTimeAfternoon": "দুপুর (১২টা–৪টা)",
+  "prefTimeEvening": "বিকাল (৪টা–৮টা)",
+  "prefTimeAny": "যেকোনো সময়",
+  "notesLabel": "নোট (ঐচ্ছিক)",
+  "serviceRequestReceived": "অনুরোধ পেয়েছি — নিশ্চিত করতে {facility} যোগাযোগ করবে",
+  "@serviceRequestReceived": {
+    "placeholders": {
+      "facility": {"type": "String"}
+    }
+  },
+  "sessionWindow": "{start}–{end}",
+  "@sessionWindow": {
+    "placeholders": {
+      "start": {"type": "String"},
+      "end": {"type": "String"}
+    }
+  },
+
   "bookedSuccessTitle": "বুকিং সফল হয়েছে!",
   "bookingRef": "বুকিং রেফারেন্স",
   "serialNumber": "সিরিয়াল নম্বর",
@@ -218,11 +322,32 @@
       "charge": {"type": "String"}
     }
   },
+  "pickupThana": "পিকআপ থানা",
+  "selectThana": "থানা নির্বাচন করুন",
+  "pickupThanaRequired": "পিকআপ থানার তথ্য প্রয়োজন",
   "pickupAddress": "হোম পিকআপ ঠিকানা",
   "pickupAddressHint": "বাড়ি, রোড, এলাকা, ল্যান্ডমার্ক...",
   "addressRequired": "হোম পিকআপের জন্য ঠিকানা প্রয়োজন",
   "timeWindow": "পছন্দের সময়",
 
+  "hospitalNotFound": "হাসপাতাল পাওয়া যায়নি",
+  "hospitalNotFoundDesc": "এটি সরিয়ে ফেলা হতে পারে। ফিরে গিয়ে অন্য হাসপাতাল দেখুন।",
+  "doctorsHere": "এখানকার ডাক্তার ({count})",
+  "@doctorsHere": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "testsHere": "এখানকার টেস্ট ({count})",
+  "@testsHere": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "servicesTitle": "সেবাসমূহ",
+  "phoneLabel": "ফোন",
+  "emergencyPhoneLabel": "ইমার্জেন্সি",
+  "ambulancePhoneLabel": "অ্যাম্বুলেন্স",
   "hospitalsTitle": "হাসপাতাল ও ডায়াগনস্টিক সেন্টার",
   "searchHospitalsPlaceholder": "হাসপাতাল বা এলাকার নাম খুঁজুন...",
 
@@ -236,6 +361,18 @@
   "savedOnPhone": "এই ফোনে সংরক্ষিত",
   "doctorVisitTag": "ডাক্তার ভিজিট",
   "labTestTag": "ল্যাব টেস্ট",
+  "hospitalServiceTag": "হাসপাতাল সেবা",
+  "statusConfirmedTag": "নিশ্চিত",
+  "awaitingConfirmationTag": "নিশ্চিতকরণের অপেক্ষায়",
+  "awaitingLabTag": "ল্যাবের অপেক্ষায়",
+  "awaitingHospitalTag": "হাসপাতালের অপেক্ষায়",
+  "notConfirmedInTime": "সময়ের মধ্যে নিশ্চিত হয়নি। এসএমএস না পেলে চেম্বারে কল করুন।",
+  "toCancelCall": "বাতিল করতে {facility} নম্বরে কল করুন",
+  "@toCancelCall": {
+    "placeholders": {
+      "facility": {"type": "String"}
+    }
+  },
   "cancelBooking": "বাতিল",
   "cancelDialogTitle": "অ্যাপয়েন্টমেন্ট বাতিল",
   "cancelDialogMessage": "অ্যাপয়েন্টমেন্ট বাতিল করতে অনুগ্রহ করে সরাসরি চেম্বারে {phone} নম্বরে যোগাযোগ করুন।",
@@ -255,5 +392,29 @@
   "networkError": "ইন্টারনেট সংযোগ নেই। সংযোগ পরীক্ষা করে পুনরায় চেষ্টা করুন।",
   "language": "ভাষা",
   "english": "English",
-  "bangla": "বাংলা"
+  "bangla": "বাংলা",
+
+  "updateRequiredTitle": "আপডেট প্রয়োজন",
+  "updateRequiredFallback": "চালিয়ে যেতে অনুগ্রহ করে অ্যাপটি আপডেট করুন।",
+  "updateAvailableMessage": "অ্যাপের নতুন সংস্করণ এসেছে।",
+  "updateSoonMessage": "এই সংস্করণটি শীঘ্রই বন্ধ হয়ে যাবে। অনুগ্রহ করে আপডেট করুন।",
+  "updateNow": "এখনই আপডেট করুন",
+
+  "errBookingModeCallOnly": "এই চেম্বারে শুধু ফোনে বুকিং নেওয়া হয়। অনুগ্রহ করে চেম্বারে কল করুন।",
+  "errRequestTooLate": "এই সেশনের জন্য অনুরোধ করার সময় পার হয়ে গেছে। অনুগ্রহ করে চেম্বারে কল করুন।",
+  "errNotCallMode": "এই চেম্বারে আর ফোনে বুকিং নেওয়া হয় না।",
+  "errNoNumbers": "এই চেম্বারের কোনো ফোন নম্বর এখনো যোগ করা হয়নি। অনুগ্রহ করে অন্য চেম্বার দেখুন।",
+
+  "usualPriceLabel": "আনুমানিক খরচ: {price}",
+  "@usualPriceLabel": {
+    "placeholders": {
+      "price": {"type": "String"}
+    }
+  },
+  "priceAtCounter": "কাউন্টারে মূল্য",
+  "priceConfirmedAtLab": "মূল্য ল্যাবে নিশ্চিত করা হবে",
+  "currentlyUnavailable": "বর্তমানে পাওয়া যাচ্ছে না",
+  "testNotLoaded": "এই টেস্টের তথ্য লোড হয়নি",
+  "testNotLoadedDesc": "টেস্ট তালিকা থেকে আবার খুলুন।",
+  "backToTests": "টেস্ট তালিকায় ফিরুন"
 }

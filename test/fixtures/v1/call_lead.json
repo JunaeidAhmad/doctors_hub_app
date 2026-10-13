@@ -1,0 +1,18 @@
+{
+  "id": "d4e5f6a7-b8c9-0d1e-2f3a-4b5c6d7e8f90",
+  "doctor_name": "A. B. M. Abdullah",
+  "facility": {
+    "id": "98847d9f-2a66-5378-85a0-1a94843eef55",
+    "display_name": "Prof. Abdullah Consultation Chamber (Green Road)"
+  },
+  "numbers": [
+    {
+      "label": "Chamber",
+      "phone": "+8801711223344"
+    },
+    {
+      "label": "",
+      "phone": "01879542300"
+    }
+  ]
+}

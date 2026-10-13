@@ -26,12 +26,29 @@ class ServerFailure extends AppFailure {
 class ValidationFailure extends AppFailure {
   const ValidationFailure({
     required String message,
+    this.code,
     this.fieldErrors = const {},
   }) : super(message);
 
+  final String? code;
   final Map<String, List<String>> fieldErrors;
 
   String? firstErrorFor(String field) => fieldErrors[field]?.firstOrNull;
+}
+
+class UpdateRequiredFailure extends AppFailure {
+  const UpdateRequiredFailure({
+    required String message,
+    this.code = 'unknown',
+    this.storeUrl,
+    this.messageEn,
+    this.messageBn,
+  }) : super(message);
+
+  final String code;
+  final String? storeUrl;
+  final String? messageEn;
+  final String? messageBn;
 }
 
 class NotFoundFailure extends AppFailure {

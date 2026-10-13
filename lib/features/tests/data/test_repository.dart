@@ -1,8 +1,44 @@
 import '../../../core/network/api_client.dart';
 import '../../../core/network/unwrap_list.dart';
-import '../domain/models/diagnostic_test.dart';
-import '../domain/models/facility_test.dart';
 import '../domain/models/test_category.dart';
+import '../domain/models/test_search.dart';
+
+class TestSearchPage {
+  const TestSearchPage({
+    required this.groups,
+    required this.count,
+    required this.next,
+    required this.facets,
+  });
+
+  final List<TestSearchGroup> groups;
+  final int count;
+  final String? next;
+  final TestSearchFacets facets;
+
+  bool get hasMore => next != null && next!.isNotEmpty;
+
+  factory TestSearchPage.fromJson(Map<String, dynamic> json) {
+    final groups = <TestSearchGroup>[];
+    final results = json['results'];
+    if (results is List) {
+      for (final item in results) {
+        if (item is Map) {
+          groups.add(TestSearchGroup.fromJson(Map<String, dynamic>.from(item)));
+        }
+      }
+    }
+    final facetsRaw = json['facets'];
+    return TestSearchPage(
+      groups: groups,
+      count: (json['count'] as num?)?.toInt() ?? groups.length,
+      next: json['next'] is String ? json['next'] as String : null,
+      facets: TestSearchFacets.fromJson(
+        facetsRaw is Map ? Map<String, dynamic>.from(facetsRaw) : null,
+      ),
+    );
+  }
+}
 
 class TestRepository {
   TestRepository(this._apiClient);
@@ -11,7 +47,9 @@ class TestRepository {
   List<TestCategory>? _cachedCategories;
 
   Future<List<TestCategory>> getCategories({bool forceRefresh = false}) async {
-    if (!forceRefresh && _cachedCategories != null && _cachedCategories!.isNotEmpty) {
+    if (!forceRefresh &&
+        _cachedCategories != null &&
+        _cachedCategories!.isNotEmpty) {
       return _cachedCategories!;
     }
 
@@ -28,124 +66,67 @@ class TestRepository {
     return _cachedCategories!;
   }
 
-  Future<PaginatedList<DiagnosticTest>> getTests({
-    String? category,
-    String? search,
+  /// One server-side call for the tests tab: groups with offerings, facets,
+  /// count and `next`. `page_size` is capped at 50 by the server.
+  Future<TestSearchPage> searchTests({
+    String? q,
+    String? testcat,
+    int? divisionId,
+    int? districtId,
+    int? thanaId,
+    String? locationId,
+    String? locationName,
+    String? fulfillment,
+    String? ownership,
+    String ordering = 'price',
     int page = 1,
     int pageSize = 20,
   }) async {
     final queryParams = <String, dynamic>{
       'page': page,
-      'page_size': pageSize,
+      'page_size': pageSize > 50 ? 50 : pageSize,
+      'ordering': ordering,
     };
 
-    if (category != null && category.isNotEmpty && category != 'all') {
-      queryParams['category'] = category;
+    if (q != null && q.trim().isNotEmpty) {
+      queryParams['q'] = q.trim();
     }
-    if (search != null && search.trim().isNotEmpty) {
-      queryParams['search'] = search.trim();
+    if (testcat != null && testcat.isNotEmpty) {
+      queryParams['testcat'] = testcat;
     }
-
-    final response = await _apiClient.get(
-      '/tests/',
-      queryParameters: queryParams,
-    );
-
-    return unwrapList<DiagnosticTest>(
-      response.data,
-      (json) => DiagnosticTest.fromJson(json as Map<String, dynamic>),
-    );
-  }
-
-  Future<List<FacilityTest>> getFacilityTestsForTest(
-    String testId, {
-    String? division,
-    int? divisionId,
-    String? district,
-    int? districtId,
-    String? area,
-    int? thanaId,
-    String? fulfillment,
-    String? ownership,
-  }) async {
-    final queryParams = <String, dynamic>{
-      'test': testId,
-      'page_size': 100,
-    };
-
-    if (fulfillment == 'home') {
-      queryParams['home_sample_collection'] = true;
-    }
-
-    final response = await _apiClient.get(
-      '/facility-tests/',
-      queryParameters: queryParams,
-    );
-
-    final paginated = unwrapList<FacilityTest>(
-      response.data,
-      (json) => FacilityTest.fromJson(json as Map<String, dynamic>),
-    );
-
-    var list = paginated.results;
-
-    // Filter by division
     if (divisionId != null) {
-      list = list.where((ft) => ft.divisionId == null || ft.divisionId == divisionId).toList();
-    } else if (division != null && division.isNotEmpty && division != 'all' && division != 'All Bangladesh') {
-      final cleanDiv = division.replaceAll(RegExp(r'\s*Division$', caseSensitive: false), '').trim().toLowerCase();
-      list = list.where((ft) {
-        if (ft.facilityDivision == null) return true;
-        return ft.facilityDivision!.toLowerCase().contains(cleanDiv);
-      }).toList();
+      queryParams['division_id'] = divisionId;
     }
-
-    // Filter by district
     if (districtId != null) {
-      list = list.where((ft) => ft.districtId == null || ft.districtId == districtId).toList();
-    } else if (district != null && district.isNotEmpty && district != 'all' && district != 'All Districts') {
-      final cleanDist = district.replaceAll(RegExp(r'\s*District$', caseSensitive: false), '').trim().toLowerCase();
-      list = list.where((ft) {
-        final d = ft.facilityDistrict?.toLowerCase() ?? '';
-        final addr = ft.facilityAddress?.toLowerCase() ?? '';
-        return d.contains(cleanDist) || addr.contains(cleanDist);
-      }).toList();
+      queryParams['district_id'] = districtId;
     }
-
-    // Filter by thana / area
     if (thanaId != null) {
-      list = list.where((ft) => ft.thanaId == null || ft.thanaId == thanaId).toList();
-    } else if (area != null && area.isNotEmpty && area != 'all' && area != 'All Areas') {
-      final cleanArea = area.replaceAll(RegExp(r'\s*(Thana|Area)s?$', caseSensitive: false), '').trim().toLowerCase();
-      list = list.where((ft) {
-        final a = ft.facilityArea?.toLowerCase() ?? '';
-        final b = ft.facilityBranch?.toLowerCase() ?? '';
-        final addr = ft.facilityAddress?.toLowerCase() ?? '';
-        return a.contains(cleanArea) || b.contains(cleanArea) || addr.contains(cleanArea);
-      }).toList();
+      queryParams['thana_id'] = thanaId;
     }
-
-    // Filter by fulfillment
-    if (fulfillment != null && fulfillment != 'all') {
-      if (fulfillment == 'home') {
-        list = list.where((ft) => ft.homeSampleCollection).toList();
-      } else if (fulfillment == 'center') {
-        list = list.where((ft) => !ft.homeSampleCollection).toList();
-      }
+    if (locationId != null) {
+      queryParams['location_id'] = locationId;
     }
-
-    // Filter by ownership
+    if (fulfillment != null && fulfillment.isNotEmpty && fulfillment != 'all') {
+      queryParams['fulfillment'] = fulfillment;
+    }
     if (ownership != null && ownership.isNotEmpty && ownership != 'all') {
-      final cleanOwn = ownership.toLowerCase();
-      list = list.where((ft) {
-        final own = ft.facilityOwnershipType?.toLowerCase() ?? '';
-        return own == cleanOwn || own.contains(cleanOwn);
-      }).toList();
+      queryParams['ownership'] = ownership;
     }
 
-    // Sort by price ascending
-    list.sort((a, b) => a.price.compareTo(b.price));
+    final response = await _apiClient.get(
+      '/facility-tests/search/',
+      queryParameters: queryParams,
+    );
 
-    return list;
+    final data = response.data;
+    if (data is Map<String, dynamic>) {
+      return TestSearchPage.fromJson(data);
+    }
+    return const TestSearchPage(
+      groups: [],
+      count: 0,
+      next: null,
+      facets: TestSearchFacets(),
+    );
   }
 }

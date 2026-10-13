@@ -356,6 +356,185 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get otpInvalid => 'Enter the 6-digit code';
+
+  @override
+  String get otpTooManyAttempts => 'Too many attempts. Please wait a minute.';
+
+  @override
+  String get badgeInstantBooking => 'Instant booking';
+
+  @override
+  String get badgeBookingByRequest => 'Booking by request';
+
+  @override
+  String get badgeBookByPhone => 'Book by phone';
+
+  @override
+  String get ctaBookAppointment => 'Book appointment';
+
+  @override
+  String get ctaRequestAppointment => 'Request appointment';
+
+  @override
+  String get ctaGetPhoneNumber => 'Get phone number';
+
+  @override
+  String get ctaSendRequest => 'Send request';
+
+  @override
+  String get selectSession => 'Select session';
+
+  @override
+  String get selectASession => 'Select a session';
+
+  @override
+  String get noSessionsForDay => 'No sessions available for this day';
+
+  @override
+  String get noChambers => 'No chambers listed';
+
+  @override
+  String get noChambersDesc => 'This doctor has no chambers listed yet.';
+
+  @override
+  String get goBack => 'Go back';
+
+  @override
+  String get sessionFull => 'Full';
+
+  @override
+  String get sessionEnded => 'Ended';
+
+  @override
+  String get sessionClosed => 'Closed';
+
+  @override
+  String sessionSeatsLeft(int count) {
+    return '$count left';
+  }
+
+  @override
+  String nextSerialNumber(int number) {
+    return 'Next serial #$number';
+  }
+
+  @override
+  String approxTime(String time) {
+    return 'approx. $time';
+  }
+
+  @override
+  String get tooLateToRequest => 'Too late to request — call the chamber';
+
+  @override
+  String get morningSession => 'Morning';
+
+  @override
+  String get eveningSession => 'Evening';
+
+  @override
+  String get requestSentTitle => 'Request sent';
+
+  @override
+  String requestWillCall(String facility, String phone) {
+    return '$facility will call you at $phone to confirm. You\'ll also get an SMS.';
+  }
+
+  @override
+  String expectCallBy(String deadline) {
+    return 'Expect a call by $deadline';
+  }
+
+  @override
+  String get beforeSessionStarts => 'before the session starts';
+
+  @override
+  String get confirmedTitle => 'You\'re booked';
+
+  @override
+  String get serialBySms => 'Your serial will come by SMS';
+
+  @override
+  String get bookingIdLabel => 'Booking ID';
+
+  @override
+  String get bookingNotFound => 'This booking isn\'t loaded';
+
+  @override
+  String get bookingNotLoadedDesc =>
+      'Open the booking again from the doctor\'s profile.';
+
+  @override
+  String get backToDoctors => 'Back to doctors';
+
+  @override
+  String get genderOther => 'Other';
+
+  @override
+  String get patientAge => 'Age (optional)';
+
+  @override
+  String get patientAgeHint => 'Years';
+
+  @override
+  String get patientGender => 'Gender (optional)';
+
+  @override
+  String sendRequestNote(String phone) {
+    return 'The chamber will call $phone to confirm';
+  }
+
+  @override
+  String nextAvailableShort(String day, String time, int count) {
+    return 'Next: $day $time · $count left';
+  }
+
+  @override
+  String get callToBook => 'Call';
+
+  @override
+  String get callDuringHours => 'Call during these hours';
+
+  @override
+  String get weeklyHours => 'Weekly hours';
+
+  @override
+  String get labWillContact =>
+      'Booking received — the lab will contact you to confirm';
+
+  @override
+  String get serviceNotOffered => 'This hospital doesn\'t offer this service';
+
+  @override
+  String get preferredTimeLabel => 'Preferred time';
+
+  @override
+  String get prefTimeMorning => 'Morning (9 am–12 pm)';
+
+  @override
+  String get prefTimeAfternoon => 'Afternoon (12–4 pm)';
+
+  @override
+  String get prefTimeEvening => 'Evening (4–8 pm)';
+
+  @override
+  String get prefTimeAny => 'Any time';
+
+  @override
+  String get notesLabel => 'Notes (optional)';
+
+  @override
+  String serviceRequestReceived(String facility) {
+    return 'Request received — $facility will contact you to confirm';
+  }
+
+  @override
+  String sessionWindow(String start, String end) {
+    return '$start–$end';
+  }
+
+  @override
   String get bookedSuccessTitle => 'You\'re booked!';
 
   @override
@@ -435,6 +614,15 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get pickupThana => 'Pickup thana';
+
+  @override
+  String get selectThana => 'Select thana';
+
+  @override
+  String get pickupThanaRequired => 'Pickup thana is required';
+
+  @override
   String get pickupAddress => 'Home Pickup Address';
 
   @override
@@ -446,6 +634,35 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get timeWindow => 'Preferred Time Window';
+
+  @override
+  String get hospitalNotFound => 'Hospital not found';
+
+  @override
+  String get hospitalNotFoundDesc =>
+      'It may have been removed. Go back and try another hospital.';
+
+  @override
+  String doctorsHere(int count) {
+    return 'Doctors here ($count)';
+  }
+
+  @override
+  String testsHere(int count) {
+    return 'Tests here ($count)';
+  }
+
+  @override
+  String get servicesTitle => 'Services';
+
+  @override
+  String get phoneLabel => 'Phone';
+
+  @override
+  String get emergencyPhoneLabel => 'Emergency';
+
+  @override
+  String get ambulancePhoneLabel => 'Ambulance';
 
   @override
   String get hospitalsTitle => 'Hospitals & Diagnostic Centers';
@@ -469,6 +686,30 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get labTestTag => 'LAB TEST';
+
+  @override
+  String get hospitalServiceTag => 'HOSPITAL SERVICE';
+
+  @override
+  String get statusConfirmedTag => 'Confirmed';
+
+  @override
+  String get awaitingConfirmationTag => 'Awaiting confirmation';
+
+  @override
+  String get awaitingLabTag => 'Awaiting lab';
+
+  @override
+  String get awaitingHospitalTag => 'Awaiting hospital';
+
+  @override
+  String get notConfirmedInTime =>
+      'Not confirmed in time. If you didn\'t get an SMS, call the chamber.';
+
+  @override
+  String toCancelCall(String facility) {
+    return 'To cancel, call $facility';
+  }
 
   @override
   String get cancelBooking => 'Cancel';
@@ -515,4 +756,58 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bangla => 'বাংলা';
+
+  @override
+  String get updateRequiredTitle => 'Update required';
+
+  @override
+  String get updateRequiredFallback => 'Please update the app to continue.';
+
+  @override
+  String get updateAvailableMessage => 'A new version of the app is available.';
+
+  @override
+  String get updateSoonMessage =>
+      'This version will stop working soon. Please update.';
+
+  @override
+  String get updateNow => 'Update now';
+
+  @override
+  String get errBookingModeCallOnly =>
+      'This chamber takes bookings by phone only. Please call the chamber.';
+
+  @override
+  String get errRequestTooLate =>
+      'Too late to request this session. Please call the chamber.';
+
+  @override
+  String get errNotCallMode => 'This chamber no longer takes phone bookings.';
+
+  @override
+  String get errNoNumbers =>
+      'This chamber has no phone number listed yet. Please try another chamber.';
+
+  @override
+  String usualPriceLabel(String price) {
+    return 'Usual price: $price';
+  }
+
+  @override
+  String get priceAtCounter => 'Price at counter';
+
+  @override
+  String get priceConfirmedAtLab => 'Price confirmed at the lab';
+
+  @override
+  String get currentlyUnavailable => 'Currently unavailable';
+
+  @override
+  String get testNotLoaded => 'This test isn\'t loaded';
+
+  @override
+  String get testNotLoadedDesc => 'Open it again from the tests list.';
+
+  @override
+  String get backToTests => 'Back to tests';
 }

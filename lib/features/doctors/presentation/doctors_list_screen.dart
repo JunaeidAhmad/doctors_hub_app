@@ -15,6 +15,8 @@ import '../../../core/widgets/filter_chip_dark.dart';
 import '../../../core/widgets/kicker.dart';
 import '../../../core/widgets/photo_placeholder.dart';
 import '../../../core/widgets/skeleton_row.dart';
+import '../../../l10n/app_localizations.dart';
+import '../../booking/domain/booking_mode.dart';
 import '../domain/models/doctor.dart';
 
 const List<String> _daysList = [
@@ -76,14 +78,16 @@ class DoctorsListScreen extends ConsumerStatefulWidget {
   const DoctorsListScreen({
     super.key,
     this.initialSpecialty,
-    this.initialDivision,
-    this.initialHospital,
+    this.initialDivisionId,
+    this.initialFacilityId,
+    this.initialFacilityName,
     this.initialSearch,
   });
 
   final String? initialSpecialty;
-  final String? initialDivision;
-  final String? initialHospital;
+  final int? initialDivisionId;
+  final String? initialFacilityId;
+  final String? initialFacilityName;
   final String? initialSearch;
 
   @override
@@ -95,17 +99,12 @@ class _DoctorsListScreenState extends ConsumerState<DoctorsListScreen> {
   Timer? _debounceTimer;
 
   String? _specialty;
-  String? _hospital;
-  String? _hospitalDisplayName;
+  String? _facilityId;
+  String? _facilityDisplayName;
 
   int? _divisionId;
-  String? _divisionName;
-
   int? _districtId;
-  String? _districtName;
-
   int? _thanaId;
-  String? _thanaName;
 
   String? _selectedDay = 'All';
   String? _gender = 'All';
@@ -125,25 +124,16 @@ class _DoctorsListScreenState extends ConsumerState<DoctorsListScreen> {
 
   int get _activeFiltersCount {
     int count = 0;
-    if (_hospital != null && _hospital!.isNotEmpty && _hospital != 'all') {
+    if (_facilityId != null && _facilityId!.isNotEmpty) {
       count++;
     }
-    if (_divisionId != null ||
-        (_divisionName != null &&
-            _divisionName!.isNotEmpty &&
-            _divisionName != 'All Bangladesh')) {
+    if (_divisionId != null) {
       count++;
     }
-    if (_districtId != null ||
-        (_districtName != null &&
-            _districtName!.isNotEmpty &&
-            _districtName != 'All Districts')) {
+    if (_districtId != null) {
       count++;
     }
-    if (_thanaId != null ||
-        (_thanaName != null &&
-            _thanaName!.isNotEmpty &&
-            _thanaName != 'All Areas')) {
+    if (_thanaId != null) {
       count++;
     }
     if (_selectedDay != null &&
@@ -164,8 +154,9 @@ class _DoctorsListScreenState extends ConsumerState<DoctorsListScreen> {
   void initState() {
     super.initState();
     _specialty = widget.initialSpecialty;
-    _divisionName = widget.initialDivision;
-    _hospital = widget.initialHospital;
+    _divisionId = widget.initialDivisionId;
+    _facilityId = widget.initialFacilityId;
+    _facilityDisplayName = widget.initialFacilityName;
     _searchQuery = widget.initialSearch ?? '';
     _searchController = TextEditingController(text: _searchQuery);
 
@@ -203,14 +194,11 @@ class _DoctorsListScreenState extends ConsumerState<DoctorsListScreen> {
 
   void _resetAllFilters() {
     setState(() {
-      _hospital = null;
-      _hospitalDisplayName = null;
+      _facilityId = null;
+      _facilityDisplayName = null;
       _divisionId = null;
-      _divisionName = null;
       _districtId = null;
-      _districtName = null;
       _thanaId = null;
-      _thanaName = null;
       _selectedDay = 'All';
       _gender = 'All';
     });
@@ -220,11 +208,8 @@ class _DoctorsListScreenState extends ConsumerState<DoctorsListScreen> {
   void _clearLocationFilters() {
     setState(() {
       _divisionId = null;
-      _divisionName = null;
       _districtId = null;
-      _districtName = null;
       _thanaId = null;
-      _thanaName = null;
     });
     _fetchDoctors(page: 1);
   }
@@ -232,14 +217,11 @@ class _DoctorsListScreenState extends ConsumerState<DoctorsListScreen> {
   void _clearAll() {
     setState(() {
       _specialty = null;
-      _hospital = null;
-      _hospitalDisplayName = null;
+      _facilityId = null;
+      _facilityDisplayName = null;
       _divisionId = null;
-      _divisionName = null;
       _districtId = null;
-      _districtName = null;
       _thanaId = null;
-      _thanaName = null;
       _selectedDay = 'All';
       _gender = 'All';
       _searchQuery = '';
@@ -263,13 +245,10 @@ class _DoctorsListScreenState extends ConsumerState<DoctorsListScreen> {
       final result = await repo.searchDoctors(
         search: _searchQuery,
         specialty: _specialty,
-        division: _divisionName,
         divisionId: _divisionId,
-        district: _districtName,
         districtId: _districtId,
-        area: _thanaName,
         thanaId: _thanaId,
-        hospital: _hospital,
+        facilityId: _facilityId,
         day: (_selectedDay != null &&
                 _selectedDay != 'All' &&
                 _selectedDay != 'All Days')
@@ -313,6 +292,27 @@ class _DoctorsListScreenState extends ConsumerState<DoctorsListScreen> {
     final divisionsAsync = ref.watch(divisionsProvider);
     final districtsAsync = ref.watch(districtsProvider(_divisionId));
     final thanasAsync = ref.watch(thanasProvider(_districtId));
+    final divisions = divisionsAsync.valueOrNull ?? [];
+    final districts = districtsAsync.valueOrNull ?? [];
+    final thanas = thanasAsync.valueOrNull ?? [];
+    final divisionName = _divisionId == null
+        ? null
+        : divisions
+            .where((d) => d.id == _divisionId)
+            .map((d) => d.name)
+            .firstOrNull;
+    final districtName = _districtId == null
+        ? null
+        : districts
+            .where((d) => d.id == _districtId)
+            .map((d) => d.name)
+            .firstOrNull;
+    final thanaName = _thanaId == null
+        ? null
+        : thanas
+            .where((t) => t.id == _thanaId)
+            .map((t) => t.name)
+            .firstOrNull;
 
     final activeSpecialtyName = _specialty != null && _specialty!.isNotEmpty
         ? _specialty!.toUpperCase()
@@ -538,8 +538,8 @@ class _DoctorsListScreenState extends ConsumerState<DoctorsListScreen> {
                               facilitiesAsync.when(
                                 data: (facilities) {
                                   final sorted = facilities.toList()
-                                    ..sort((a, b) =>
-                                        a.name.compareTo(b.name));
+                                    ..sort((a, b) => a.displayName
+                                        .compareTo(b.displayName));
                                   final items = [
                                     DhDropdownItem<String>(
                                       value: '',
@@ -549,28 +549,25 @@ class _DoctorsListScreenState extends ConsumerState<DoctorsListScreen> {
                                     ),
                                     ...sorted.map(
                                       (f) => DhDropdownItem<String>(
-                                        value: f.id.isNotEmpty
-                                            ? f.id
-                                            : f.slug,
-                                        label: f.fullDisplayName,
+                                        value: f.id,
+                                        label: f.displayName,
                                       ),
                                     ),
                                   ];
                                   return DhDropdown<String>(
-                                    value: _hospital ?? '',
+                                    value: _facilityId ?? '',
                                     items: items,
                                     onChanged: (val) {
                                       setState(() {
-                                        _hospital = (val != null &&
+                                        _facilityId = (val != null &&
                                                 val.isNotEmpty)
                                             ? val
                                             : null;
                                         final found = facilities
-                                            .where((f) =>
-                                                f.id == val || f.slug == val)
+                                            .where((f) => f.id == val)
                                             .firstOrNull;
-                                        _hospitalDisplayName =
-                                            found?.fullDisplayName;
+                                        _facilityDisplayName =
+                                            found?.displayName;
                                       });
                                       _fetchDoctors(page: 1);
                                     },
@@ -594,10 +591,7 @@ class _DoctorsListScreenState extends ConsumerState<DoctorsListScreen> {
                                   ),
                                   if (_divisionId != null ||
                                       _districtId != null ||
-                                      _thanaId != null ||
-                                      (_divisionName != null &&
-                                          _divisionName!.isNotEmpty &&
-                                          _divisionName != 'All Bangladesh'))
+                                      _thanaId != null)
                                     InkWell(
                                       onTap: _clearLocationFilters,
                                       child: Text(
@@ -633,16 +627,10 @@ class _DoctorsListScreenState extends ConsumerState<DoctorsListScreen> {
                                     value: _divisionId,
                                     items: items,
                                     onChanged: (val) {
-                                      final div = divisions
-                                          .where((d) => d.id == val)
-                                          .firstOrNull;
                                       setState(() {
                                         _divisionId = val;
-                                        _divisionName = div?.name;
                                         _districtId = null;
-                                        _districtName = null;
                                         _thanaId = null;
-                                        _thanaName = null;
                                       });
                                       _fetchDoctors(page: 1);
                                     },
@@ -675,14 +663,9 @@ class _DoctorsListScreenState extends ConsumerState<DoctorsListScreen> {
                                     value: _districtId,
                                     items: items,
                                     onChanged: (val) {
-                                      final dist = districts
-                                          .where((d) => d.id == val)
-                                          .firstOrNull;
                                       setState(() {
                                         _districtId = val;
-                                        _districtName = dist?.name;
                                         _thanaId = null;
-                                        _thanaName = null;
                                       });
                                       _fetchDoctors(page: 1);
                                     },
@@ -715,12 +698,8 @@ class _DoctorsListScreenState extends ConsumerState<DoctorsListScreen> {
                                     value: _thanaId,
                                     items: items,
                                     onChanged: (val) {
-                                      final th = thanas
-                                          .where((t) => t.id == val)
-                                          .firstOrNull;
                                       setState(() {
                                         _thanaId = val;
-                                        _thanaName = th?.name;
                                       });
                                       _fetchDoctors(page: 1);
                                     },
@@ -913,59 +892,47 @@ class _DoctorsListScreenState extends ConsumerState<DoctorsListScreen> {
                                   _fetchDoctors(page: 1);
                                 },
                               ),
-                            if (_hospital != null && _hospital!.isNotEmpty)
+                            if (_facilityId != null)
                               FilterChipDark(
                                 label:
-                                    'At ${_hospitalDisplayName ?? _hospital!}',
+                                    'At ${_facilityDisplayName ?? _facilityId!}',
                                 onDeleted: () {
                                   setState(() {
-                                    _hospital = null;
-                                    _hospitalDisplayName = null;
+                                    _facilityId = null;
+                                    _facilityDisplayName = null;
                                   });
                                   _fetchDoctors(page: 1);
                                 },
                               ),
-                            if (_divisionName != null &&
-                                _divisionName!.isNotEmpty &&
-                                _divisionName != 'All Bangladesh')
+                            if (divisionName != null)
                               FilterChipDark(
-                                label: _divisionName!,
+                                label: divisionName,
                                 onDeleted: () {
                                   setState(() {
                                     _divisionId = null;
-                                    _divisionName = null;
                                     _districtId = null;
-                                    _districtName = null;
                                     _thanaId = null;
-                                    _thanaName = null;
                                   });
                                   _fetchDoctors(page: 1);
                                 },
                               ),
-                            if (_districtName != null &&
-                                _districtName!.isNotEmpty &&
-                                _districtName != 'All Districts')
+                            if (districtName != null)
                               FilterChipDark(
-                                label: _districtName!,
+                                label: districtName,
                                 onDeleted: () {
                                   setState(() {
                                     _districtId = null;
-                                    _districtName = null;
                                     _thanaId = null;
-                                    _thanaName = null;
                                   });
                                   _fetchDoctors(page: 1);
                                 },
                               ),
-                            if (_thanaName != null &&
-                                _thanaName!.isNotEmpty &&
-                                _thanaName != 'All Areas')
+                            if (thanaName != null)
                               FilterChipDark(
-                                label: _thanaName!,
+                                label: thanaName,
                                 onDeleted: () {
                                   setState(() {
                                     _thanaId = null;
-                                    _thanaName = null;
                                   });
                                   _fetchDoctors(page: 1);
                                 },
@@ -1095,7 +1062,7 @@ class _DoctorsListScreenState extends ConsumerState<DoctorsListScreen> {
   Widget _buildDoctorCard(BuildContext context, Doctor doctor, bool isBn) {
     final primaryChamber = doctor.primaryChamber;
     final otherChambersCount =
-        doctor.affiliations.length > 1 ? doctor.affiliations.length - 1 : 0;
+        doctor.chambers.length > 1 ? doctor.chambers.length - 1 : 0;
 
     return InkWell(
       onTap: () => context.push('/doctors/${doctor.slug}'),
@@ -1188,23 +1155,48 @@ class _DoctorsListScreenState extends ConsumerState<DoctorsListScreen> {
 
             // Chamber information
             if (primaryChamber != null)
-              Row(
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.location_on_outlined, size: 16, color: AppColors.muted),
-                  const SizedBox(width: 4),
-                  Expanded(
-                    child: Text(
-                      primaryChamber.fullDisplayName,
-                      style: AppTypography.bodyMedium.copyWith(fontSize: 13),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                  Row(
+                    children: [
+                      const Icon(Icons.location_on_outlined,
+                          size: 16, color: AppColors.muted),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          primaryChamber.fullDisplayName,
+                          style:
+                              AppTypography.bodyMedium.copyWith(fontSize: 13),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      if (otherChambersCount > 0)
+                        Text(
+                          isBn
+                              ? '+ $otherChambersCount টি চেম্বার'
+                              : '+ $otherChambersCount more',
+                          style: AppTypography.tag
+                              .copyWith(color: AppColors.muted),
+                        ),
+                    ],
                   ),
-                  if (otherChambersCount > 0)
+                  if (nextAvailableLabel(
+                        primaryChamber,
+                        AppLocalizations.of(context)!,
+                      ) !=
+                      null) ...[
+                    const SizedBox(height: 4),
                     Text(
-                      isBn ? '+ $otherChambersCount টি চেম্বার' : '+ $otherChambersCount more',
-                      style: AppTypography.tag.copyWith(color: AppColors.muted),
+                      nextAvailableLabel(
+                        primaryChamber,
+                        AppLocalizations.of(context)!,
+                      )!,
+                      style: AppTypography.secondary
+                          .copyWith(color: AppColors.accentLink),
                     ),
+                  ],
                 ],
               ),
 

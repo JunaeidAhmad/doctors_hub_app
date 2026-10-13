@@ -1,0 +1,155 @@
+{
+  "affiliation_id": "1c5ccd06-0079-55db-b1f0-9cea39c0d632",
+  "doctor_id": "c067135b-2ab0-54d1-8b67-58ce852add2b",
+  "facility": {
+    "id": "42e93c99-d8db-5d1f-b8af-59838b290646",
+    "slug": "square-hospital-panthapath-main",
+    "location_type": "hospital",
+    "ownership_type": "private",
+    "name": "Square Hospital",
+    "branch": "Panthapath Main",
+    "display_name": "Square Hospital (Panthapath Main)",
+    "address": "18/F, Bir Uttam Qazi Nuruzzaman Sarak, Panthapath",
+    "thana_id": 6,
+    "area": "Panthapath",
+    "area_bn": "পান্থপথ",
+    "district_id": 1,
+    "district": "Dhaka",
+    "district_bn": "ঢাকা",
+    "division_id": 1,
+    "division": "Dhaka",
+    "division_bn": "ঢাকা",
+    "phone": "+8801713377775",
+    "email": "info@squarehospital.com",
+    "logo": null,
+    "image": null,
+    "rating": 4.85,
+    "reviews_count": 340,
+    "is_verified": true,
+    "is_active": true
+  },
+  "fee": "2000.00",
+  "timezone": "Asia/Dhaka",
+  "next_available": {
+    "date": "2026-10-14",
+    "session_key": "s:e2db71ac-bd31-55ff-8f9a-12247d7fe32c",
+    "session_start": "17:00",
+    "start_time": "17:00",
+    "estimated_time": "17:00",
+    "remaining": 30,
+    "capacity_remaining": 30
+  },
+  "dates": [
+    {
+      "date": "2026-10-13",
+      "weekday": "Tuesday",
+      "has_schedule": false,
+      "sessions_count": 0,
+      "capacity_remaining": 0,
+      "status": "closed",
+      "sessions": []
+    },
+    {
+      "date": "2026-10-14",
+      "weekday": "Wednesday",
+      "has_schedule": true,
+      "sessions_count": 1,
+      "capacity_remaining": 30,
+      "status": "available",
+      "sessions": [
+        {
+          "session_key": "s:e2db71ac-bd31-55ff-8f9a-12247d7fe32c",
+          "session_start": "17:00",
+          "start_time": "17:00",
+          "session_end": "20:00",
+          "end_time": "20:00",
+          "capacity": 30,
+          "booked": 0,
+          "remaining": 30,
+          "capacity_remaining": 30,
+          "next_serial": 1,
+          "estimated_time": "17:00",
+          "status": "available",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "date": "2026-10-15",
+      "weekday": "Thursday",
+      "has_schedule": false,
+      "sessions_count": 0,
+      "capacity_remaining": 0,
+      "status": "closed",
+      "sessions": []
+    },
+    {
+      "date": "2026-10-16",
+      "weekday": "Friday",
+      "has_schedule": false,
+      "sessions_count": 0,
+      "capacity_remaining": 0,
+      "status": "closed",
+      "sessions": []
+    },
+    {
+      "date": "2026-10-17",
+      "weekday": "Saturday",
+      "has_schedule": true,
+      "sessions_count": 1,
+      "capacity_remaining": 30,
+      "status": "available",
+      "sessions": [
+        {
+          "session_key": "s:296362be-be99-50ef-a3ee-029af6b56118",
+          "session_start": "17:00",
+          "start_time": "17:00",
+          "session_end": "20:00",
+          "end_time": "20:00",
+          "capacity": 30,
+          "booked": 0,
+          "remaining": 30,
+          "capacity_remaining": 30,
+          "next_serial": 1,
+          "estimated_time": "17:00",
+          "status": "available",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "date": "2026-10-18",
+      "weekday": "Sunday",
+      "has_schedule": false,
+      "sessions_count": 0,
+      "capacity_remaining": 0,
+      "status": "closed",
+      "sessions": []
+    },
+    {
+      "date": "2026-10-19",
+      "weekday": "Monday",
+      "has_schedule": true,
+      "sessions_count": 1,
+      "capacity_remaining": 30,
+      "status": "available",
+      "sessions": [
+        {
+          "session_key": "s:3b856815-aa90-52c1-ad55-cfc8cc8a2f90",
+          "session_start": "17:00",
+          "start_time": "17:00",
+          "session_end": "20:00",
+          "end_time": "20:00",
+          "capacity": 30,
+          "booked": 0,
+          "remaining": 30,
+          "capacity_remaining": 30,
+          "next_serial": 1,
+          "estimated_time": "17:00",
+          "status": "available",
+          "note": ""
+        }
+      ]
+    }
+  ]
+}

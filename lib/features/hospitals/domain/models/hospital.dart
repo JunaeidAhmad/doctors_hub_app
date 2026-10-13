@@ -1,121 +1,233 @@
-class Hospital {
-  const Hospital({
-    required this.id,
-    required this.name,
-    this.bnName,
-    required this.slug,
-    this.category,
-    this.branch,
-    this.addressLine,
-    this.area,
-    this.district,
-    this.division,
-    this.phone,
-    this.doctorCount,
-    this.rating,
-    this.reviewsCount,
-    this.ownershipType,
-  });
+import '../../../../core/models/facility_summary.dart';
+
+class HospitalCategoryRef {
+  const HospitalCategoryRef({this.id, this.slug, this.name});
+
+  final String? id;
+  final String? slug;
+  final String? name;
+
+  factory HospitalCategoryRef.fromJson(Map<String, dynamic> json) {
+    return HospitalCategoryRef(
+      id: json['id']?.toString(),
+      slug: json['slug'] as String?,
+      name: json['name'] as String?,
+    );
+  }
+}
+
+class HospitalServiceRef {
+  const HospitalServiceRef({required this.id, required this.name, this.icon});
 
   final String id;
   final String name;
-  final String? bnName;
-  final String slug;
-  final String? category;
+  final String? icon;
+
+  factory HospitalServiceRef.fromJson(Map<String, dynamic> json) {
+    return HospitalServiceRef(
+      id: json['id']?.toString() ?? '',
+      name: json['name'] as String? ?? '',
+      icon: json['icon'] as String?,
+    );
+  }
+}
+
+/// A hospital or diagnostic centre from `GET /hospitals/` /
+/// `GET /hospitals/{location}/`. The v1 serializers spread the flat facility
+/// summary into the top level (gap G1), so this parses the real payload.
+class Hospital {
+  const Hospital({
+    required this.id,
+    required this.displayName,
+    this.slug,
+    this.name = '',
+    this.branch,
+    this.category,
+    this.address,
+    this.area,
+    this.areaBn,
+    this.district,
+    this.districtBn,
+    this.division,
+    this.divisionBn,
+    this.phone,
+    this.doctorCount,
+    this.testCount,
+    this.rating,
+    this.reviewsCount,
+    this.ownershipType,
+    this.locationType,
+    this.emergencyPhone,
+    this.ambulancePhone,
+    this.openTiming,
+    this.description,
+    this.services = const [],
+    this.logo,
+    this.image,
+  });
+
+  final String id;
+  final String displayName;
+  final String? slug;
+  final String name;
   final String? branch;
-  final String? addressLine;
+  final String? category;
+  final String? address;
   final String? area;
+  final String? areaBn;
   final String? district;
+  final String? districtBn;
   final String? division;
+  final String? divisionBn;
   final String? phone;
   final int? doctorCount;
+  final int? testCount;
   final double? rating;
   final int? reviewsCount;
   final String? ownershipType;
+  final String? locationType;
+  final String? emergencyPhone;
+  final String? ambulancePhone;
+  final String? openTiming;
+  final String? description;
+  final List<HospitalServiceRef> services;
+  final String? logo;
+  final String? image;
 
-  String localizedName(String locale) {
-    if (locale == 'bn' && bnName != null && bnName!.isNotEmpty) {
-      return bnName!;
+  String localizedName(String locale) => displayName;
+
+  String localizedArea(String locale) {
+    if (locale == 'bn' && areaBn != null && areaBn!.isNotEmpty) return areaBn!;
+    return area ?? '';
+  }
+
+  String localizedDistrict(String locale) {
+    if (locale == 'bn' && districtBn != null && districtBn!.isNotEmpty) {
+      return districtBn!;
     }
-    return name;
+    return district ?? '';
   }
 
   String get initials {
-    final parts = name.trim().split(RegExp(r'\s+'));
-    if (parts.isEmpty) return 'H';
+    final source = displayName.trim();
+    final parts = source.split(RegExp(r'\s+'));
+    if (parts.isEmpty || parts.first.isEmpty) return 'H';
     if (parts.length == 1) return parts[0].substring(0, 1).toUpperCase();
     return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
   }
 
-  String get fullDisplayName {
-    if (branch != null && branch!.isNotEmpty) {
-      return '$name, $branch';
-    }
-    return name;
-  }
+  String get fullDisplayName => displayName;
+
+  FacilitySummary get facility => FacilitySummary(
+        id: id,
+        displayName: displayName,
+        slug: slug,
+        name: name,
+        branch: branch,
+        address: address,
+        area: area,
+        areaBn: areaBn,
+        district: district,
+        districtBn: districtBn,
+        division: division,
+        divisionBn: divisionBn,
+        phone: phone,
+        logo: logo,
+        image: image,
+        locationType: locationType,
+        ownershipType: ownershipType,
+        rating: rating,
+        reviewsCount: reviewsCount,
+      );
 
   factory Hospital.fromJson(Map<String, dynamic> json) {
-    // Port flattenFacility logic: attributes might be top-level or under location_details
-    final loc = json['location_details'] as Map<String, dynamic>?;
+    String? str(String key) => json[key] is String ? json[key] as String : null;
+    int? integer(String key) => (json[key] as num?)?.toInt();
 
-    final name = json['name'] as String? ?? loc?['name'] as String? ?? '';
-    final bnName = json['bn_name'] as String? ?? loc?['bn_name'] as String?;
-    final slug = json['slug'] as String? ?? loc?['slug'] as String? ?? '';
-    final branch = json['branch'] as String? ?? loc?['branch'] as String?;
-    final addressLine = json['address_line'] as String? ?? loc?['address_line'] as String?;
-    final area = json['area'] as String? ?? loc?['area'] as String?;
-    final district = json['district'] as String? ?? loc?['district'] as String?;
-    final division = json['division'] as String? ?? loc?['division'] as String?;
-    final phone = json['phone'] as String? ?? loc?['phone'] as String?;
-
-    String? category;
-    if (json['category'] is Map) {
-      category = (json['category'] as Map)['name']?.toString() ??
-          (json['category'] as Map)['slug']?.toString();
-    } else if (json['category'] is String) {
-      category = json['category'] as String;
-    } else if (json['location_type'] is String) {
-      category = json['location_type'] as String;
-    } else if (loc?['location_type'] is String) {
-      category = loc!['location_type'] as String;
+    String? categoryName;
+    final categoryRaw = json['category'];
+    if (categoryRaw is Map) {
+      categoryName = categoryRaw['name'] is String
+          ? categoryRaw['name'] as String
+          : categoryRaw['slug'] is String
+              ? categoryRaw['slug'] as String
+              : null;
     }
 
-    final ownershipType = json['ownership_type'] as String? ?? loc?['ownership_type'] as String?;
+    final services = <HospitalServiceRef>[];
+    final servicesRaw = json['services'];
+    if (servicesRaw is List) {
+      for (final item in servicesRaw) {
+        if (item is Map) {
+          services.add(
+            HospitalServiceRef.fromJson(Map<String, dynamic>.from(item)),
+          );
+        }
+      }
+    }
+
+    final displayName = str('display_name') ?? str('name') ?? '';
 
     return Hospital(
-      id: json['id']?.toString() ?? loc?['id']?.toString() ?? '',
-      name: name,
-      bnName: bnName,
-      slug: slug,
-      category: category,
-      branch: branch,
-      addressLine: addressLine,
-      area: area,
-      district: district,
-      division: division,
-      phone: phone,
-      doctorCount: (json['doctor_count'] as num?)?.toInt() ?? (json['doctors_count'] as num?)?.toInt(),
-      rating: (json['rating'] as num?)?.toDouble() ?? (loc?['rating'] as num?)?.toDouble(),
-      reviewsCount: (json['reviews_count'] as num?)?.toInt() ?? (loc?['reviews_count'] as num?)?.toInt(),
-      ownershipType: ownershipType,
+      id: str('id') ?? '',
+      displayName: displayName,
+      slug: str('slug'),
+      name: str('name') ?? displayName,
+      branch: str('branch'),
+      category: categoryName,
+      address: str('address'),
+      area: str('area'),
+      areaBn: str('area_bn'),
+      district: str('district'),
+      districtBn: str('district_bn'),
+      division: str('division'),
+      divisionBn: str('division_bn'),
+      phone: str('phone'),
+      doctorCount: integer('doctor_count'),
+      testCount: integer('test_count'),
+      rating: (json['rating'] as num?)?.toDouble(),
+      reviewsCount: integer('reviews_count'),
+      ownershipType: str('ownership_type'),
+      locationType: str('location_type'),
+      emergencyPhone: str('emergency_phone'),
+      ambulancePhone: str('ambulance_phone'),
+      openTiming: str('open_timing'),
+      description: str('description'),
+      services: services,
+      logo: str('logo'),
+      image: str('image'),
     );
   }
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'name': name,
-    'bn_name': bnName,
-    'slug': slug,
-    'category': category,
-    'branch': branch,
-    'address_line': addressLine,
-    'area': area,
-    'district': district,
-    'division': division,
-    'phone': phone,
-    'doctor_count': doctorCount,
-    'rating': rating,
-    'reviews_count': reviewsCount,
-    'ownership_type': ownershipType,
-  };
+        'id': id,
+        'display_name': displayName,
+        'slug': slug,
+        'name': name,
+        'branch': branch,
+        'category': category == null ? null : {'name': category},
+        'address': address,
+        'area': area,
+        'area_bn': areaBn,
+        'district': district,
+        'district_bn': districtBn,
+        'division': division,
+        'division_bn': divisionBn,
+        'phone': phone,
+        'doctor_count': doctorCount,
+        'test_count': testCount,
+        'rating': rating,
+        'reviews_count': reviewsCount,
+        'ownership_type': ownershipType,
+        'location_type': locationType,
+        'emergency_phone': emergencyPhone,
+        'ambulance_phone': ambulancePhone,
+        'open_timing': openTiming,
+        'description': description,
+        'services': services
+            .map((s) => {'id': s.id, 'name': s.name, 'icon': s.icon})
+            .toList(),
+        'logo': logo,
+        'image': image,
+      };
 }

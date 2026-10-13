@@ -9,7 +9,7 @@ import 'package:doctors_hub_app/features/doctors/data/doctor_repository.dart';
 import 'package:doctors_hub_app/features/doctors/domain/models/doctor.dart';
 import 'package:doctors_hub_app/features/doctors/domain/models/specialty.dart';
 import 'package:doctors_hub_app/features/doctors/presentation/doctors_list_screen.dart';
-import 'package:doctors_hub_app/features/hospitals/domain/models/hospital.dart';
+import 'package:doctors_hub_app/core/models/facility_summary.dart';
 import 'package:doctors_hub_app/features/location/domain/models/division.dart';
 import 'package:doctors_hub_app/features/location/domain/models/district.dart';
 import 'package:doctors_hub_app/features/location/domain/models/thana.dart';
@@ -21,14 +21,10 @@ class MockDoctorRepository extends DoctorRepository {
   Future<PaginatedList<Doctor>> searchDoctors({
     String? search,
     String? specialty,
-    String? division,
     int? divisionId,
-    String? district,
     int? districtId,
-    String? area,
     int? thanaId,
-    String? hospital,
-    String? facility,
+    String? facilityId,
     String? day,
     String? gender,
     int page = 1,
@@ -65,10 +61,9 @@ void main() {
     ];
 
     final testFacilities = [
-      const Hospital(
+      const FacilitySummary(
         id: 'hosp-1',
-        name: 'Square Hospital',
-        slug: 'square-hospital',
+        displayName: 'Square Hospital',
       ),
     ];
 

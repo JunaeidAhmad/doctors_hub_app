@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../app_config/app_config_providers.dart';
+import '../models/facility_summary.dart';
 import '../network/api_client.dart';
 import '../storage/local_booking_store.dart';
 import '../../features/location/data/location_repository.dart';
@@ -13,7 +17,6 @@ import '../../features/location/domain/models/district.dart';
 import '../../features/location/domain/models/thana.dart';
 import '../../features/doctors/domain/models/specialty.dart';
 import '../../features/tests/domain/models/test_category.dart';
-import '../../features/hospitals/domain/models/hospital.dart';
 import '../../features/hospitals/domain/models/hospital_category.dart';
 import '../../features/bookings/domain/models/booking_item.dart';
 
@@ -22,9 +25,29 @@ final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
   throw UnimplementedError('sharedPreferencesProvider must be initialized');
 });
 
+// Build number for `X-App-Build`, read once at startup in main.dart.
+final appBuildNumberProvider = Provider<int>((ref) => 0);
+
+// `X-App-Platform` header value.
+final appPlatformProvider = Provider<String>((ref) {
+  try {
+    if (Platform.isIOS) return 'ios';
+    if (Platform.isAndroid) return 'android';
+  } catch (_) {
+    // Non-mobile (tests, desktop): fall through.
+  }
+  return 'android';
+});
+
 // ApiClient
 final apiClientProvider = Provider<ApiClient>((ref) {
-  final client = ApiClient();
+  final client = ApiClient(
+    appBuild: ref.watch(appBuildNumberProvider),
+    platform: ref.watch(appPlatformProvider),
+    onUpdateRequired: (failure) {
+      ref.read(updateRequiredProvider).value = failure;
+    },
+  );
   final locale = ref.watch(localeProvider);
   client.setLocale(locale.languageCode);
   return client;
@@ -151,7 +174,7 @@ final thanasProvider =
   return ref.watch(locationRepositoryProvider).getThanas(districtId: districtId);
 });
 
-final facilitiesProvider = FutureProvider<List<Hospital>>((ref) async {
-  return ref.watch(hospitalRepositoryProvider).getAllFacilities();
+final facilitiesProvider = FutureProvider<List<FacilitySummary>>((ref) async {
+  return ref.watch(locationRepositoryProvider).getFacilities();
 });
 

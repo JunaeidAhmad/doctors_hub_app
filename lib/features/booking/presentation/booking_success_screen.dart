@@ -8,7 +8,9 @@ import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/widgets/dh_scaffold.dart';
 import '../../../core/widgets/primary_cta_button.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../bookings/domain/models/booking_item.dart';
+import '../domain/models/booking_result.dart';
 
 final lastBookingSuccessProvider = StateProvider<BookingItem?>((ref) => null);
 
@@ -20,7 +22,23 @@ class BookingSuccessScreen extends ConsumerWidget {
     final booking = ref.watch(lastBookingSuccessProvider);
     final locale = ref.watch(localeProvider);
     final isBn = locale.languageCode == 'bn';
+    final l10n = AppLocalizations.of(context)!;
 
+    if (booking == null) {
+      return DhScaffold(
+        body: SafeArea(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Text(l10n.bookingNotFound, style: AppTypography.h2),
+            ),
+          ),
+        ),
+      );
+    }
+
+    final isConfirmedDoctor = booking.type == 'doctor' &&
+        booking.status == BookingStatus.confirmed;
     return DhScaffold(
       statusBarColor: AppColors.accent,
       statusBarIconBrightness: Brightness.light,
@@ -28,7 +46,6 @@ class BookingSuccessScreen extends ConsumerWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // Red Status Top Banner
             Container(
               width: double.infinity,
               color: AppColors.accent,
@@ -40,7 +57,10 @@ class BookingSuccessScreen extends ConsumerWidget {
                     height: 48,
                     decoration: BoxDecoration(
                       color: AppColors.paper,
-                      border: Border.all(color: AppColors.ink, width: AppColors.borderWidth),
+                      border: Border.all(
+                        color: AppColors.ink,
+                        width: AppColors.borderWidth,
+                      ),
                     ),
                     child: const Icon(
                       Icons.check,
@@ -50,19 +70,18 @@ class BookingSuccessScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    isBn ? 'বুকিং সফল হয়েছে!' : 'You\'re booked!',
+                    _headline(l10n, booking),
                     style: const TextStyle(
                       fontFamily: AppTypography.fontArchivo,
                       fontSize: 26,
                       fontWeight: FontWeight.w800,
                       color: AppColors.paper,
                     ),
+                    textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    isBn
-                        ? 'আপনার মোবাইল নম্বরে কনফার্মেশন পাঠানো হয়েছে।'
-                        : 'Details have been sent to your mobile via SMS.',
+                    _subHeadline(l10n, booking),
                     style: const TextStyle(
                       fontFamily: AppTypography.fontArchivo,
                       fontSize: 13,
@@ -73,8 +92,6 @@ class BookingSuccessScreen extends ConsumerWidget {
                 ],
               ),
             ),
-
-            // Booking Details Card
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(16),
@@ -84,21 +101,24 @@ class BookingSuccessScreen extends ConsumerWidget {
                     Container(
                       decoration: BoxDecoration(
                         color: AppColors.paper,
-                        border: Border.all(color: AppColors.ink, width: AppColors.borderWidth),
+                        border: Border.all(
+                          color: AppColors.ink,
+                          width: AppColors.borderWidth,
+                        ),
                       ),
                       padding: const EdgeInsets.all(20),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Reference & Serial
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    isBn ? 'বুকিং রেফারেন্স' : 'BOOKING REF',
+                                    l10n.bookingIdLabel.toUpperCase(),
                                     style: AppTypography.kicker.copyWith(
                                       color: AppColors.muted,
                                       fontSize: 10,
@@ -106,7 +126,7 @@ class BookingSuccessScreen extends ConsumerWidget {
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    booking?.bookingRef ?? 'DH-78291',
+                                    booking.bookingRef,
                                     style: const TextStyle(
                                       fontFamily: AppTypography.fontMono,
                                       fontSize: 15,
@@ -116,118 +136,93 @@ class BookingSuccessScreen extends ConsumerWidget {
                                   ),
                                 ],
                               ),
-                              if (booking?.serialDisplay != null)
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.accentWash,
-                                    border: Border.all(color: AppColors.accent, width: 1.5),
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        isBn ? 'সিরিয়াল' : 'SERIAL',
-                                        style: AppTypography.kicker.copyWith(fontSize: 9),
-                                      ),
-                                      Text(
-                                        booking!.serialDisplay!,
-                                        style: const TextStyle(
-                                          fontFamily: AppTypography.fontMono,
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w700,
-                                          color: AppColors.accentDeep,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                              if (isConfirmedDoctor &&
+                                  booking.serialDisplay != null &&
+                                  booking.serialDisplay!.isNotEmpty)
+                                _buildSerialBadge(booking.serialDisplay!, isBn),
                             ],
                           ),
-
                           const SizedBox(height: 16),
                           const Divider(color: AppColors.lineSoft, height: 1),
                           const SizedBox(height: 16),
-
                           _buildDetailRow(
                             label: isBn ? 'রোগী' : 'FOR',
-                            value: booking?.patientName ?? 'Patient',
-                            subValue: booking?.patientPhone != null
-                                ? '+88 ${booking!.patientPhone}'
+                            value: booking.patientName,
+                            subValue: booking.patientPhone.isNotEmpty
+                                ? '+88 ${booking.patientPhone}'
                                 : null,
                           ),
                           const SizedBox(height: 14),
                           _buildDetailRow(
                             label: isBn ? 'অ্যাপয়েন্টমেন্ট' : 'AT',
-                            value: booking?.title ?? 'Doctor Visit',
-                            subValue: '${booking?.subtitle ?? ''} · ${booking?.facilityName ?? ''}',
+                            value: booking.title,
+                            subValue: booking.type == 'doctor'
+                                ? booking.facilityName
+                                : (booking.subtitle.isNotEmpty
+                                    ? booking.subtitle
+                                    : booking.facilityName),
                           ),
                           const SizedBox(height: 14),
                           _buildDetailRow(
-                            label: isBn ? 'তারিখ ও সময়' : 'WHEN',
-                            value: booking != null
-                                ? '${DateFormat('EEE, d MMM yyyy').format(booking.appointmentDate)} — ${booking.timeSlot}'
-                                : 'Today',
+                            label: isBn ? 'তারিখ' : 'DATE',
+                            value: DateFormat('EEE, d MMM yyyy')
+                                .format(booking.appointmentDate),
+                            subValue: _timeLine(booking),
                           ),
                           const SizedBox(height: 14),
                           _buildDetailRow(
                             label: isBn ? 'পেমেন্ট' : 'PAY',
-                            value: booking?.paymentMethod == 'online'
+                            value: booking.paymentMethod == 'online'
                                 ? (isBn ? 'অনলাইনে পরিশোধিত' : 'Paid online')
-                                : (isBn ? 'চেম্বারে সরাসরি পরিশোধ' : 'Pay at counter'),
-                            subValue: booking != null
-                                ? CurrencyFormatter.format(booking.fee, locale: isBn ? 'bn' : 'en')
-                                : null,
+                                : (isBn
+                                    ? 'চেম্বারে সরাসরি পরিশোধ'
+                                    : 'Pay at counter'),
+                            subValue: booking.fee == null
+                                ? null
+                                : CurrencyFormatter.format(
+                                    booking.fee,
+                                    locale: isBn ? 'bn' : 'en',
+                                  ),
                           ),
                         ],
                       ),
                     ),
-
                     const SizedBox(height: 16),
-
-                    // Contextual note
-                    Container(
-                      padding: const EdgeInsets.all(14),
-                      decoration: const BoxDecoration(
-                        color: AppColors.fill,
-                        border: Border(
-                          left: BorderSide(color: AppColors.ink, width: 3),
+                    if (_note(l10n, booking) != null)
+                      Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: const BoxDecoration(
+                          color: AppColors.fill,
+                          border: Border(
+                            left: BorderSide(color: AppColors.ink, width: 3),
+                          ),
+                        ),
+                        child: Text(
+                          _note(l10n, booking)!,
+                          style: AppTypography.secondary
+                              .copyWith(color: AppColors.ink),
                         ),
                       ),
-                      child: Text(
-                        isBn
-                            ? 'অনুগ্রহ করে নির্ধারিত সময়ের ১৫ মিনিট পূর্বে উপস্থিত থাকুন। প্রয়োজনে চেম্বারের সাথে যোগাযোগ করুন।'
-                            : 'Please arrive 15 minutes before your scheduled appointment time.',
-                        style: AppTypography.secondary.copyWith(color: AppColors.ink),
-                      ),
-                    ),
-
                     const SizedBox(height: 24),
-
-                    // See my bookings
                     PrimaryCtaButton(
                       label: isBn ? 'আমার বুকিং দেখুন' : 'See my bookings',
                       trailingIcon: '→',
-                      onPressed: () {
-                        context.go('/bookings');
-                      },
+                      onPressed: () => context.go('/bookings'),
                     ),
-
                     const SizedBox(height: 12),
-
-                    // Back to home
                     OutlinedButton(
                       style: OutlinedButton.styleFrom(
                         minimumSize: const Size(double.infinity, 48),
-                        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-                        side: const BorderSide(color: AppColors.ink, width: AppColors.borderWidth),
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.zero,
+                        ),
+                        side: const BorderSide(
+                          color: AppColors.ink,
+                          width: AppColors.borderWidth,
+                        ),
                         backgroundColor: AppColors.paper,
                       ),
-                      onPressed: () {
-                        context.go('/');
-                      },
+                      onPressed: () => context.go('/'),
                       child: Text(
                         isBn ? 'হোমে ফিরে যান' : 'Back to home',
                         style: AppTypography.bodyMedium,
@@ -239,6 +234,101 @@ class BookingSuccessScreen extends ConsumerWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  String _headline(AppLocalizations l10n, BookingItem booking) {
+    if (booking.status == BookingStatus.confirmed) return l10n.confirmedTitle;
+    if (booking.status == BookingStatus.pending) {
+      return l10n.requestSentTitle;
+    }
+    return l10n.bookedSuccessTitle;
+  }
+
+  String _subHeadline(AppLocalizations l10n, BookingItem booking) {
+    if (booking.status == BookingStatus.confirmed) {
+      if (booking.serialDisplay == null || booking.serialDisplay!.isEmpty) {
+        return l10n.serialBySms;
+      }
+      return l10n.sessionWindow(
+        _formatTime(booking.sessionStart),
+        _formatTime(booking.sessionEnd),
+      );
+    }
+    if (booking.status == BookingStatus.pending && booking.type == 'doctor') {
+      return l10n.requestWillCall(booking.facilityName, booking.patientPhone);
+    }
+    if (booking.type == 'test') {
+      return l10n.labWillContact;
+    }
+    return l10n.serviceRequestReceived(booking.facilityName);
+  }
+
+  String? _note(AppLocalizations l10n, BookingItem booking) {
+    if (booking.status == BookingStatus.pending &&
+        booking.type == 'doctor' &&
+        booking.confirmDeadline != null) {
+      final deadline = _formatDeadline(booking.confirmDeadline!);
+      final urgent =
+          booking.isUrgent ? ' — ${l10n.beforeSessionStarts}' : '';
+      return '${l10n.expectCallBy(deadline)}$urgent';
+    }
+    if (booking.status == BookingStatus.confirmed) {
+      return l10n.successNote;
+    }
+    return null;
+  }
+
+  String? _timeLine(BookingItem booking) {
+    final parts = <String>[];
+    if (booking.timeSlot.isNotEmpty) parts.add(booking.timeSlot);
+    if (booking.estimatedTime != null && booking.estimatedTime!.isNotEmpty) {
+      parts.add('approx. ${_formatTime(booking.estimatedTime)}');
+    }
+    return parts.isEmpty ? null : parts.join(' · ');
+  }
+
+  String _formatTime(String? time) {
+    if (time == null || time.isEmpty) return '';
+    final parts = time.split(':');
+    final hour = int.tryParse(parts[0]) ?? 0;
+    final minute = parts.length > 1 ? int.tryParse(parts[1]) ?? 0 : 0;
+    return DateFormat('h:mm a').format(DateTime(2000, 1, 1, hour, minute));
+  }
+
+  String _formatDeadline(String iso) {
+    try {
+      final parsed = DateTime.parse(iso);
+      return DateFormat('EEE d MMM, h:mm a').format(parsed);
+    } catch (_) {
+      return iso;
+    }
+  }
+
+  Widget _buildSerialBadge(String serial, bool isBn) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: AppColors.accentWash,
+        border: Border.all(color: AppColors.accent, width: 1.5),
+      ),
+      child: Column(
+        children: [
+          Text(
+            isBn ? 'সিরিয়াল' : 'SERIAL',
+            style: AppTypography.kicker.copyWith(fontSize: 9),
+          ),
+          Text(
+            serial,
+            style: const TextStyle(
+              fontFamily: AppTypography.fontMono,
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: AppColors.accentDeep,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -263,7 +353,7 @@ class BookingSuccessScreen extends ConsumerWidget {
           value,
           style: AppTypography.bodyMedium.copyWith(fontSize: 14),
         ),
-        if (subValue != null) ...[
+        if (subValue != null && subValue.isNotEmpty) ...[
           const SizedBox(height: 2),
           Text(
             subValue,

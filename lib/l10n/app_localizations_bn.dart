@@ -356,6 +356,188 @@ class AppLocalizationsBn extends AppLocalizations {
   }
 
   @override
+  String get otpInvalid => '৬ ডিজিটের কোডটি লিখুন';
+
+  @override
+  String get otpTooManyAttempts =>
+      'অনেকবার চেষ্টা করা হয়েছে। এক মিনিট অপেক্ষা করুন।';
+
+  @override
+  String get badgeInstantBooking => 'সাথে সাথে বুকিং';
+
+  @override
+  String get badgeBookingByRequest => 'অনুরোধে বুকিং';
+
+  @override
+  String get badgeBookByPhone => 'ফোনে বুকিং';
+
+  @override
+  String get ctaBookAppointment => 'অ্যাপয়েন্টমেন্ট বুক করুন';
+
+  @override
+  String get ctaRequestAppointment => 'অ্যাপয়েন্টমেন্টের অনুরোধ করুন';
+
+  @override
+  String get ctaGetPhoneNumber => 'ফোন নম্বর নিন';
+
+  @override
+  String get ctaSendRequest => 'অনুরোধ পাঠান';
+
+  @override
+  String get selectSession => 'সেশন নির্বাচন করুন';
+
+  @override
+  String get selectASession => 'একটি সেশন নির্বাচন করুন';
+
+  @override
+  String get noSessionsForDay => 'এই দিনে কোন সেশন নেই';
+
+  @override
+  String get noChambers => 'কোন চেম্বার নেই';
+
+  @override
+  String get noChambersDesc =>
+      'এই ডাক্তারের চেম্বারের তথ্য এখনো যোগ করা হয়নি।';
+
+  @override
+  String get goBack => 'ফিরে যান';
+
+  @override
+  String get sessionFull => 'পূর্ণ';
+
+  @override
+  String get sessionEnded => 'শেষ';
+
+  @override
+  String get sessionClosed => 'বন্ধ';
+
+  @override
+  String sessionSeatsLeft(int count) {
+    return '$count টি বাকি';
+  }
+
+  @override
+  String nextSerialNumber(int number) {
+    return 'পরবর্তী সিরিয়াল #$number';
+  }
+
+  @override
+  String approxTime(String time) {
+    return 'আনুমানিক $time';
+  }
+
+  @override
+  String get tooLateToRequest =>
+      'অনুরোধ করার সময় পার হয়ে গেছে — চেম্বারে কল করুন';
+
+  @override
+  String get morningSession => 'সকাল';
+
+  @override
+  String get eveningSession => 'বিকাল';
+
+  @override
+  String get requestSentTitle => 'অনুরোধ পাঠানো হয়েছে';
+
+  @override
+  String requestWillCall(String facility, String phone) {
+    return '$facility নিশ্চিত করতে $phone নম্বরে কল করবে। একটি এসএমএসও পাবেন।';
+  }
+
+  @override
+  String expectCallBy(String deadline) {
+    return '$deadline এর মধ্যে কল আশা করুন';
+  }
+
+  @override
+  String get beforeSessionStarts => 'সেশন শুরুর আগে';
+
+  @override
+  String get confirmedTitle => 'আপনি বুক হয়ে গেছেন';
+
+  @override
+  String get serialBySms => 'আপনার সিরিয়াল এসএমএসে জানানো হবে';
+
+  @override
+  String get bookingIdLabel => 'বুকিং আইডি';
+
+  @override
+  String get bookingNotFound => 'এই বুকিংটি লোড হয়নি';
+
+  @override
+  String get bookingNotLoadedDesc =>
+      'ডাক্তারের প্রোফাইল থেকে আবার বুকিং শুরু করুন।';
+
+  @override
+  String get backToDoctors => 'ডাক্তার তালিকায় ফিরুন';
+
+  @override
+  String get genderOther => 'অন্যান্য';
+
+  @override
+  String get patientAge => 'বয়স (ঐচ্ছিক)';
+
+  @override
+  String get patientAgeHint => 'বছর';
+
+  @override
+  String get patientGender => 'লিঙ্গ (ঐচ্ছিক)';
+
+  @override
+  String sendRequestNote(String phone) {
+    return 'নিশ্চিত করতে চেম্বার $phone নম্বরে কল করবে';
+  }
+
+  @override
+  String nextAvailableShort(String day, String time, int count) {
+    return 'পরবর্তী: $day $time · $count টি বাকি';
+  }
+
+  @override
+  String get callToBook => 'কল করুন';
+
+  @override
+  String get callDuringHours => 'এই সময়ে কল করুন';
+
+  @override
+  String get weeklyHours => 'সাপ্তাহিক সময়সূচি';
+
+  @override
+  String get labWillContact =>
+      'বুকিং পেয়েছি — নিশ্চিত করতে ল্যাব যোগাযোগ করবে';
+
+  @override
+  String get serviceNotOffered => 'এই হাসপাতালে এই সেবাটি নেই';
+
+  @override
+  String get preferredTimeLabel => 'পছন্দের সময়';
+
+  @override
+  String get prefTimeMorning => 'সকাল (৯টা–১২টা)';
+
+  @override
+  String get prefTimeAfternoon => 'দুপুর (১২টা–৪টা)';
+
+  @override
+  String get prefTimeEvening => 'বিকাল (৪টা–৮টা)';
+
+  @override
+  String get prefTimeAny => 'যেকোনো সময়';
+
+  @override
+  String get notesLabel => 'নোট (ঐচ্ছিক)';
+
+  @override
+  String serviceRequestReceived(String facility) {
+    return 'অনুরোধ পেয়েছি — নিশ্চিত করতে $facility যোগাযোগ করবে';
+  }
+
+  @override
+  String sessionWindow(String start, String end) {
+    return '$start–$end';
+  }
+
+  @override
   String get bookedSuccessTitle => 'বুকিং সফল হয়েছে!';
 
   @override
@@ -435,6 +617,15 @@ class AppLocalizationsBn extends AppLocalizations {
   }
 
   @override
+  String get pickupThana => 'পিকআপ থানা';
+
+  @override
+  String get selectThana => 'থানা নির্বাচন করুন';
+
+  @override
+  String get pickupThanaRequired => 'পিকআপ থানার তথ্য প্রয়োজন';
+
+  @override
   String get pickupAddress => 'হোম পিকআপ ঠিকানা';
 
   @override
@@ -445,6 +636,35 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get timeWindow => 'পছন্দের সময়';
+
+  @override
+  String get hospitalNotFound => 'হাসপাতাল পাওয়া যায়নি';
+
+  @override
+  String get hospitalNotFoundDesc =>
+      'এটি সরিয়ে ফেলা হতে পারে। ফিরে গিয়ে অন্য হাসপাতাল দেখুন।';
+
+  @override
+  String doctorsHere(int count) {
+    return 'এখানকার ডাক্তার ($count)';
+  }
+
+  @override
+  String testsHere(int count) {
+    return 'এখানকার টেস্ট ($count)';
+  }
+
+  @override
+  String get servicesTitle => 'সেবাসমূহ';
+
+  @override
+  String get phoneLabel => 'ফোন';
+
+  @override
+  String get emergencyPhoneLabel => 'ইমার্জেন্সি';
+
+  @override
+  String get ambulancePhoneLabel => 'অ্যাম্বুলেন্স';
 
   @override
   String get hospitalsTitle => 'হাসপাতাল ও ডায়াগনস্টিক সেন্টার';
@@ -468,6 +688,30 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get labTestTag => 'ল্যাব টেস্ট';
+
+  @override
+  String get hospitalServiceTag => 'হাসপাতাল সেবা';
+
+  @override
+  String get statusConfirmedTag => 'নিশ্চিত';
+
+  @override
+  String get awaitingConfirmationTag => 'নিশ্চিতকরণের অপেক্ষায়';
+
+  @override
+  String get awaitingLabTag => 'ল্যাবের অপেক্ষায়';
+
+  @override
+  String get awaitingHospitalTag => 'হাসপাতালের অপেক্ষায়';
+
+  @override
+  String get notConfirmedInTime =>
+      'সময়ের মধ্যে নিশ্চিত হয়নি। এসএমএস না পেলে চেম্বারে কল করুন।';
+
+  @override
+  String toCancelCall(String facility) {
+    return 'বাতিল করতে $facility নম্বরে কল করুন';
+  }
 
   @override
   String get cancelBooking => 'বাতিল';
@@ -514,4 +758,59 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get bangla => 'বাংলা';
+
+  @override
+  String get updateRequiredTitle => 'আপডেট প্রয়োজন';
+
+  @override
+  String get updateRequiredFallback =>
+      'চালিয়ে যেতে অনুগ্রহ করে অ্যাপটি আপডেট করুন।';
+
+  @override
+  String get updateAvailableMessage => 'অ্যাপের নতুন সংস্করণ এসেছে।';
+
+  @override
+  String get updateSoonMessage =>
+      'এই সংস্করণটি শীঘ্রই বন্ধ হয়ে যাবে। অনুগ্রহ করে আপডেট করুন।';
+
+  @override
+  String get updateNow => 'এখনই আপডেট করুন';
+
+  @override
+  String get errBookingModeCallOnly =>
+      'এই চেম্বারে শুধু ফোনে বুকিং নেওয়া হয়। অনুগ্রহ করে চেম্বারে কল করুন।';
+
+  @override
+  String get errRequestTooLate =>
+      'এই সেশনের জন্য অনুরোধ করার সময় পার হয়ে গেছে। অনুগ্রহ করে চেম্বারে কল করুন।';
+
+  @override
+  String get errNotCallMode => 'এই চেম্বারে আর ফোনে বুকিং নেওয়া হয় না।';
+
+  @override
+  String get errNoNumbers =>
+      'এই চেম্বারের কোনো ফোন নম্বর এখনো যোগ করা হয়নি। অনুগ্রহ করে অন্য চেম্বার দেখুন।';
+
+  @override
+  String usualPriceLabel(String price) {
+    return 'আনুমানিক খরচ: $price';
+  }
+
+  @override
+  String get priceAtCounter => 'কাউন্টারে মূল্য';
+
+  @override
+  String get priceConfirmedAtLab => 'মূল্য ল্যাবে নিশ্চিত করা হবে';
+
+  @override
+  String get currentlyUnavailable => 'বর্তমানে পাওয়া যাচ্ছে না';
+
+  @override
+  String get testNotLoaded => 'এই টেস্টের তথ্য লোড হয়নি';
+
+  @override
+  String get testNotLoadedDesc => 'টেস্ট তালিকা থেকে আবার খুলুন।';
+
+  @override
+  String get backToTests => 'টেস্ট তালিকায় ফিরুন';
 }

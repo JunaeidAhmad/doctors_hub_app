@@ -1,3 +1,4 @@
+import '../../../core/models/facility_summary.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/unwrap_list.dart';
 import '../domain/models/division.dart';
@@ -10,8 +11,32 @@ class LocationRepository {
   final ApiClient _apiClient;
   List<Division>? _cachedDivisions;
   List<District>? _cachedAllDistricts;
+  List<FacilitySummary>? _cachedFacilities;
   final Map<int, List<District>> _cachedDistrictsByDivision = {};
   final Map<int, List<Thana>> _cachedThanasByDistrict = {};
+
+  /// The facility picker's options from `GET /search-metadata/` (`facilities`
+  /// list), cached for the session.
+  Future<List<FacilitySummary>> getFacilities({bool forceRefresh = false}) async {
+    if (!forceRefresh && _cachedFacilities != null) {
+      return _cachedFacilities!;
+    }
+
+    final response = await _apiClient.get('/search-metadata/');
+    final data = response.data;
+    final facilities = <FacilitySummary>[];
+    if (data is Map && data['facilities'] is List) {
+      for (final item in data['facilities'] as List) {
+        if (item is Map) {
+          facilities.add(
+            FacilitySummary.fromJson(Map<String, dynamic>.from(item)),
+          );
+        }
+      }
+    }
+    _cachedFacilities = facilities;
+    return facilities;
+  }
 
   Future<List<Division>> getDivisions({bool forceRefresh = false}) async {
     if (!forceRefresh && _cachedDivisions != null && _cachedDivisions!.isNotEmpty) {

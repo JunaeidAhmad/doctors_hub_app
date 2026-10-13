@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:doctors_hub_app/core/storage/local_booking_store.dart';
+import 'package:doctors_hub_app/features/booking/domain/models/booking_result.dart';
 import 'package:doctors_hub_app/features/bookings/domain/models/booking_item.dart';
 
 void main() {
@@ -71,6 +74,37 @@ void main() {
       await store.removeBooking('book-1');
       expect(store.getBookings().length, equals(1));
       expect(store.getUpcomingCount(), equals(0));
+    });
+
+    test('migrates v1 entries to v2 with status unknown and drops the v1 key',
+        () async {
+      final prefs = await SharedPreferences.getInstance();
+      final legacy = {
+        'id': 'old-1',
+        'booking_ref': 'OLDREF',
+        'type': 'doctor',
+        'title': 'Dr. Old',
+        'subtitle': 'Medicine',
+        'facility_name': 'Old Chamber',
+        'appointment_date':
+            DateTime.now().add(const Duration(days: 2)).toIso8601String(),
+        'time_slot': '5:00 PM',
+        'patient_name': 'A Patient',
+        'patient_phone': '01712345678',
+        'fee': 500.0,
+        'payment_method': 'counter',
+        'created_at': DateTime.now().toIso8601String(),
+      };
+      await prefs.setStringList('dh_saved_bookings_v1', [jsonEncode(legacy)]);
+
+      final migratedStore = LocalBookingStore(prefs);
+      final bookings = migratedStore.getBookings();
+
+      expect(bookings, hasLength(1));
+      expect(bookings.single.id, 'old-1');
+      expect(bookings.single.status, BookingStatus.unknown);
+      expect(prefs.getStringList('dh_saved_bookings_v1'), isNull);
+      expect(prefs.getStringList('dh_saved_bookings_v2'), isNotNull);
     });
   });
 }

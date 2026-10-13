@@ -19,12 +19,12 @@ class HospitalsScreen extends ConsumerStatefulWidget {
   const HospitalsScreen({
     super.key,
     this.initialCategory,
-    this.initialDivision,
+    this.initialDivisionId,
     this.initialSearch,
   });
 
   final String? initialCategory;
-  final String? initialDivision;
+  final int? initialDivisionId;
   final String? initialSearch;
 
   @override
@@ -37,11 +37,8 @@ class _HospitalsScreenState extends ConsumerState<HospitalsScreen> {
 
   String? _category;
   int? _divisionId;
-  String? _divisionName;
   int? _districtId;
-  String? _districtName;
   int? _thanaId;
-  String? _thanaName;
   String _ownershipType = 'all';
   bool _showFilters = false;
   String _searchQuery = '';
@@ -79,24 +76,9 @@ class _HospitalsScreenState extends ConsumerState<HospitalsScreen> {
 
   int get _activeFiltersCount {
     int count = 0;
-    if (_divisionId != null ||
-        (_divisionName != null &&
-            _divisionName!.isNotEmpty &&
-            _divisionName != 'All Bangladesh')) {
-      count++;
-    }
-    if (_districtId != null ||
-        (_districtName != null &&
-            _districtName!.isNotEmpty &&
-            _districtName != 'All Districts')) {
-      count++;
-    }
-    if (_thanaId != null ||
-        (_thanaName != null &&
-            _thanaName!.isNotEmpty &&
-            _thanaName != 'All Areas')) {
-      count++;
-    }
+    if (_divisionId != null) count++;
+    if (_districtId != null) count++;
+    if (_thanaId != null) count++;
     if (_ownershipType != 'all') {
       count++;
     }
@@ -110,7 +92,7 @@ class _HospitalsScreenState extends ConsumerState<HospitalsScreen> {
   void initState() {
     super.initState();
     _category = widget.initialCategory;
-    _divisionName = widget.initialDivision;
+    _divisionId = widget.initialDivisionId;
     _searchQuery = widget.initialSearch ?? '';
     _searchController = TextEditingController(text: _searchQuery);
     _scrollController.addListener(_onScroll);
@@ -146,11 +128,8 @@ class _HospitalsScreenState extends ConsumerState<HospitalsScreen> {
   void _resetAllFilters() {
     setState(() {
       _divisionId = null;
-      _divisionName = null;
       _districtId = null;
-      _districtName = null;
       _thanaId = null;
-      _thanaName = null;
       _ownershipType = 'all';
     });
     _fetchHospitals(page: 1);
@@ -159,11 +138,8 @@ class _HospitalsScreenState extends ConsumerState<HospitalsScreen> {
   void _clearLocationFilters() {
     setState(() {
       _divisionId = null;
-      _divisionName = null;
       _districtId = null;
-      _districtName = null;
       _thanaId = null;
-      _thanaName = null;
     });
     _fetchHospitals(page: 1);
   }
@@ -172,11 +148,8 @@ class _HospitalsScreenState extends ConsumerState<HospitalsScreen> {
     setState(() {
       _category = null;
       _divisionId = null;
-      _divisionName = null;
       _districtId = null;
-      _districtName = null;
       _thanaId = null;
-      _thanaName = null;
       _ownershipType = 'all';
       _searchQuery = '';
       _searchController.clear();
@@ -198,11 +171,8 @@ class _HospitalsScreenState extends ConsumerState<HospitalsScreen> {
       final repo = ref.read(hospitalRepositoryProvider);
       final result = await repo.getHospitals(
         category: _category,
-        division: _divisionName,
         divisionId: _divisionId,
-        district: _districtName,
         districtId: _districtId,
-        area: _thanaName,
         thanaId: _thanaId,
         ownershipType: _ownershipType != 'all' ? _ownershipType : null,
         search: _searchQuery,
@@ -240,36 +210,26 @@ class _HospitalsScreenState extends ConsumerState<HospitalsScreen> {
     final divisionsAsync = ref.watch(divisionsProvider);
     final districtsAsync = ref.watch(districtsProvider(_divisionId));
     final thanasAsync = ref.watch(thanasProvider(_districtId));
+    final divisions = divisionsAsync.valueOrNull ?? [];
+    final divisionById = divisions.where((d) => d.id == _divisionId).firstOrNull;
+    final districtById = (districtsAsync.valueOrNull ?? [])
+        .where((d) => d.id == _districtId)
+        .firstOrNull;
+    final thanaById =
+        (thanasAsync.valueOrNull ?? []).where((t) => t.id == _thanaId).firstOrNull;
 
     return DhScaffold(
       body: SafeArea(
         child: Column(
           children: [
-            // Top Nav
+            // Tab header (root screen, no back)
             Container(
-              height: 52,
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              decoration: const BoxDecoration(
-                color: AppColors.paper,
-                border: Border(
-                  bottom: BorderSide(
-                    color: AppColors.ink,
-                    width: AppColors.borderWidth,
-                  ),
-                ),
-              ),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back, color: AppColors.ink),
-                    onPressed: () => context.pop(),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    isBn ? 'হাসপাতাল ও সেন্টার' : 'Hospitals & Diagnostics',
-                    style: AppTypography.h2.copyWith(fontSize: 16),
-                  ),
-                ],
+              width: double.infinity,
+              color: AppColors.paper,
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+              child: Text(
+                isBn ? 'হাসপাতাল ও সেন্টার' : 'Hospitals & Diagnostics',
+                style: AppTypography.h1.copyWith(fontSize: 24),
               ),
             ),
 
@@ -513,10 +473,7 @@ class _HospitalsScreenState extends ConsumerState<HospitalsScreen> {
                                   ),
                                   if (_divisionId != null ||
                                       _districtId != null ||
-                                      _thanaId != null ||
-                                      (_divisionName != null &&
-                                          _divisionName!.isNotEmpty &&
-                                          _divisionName != 'All Bangladesh'))
+                                      _thanaId != null)
                                     InkWell(
                                       onTap: _clearLocationFilters,
                                       child: Text(
@@ -552,16 +509,10 @@ class _HospitalsScreenState extends ConsumerState<HospitalsScreen> {
                                     value: _divisionId,
                                     items: items,
                                     onChanged: (val) {
-                                      final div = divisions
-                                          .where((d) => d.id == val)
-                                          .firstOrNull;
                                       setState(() {
                                         _divisionId = val;
-                                        _divisionName = div?.name;
                                         _districtId = null;
-                                        _districtName = null;
                                         _thanaId = null;
-                                        _thanaName = null;
                                       });
                                       _fetchHospitals(page: 1);
                                     },
@@ -594,14 +545,9 @@ class _HospitalsScreenState extends ConsumerState<HospitalsScreen> {
                                     value: _districtId,
                                     items: items,
                                     onChanged: (val) {
-                                      final dist = districts
-                                          .where((d) => d.id == val)
-                                          .firstOrNull;
                                       setState(() {
                                         _districtId = val;
-                                        _districtName = dist?.name;
                                         _thanaId = null;
-                                        _thanaName = null;
                                       });
                                       _fetchHospitals(page: 1);
                                     },
@@ -634,12 +580,8 @@ class _HospitalsScreenState extends ConsumerState<HospitalsScreen> {
                                     value: _thanaId,
                                     items: items,
                                     onChanged: (val) {
-                                      final thana = thanas
-                                          .where((t) => t.id == val)
-                                          .firstOrNull;
                                       setState(() {
                                         _thanaId = val;
-                                        _thanaName = thana?.name;
                                       });
                                       _fetchHospitals(page: 1);
                                     },
@@ -765,48 +707,34 @@ class _HospitalsScreenState extends ConsumerState<HospitalsScreen> {
                                   _fetchHospitals(page: 1);
                                 },
                               ),
-                            if (_divisionName != null &&
-                                _divisionName!.isNotEmpty &&
-                                _divisionName != 'All Bangladesh')
+                            if (divisionById != null)
                               FilterChipDark(
-                                label: 'Div: $_divisionName',
+                                label: divisionById.name,
                                 onDeleted: () {
                                   setState(() {
                                     _divisionId = null;
-                                    _divisionName = null;
                                     _districtId = null;
-                                    _districtName = null;
                                     _thanaId = null;
-                                    _thanaName = null;
                                   });
                                   _fetchHospitals(page: 1);
                                 },
                               ),
-                            if (_districtName != null &&
-                                _districtName!.isNotEmpty &&
-                                _districtName != 'All Districts')
+                            if (districtById != null)
                               FilterChipDark(
-                                label: 'Dist: $_districtName',
+                                label: districtById.name,
                                 onDeleted: () {
                                   setState(() {
                                     _districtId = null;
-                                    _districtName = null;
                                     _thanaId = null;
-                                    _thanaName = null;
                                   });
                                   _fetchHospitals(page: 1);
                                 },
                               ),
-                            if (_thanaName != null &&
-                                _thanaName!.isNotEmpty &&
-                                _thanaName != 'All Areas')
+                            if (thanaById != null)
                               FilterChipDark(
-                                label: 'Area: $_thanaName',
+                                label: thanaById.name,
                                 onDeleted: () {
-                                  setState(() {
-                                    _thanaId = null;
-                                    _thanaName = null;
-                                  });
+                                  setState(() => _thanaId = null);
                                   _fetchHospitals(page: 1);
                                 },
                               ),
@@ -916,7 +844,7 @@ class _HospitalsScreenState extends ConsumerState<HospitalsScreen> {
           final h = _hospitals[index];
           return InkWell(
             onTap: () {
-              context.push('/doctors?hospital=${Uri.encodeComponent(h.name)}');
+              context.push('/hospitals/${h.slug ?? h.id}');
             },
             child: Container(
               decoration: BoxDecoration(
