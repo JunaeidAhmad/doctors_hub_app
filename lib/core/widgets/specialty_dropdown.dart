@@ -24,8 +24,8 @@ class SpecialtyGroup {
 /// - Umbrellas are items with `isUmbrella == true`.
 /// - A leaf with several parents appears under each matching umbrella.
 /// - Leaves without a matching umbrella fall into a trailing "Other" group.
-/// - Umbrellas sort by total doctors desc, then name; leaves sort by
-///   doctor count desc, then name.
+/// - Items sort by `display_order` (curated, when present), then by doctor
+///   count desc, then by name.
 /// - Returns an empty list when there are no umbrellas (legacy flat data),
 ///   in which case callers should render a flat list.
 List<SpecialtyGroup> buildSpecialtyGroups(List<Specialty> specialties) {
@@ -62,12 +62,7 @@ List<SpecialtyGroup> buildSpecialtyGroups(List<Specialty> specialties) {
   final groups = <SpecialtyGroup>[];
   for (final umbrella in umbrellas) {
     final leaves = (leavesByKey[umbrella.slug] ?? []).toList()
-      ..sort((a, b) {
-        final countCmp =
-            (b.doctorCount ?? 0).compareTo(a.doctorCount ?? 0);
-        if (countCmp != 0) return countCmp;
-        return a.name.compareTo(b.name);
-      });
+      ..sort(compareSpecialties);
     final own = umbrella.doctorCount ?? 0;
     final sum = leafSum(leaves);
     // Prefer the server-provided umbrella count (distinct doctors) when
@@ -77,17 +72,20 @@ List<SpecialtyGroup> buildSpecialtyGroups(List<Specialty> specialties) {
   }
 
   groups.sort((a, b) {
+    final aOrder = a.umbrella?.displayOrder;
+    final bOrder = b.umbrella?.displayOrder;
+    if (aOrder != null && bOrder != null && aOrder != bOrder) {
+      return aOrder.compareTo(bOrder);
+    }
+    if (aOrder != null && bOrder == null) return -1;
+    if (aOrder == null && bOrder != null) return 1;
     final countCmp = b.total.compareTo(a.total);
     if (countCmp != 0) return countCmp;
     return (a.umbrella?.name ?? '').compareTo(b.umbrella?.name ?? '');
   });
 
   if (orphans.isNotEmpty) {
-    orphans.sort((a, b) {
-      final countCmp = (b.doctorCount ?? 0).compareTo(a.doctorCount ?? 0);
-      if (countCmp != 0) return countCmp;
-      return a.name.compareTo(b.name);
-    });
+    orphans.sort(compareSpecialties);
     groups.add(
       SpecialtyGroup(
         umbrella: null,
@@ -98,6 +96,21 @@ List<SpecialtyGroup> buildSpecialtyGroups(List<Specialty> specialties) {
   }
 
   return groups;
+}
+
+/// Curated `display_order` first (when both sides have one), then doctor
+/// count desc, then name.
+int compareSpecialties(Specialty a, Specialty b) {
+  final aOrder = a.displayOrder;
+  final bOrder = b.displayOrder;
+  if (aOrder != null && bOrder != null && aOrder != bOrder) {
+    return aOrder.compareTo(bOrder);
+  }
+  if (aOrder != null && bOrder == null) return -1;
+  if (aOrder == null && bOrder != null) return 1;
+  final countCmp = (b.doctorCount ?? 0).compareTo(a.doctorCount ?? 0);
+  if (countCmp != 0) return countCmp;
+  return a.name.compareTo(b.name);
 }
 
 /// Bilingual label matching the web taxonomy picker:
@@ -283,8 +296,7 @@ class _SpecialtySheet extends StatelessWidget {
   }
 
   Widget _buildFlatList(BuildContext context, List<Specialty> items) {
-    final sorted = items.toList()
-      ..sort((a, b) => a.name.compareTo(b.name));
+    final sorted = items.toList()..sort(compareSpecialties);
     return ListView.separated(
       itemCount: sorted.length + 1,
       separatorBuilder: (_, __) => const Divider(

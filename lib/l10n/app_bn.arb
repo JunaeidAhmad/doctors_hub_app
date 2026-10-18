@@ -367,6 +367,19 @@
   "awaitingLabTag": "ল্যাবের অপেক্ষায়",
   "awaitingHospitalTag": "হাসপাতালের অপেক্ষায়",
   "notConfirmedInTime": "সময়ের মধ্যে নিশ্চিত হয়নি। এসএমএস না পেলে চেম্বারে কল করুন।",
+  "statusCancelledTag": "বাতিল",
+  "cancelBookingDesc": "এটি {facility}-এ আপনার অ্যাপয়েন্টমেন্ট বাতিল করবে এবং চেম্বারকে জানানো হবে।",
+  "@cancelBookingDesc": {
+    "placeholders": {
+      "facility": {"type": "String"}
+    }
+  },
+  "cancelReasonHint": "বাতিলের কারণ",
+  "cancelReasonRequired": "কারণ লিখুন (কমপক্ষে ৩ অক্ষর)।",
+  "confirmCancellation": "হ্যাঁ, বাতিল করুন",
+  "cancelFailed": "বুকিং বাতিল করা যায়নি। আবার চেষ্টা করুন।",
+  "cancelNotAllowed": "এই বুকিংটি আর বাতিল করা যাবে না। স্ট্যাটাস দেখতে নিচে টেনে রিফ্রেশ করুন।",
+  "manageRequestInBookings": "বুকিং ট্যাব থেকে এই অনুরোধটি দেখতে বা বাতিল করতে পারবেন।",
   "toCancelCall": "বাতিল করতে {facility} নম্বরে কল করুন",
   "@toCancelCall": {
     "placeholders": {
@@ -402,6 +415,7 @@
 
   "errBookingModeCallOnly": "এই চেম্বারে শুধু ফোনে বুকিং নেওয়া হয়। অনুগ্রহ করে চেম্বারে কল করুন।",
   "errRequestTooLate": "এই সেশনের জন্য অনুরোধ করার সময় পার হয়ে গেছে। অনুগ্রহ করে চেম্বারে কল করুন।",
+  "errOtpRequired": "ফোন যাচাইয়ের সময় শেষ হয়ে গেছে। অনুগ্রহ করে আবার যাচাই করুন।",
   "errNotCallMode": "এই চেম্বারে আর ফোনে বুকিং নেওয়া হয় না।",
   "errNoNumbers": "এই চেম্বারের কোনো ফোন নম্বর এখনো যোগ করা হয়নি। অনুগ্রহ করে অন্য চেম্বার দেখুন।",
 

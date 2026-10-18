@@ -433,7 +433,7 @@ class _DoctorBookingStep1ScreenState extends ConsumerState<DoctorBookingStep1Scr
           break;
       }
     } else if (mode == BookingMode.request &&
-        DhakaTime.startsWithinHour(
+        DhakaTime.requestCutoffReached(
           now: DateTime.now().toUtc(),
           dateIso: date.date,
           sessionStart:

@@ -30,6 +30,7 @@ class BookingItem {
     this.estimatedTime,
     this.confirmDeadline,
     this.isUrgent = false,
+    this.patientToken,
   });
 
   final String id;
@@ -59,6 +60,15 @@ class BookingItem {
   final String? confirmDeadline;
   final bool isUrgent;
 
+  /// Bearer token from the doctor-booking create response; enables the
+  /// server status read and patient cancel.
+  final String? patientToken;
+
+  /// True when the server can be asked about this booking (doctor bookings
+  /// created after 2026-10-18).
+  bool get canManageOnServer =>
+      type == 'doctor' && patientToken != null && patientToken!.isNotEmpty;
+
   /// Upcoming = the session end (or the test date's end of day in Dhaka) is
   /// still after now — not just "date >= today".
   bool get isUpcoming {
@@ -70,12 +80,17 @@ class BookingItem {
     return end.isAfter(now);
   }
 
-  BookingItem copyWith({BookingStatus? status}) {
+  BookingItem copyWith({
+    BookingStatus? status,
+    String? serialDisplay,
+    int? serialNumber,
+    String? estimatedTime,
+  }) {
     return BookingItem(
       id: id,
       bookingRef: bookingRef,
-      serialDisplay: serialDisplay,
-      serialNumber: serialNumber,
+      serialDisplay: serialDisplay ?? this.serialDisplay,
+      serialNumber: serialNumber ?? this.serialNumber,
       type: type,
       title: title,
       subtitle: subtitle,
@@ -95,9 +110,10 @@ class BookingItem {
       doctorSlug: doctorSlug,
       sessionStart: sessionStart,
       sessionEnd: sessionEnd,
-      estimatedTime: estimatedTime,
+      estimatedTime: estimatedTime ?? this.estimatedTime,
       confirmDeadline: confirmDeadline,
       isUrgent: isUrgent,
+      patientToken: patientToken,
     );
   }
 
@@ -129,6 +145,7 @@ class BookingItem {
       estimatedTime: json['estimated_time'] as String?,
       confirmDeadline: json['confirm_deadline'] as String?,
       isUrgent: json['is_urgent'] == true,
+      patientToken: json['patient_token'] as String?,
     );
   }
 
@@ -159,5 +176,6 @@ class BookingItem {
         'estimated_time': estimatedTime,
         'confirm_deadline': confirmDeadline,
         'is_urgent': isUrgent,
+        'patient_token': patientToken,
       };
 }

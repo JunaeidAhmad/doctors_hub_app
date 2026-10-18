@@ -171,6 +171,10 @@
               "$ref": "#/components/schemas/ChamberContactItem"
             },
             "type": "array"
+          },
+          "pending_requests": {
+            "readOnly": true,
+            "type": "integer"
           }
         },
         "required": [
@@ -931,7 +935,6 @@
           },
           "phone": {
             "maxLength": 20,
-            "pattern": "^(?:\\+8801|8801|01)[3-9]\\d{8}$",
             "type": "string"
           }
         },
@@ -955,7 +958,6 @@
           "phone": {
             "maxLength": 20,
             "minLength": 1,
-            "pattern": "^(?:\\+8801|8801|01)[3-9]\\d{8}$",
             "type": "string"
           }
         },
@@ -1127,29 +1129,169 @@
         "type": "object"
       },
       "DiagnosticCenter": {
+        "description": "Schema-only declarations for the flat facility keys that\n`to_representation` injects from `FacilitySummarySerializer` (G1).\n\nThese fields are read-only: serialization output is fully controlled by\n`to_representation`, so declaring them only makes the OpenAPI schema match\nthe real response payload.",
         "properties": {
+          "address": {
+            "readOnly": true,
+            "type": "string"
+          },
+          "area": {
+            "nullable": true,
+            "readOnly": true,
+            "type": "string"
+          },
+          "area_bn": {
+            "nullable": true,
+            "readOnly": true,
+            "type": "string"
+          },
+          "badge": {
+            "default": "",
+            "readOnly": true,
+            "type": "string"
+          },
+          "branch": {
+            "readOnly": true,
+            "type": "string"
+          },
           "category": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/DiagnosticCenterCategory"
+                "$ref": "#/components/schemas/FacilityCategoryRef"
               }
             ],
+            "nullable": true,
             "readOnly": true
+          },
+          "category_name": {
+            "nullable": true,
+            "readOnly": true,
+            "type": "string"
+          },
+          "description": {
+            "default": "",
+            "readOnly": true,
+            "type": "string"
+          },
+          "display_name": {
+            "readOnly": true,
+            "type": "string"
+          },
+          "district": {
+            "nullable": true,
+            "readOnly": true,
+            "type": "string"
+          },
+          "district_bn": {
+            "nullable": true,
+            "readOnly": true,
+            "type": "string"
+          },
+          "district_id": {
+            "nullable": true,
+            "readOnly": true,
+            "type": "integer"
+          },
+          "division": {
+            "nullable": true,
+            "readOnly": true,
+            "type": "string"
+          },
+          "division_bn": {
+            "nullable": true,
+            "readOnly": true,
+            "type": "string"
+          },
+          "division_id": {
+            "nullable": true,
+            "readOnly": true,
+            "type": "integer"
           },
           "doctor_count": {
             "default": 0,
             "readOnly": true,
             "type": "integer"
           },
+          "email": {
+            "readOnly": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "readOnly": true,
+            "type": "string"
+          },
+          "image": {
+            "nullable": true,
+            "readOnly": true,
+            "type": "string"
+          },
+          "is_active": {
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "is_verified": {
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "location_type": {
+            "readOnly": true,
+            "type": "string"
+          },
+          "logo": {
+            "nullable": true,
+            "readOnly": true,
+            "type": "string"
+          },
+          "name": {
+            "readOnly": true,
+            "type": "string"
+          },
+          "open_timing": {
+            "default": "",
+            "readOnly": true,
+            "type": "string"
+          },
+          "ownership_type": {
+            "readOnly": true,
+            "type": "string"
+          },
+          "phone": {
+            "readOnly": true,
+            "type": "string"
+          },
+          "rating": {
+            "format": "double",
+            "readOnly": true,
+            "type": "number"
+          },
+          "reviews_count": {
+            "readOnly": true,
+            "type": "integer"
+          },
           "services": {
             "items": {
-              "$ref": "#/components/schemas/DiagnosticService"
+              "$ref": "#/components/schemas/FacilityServiceRef"
             },
             "readOnly": true,
             "type": "array"
           },
+          "slug": {
+            "readOnly": true,
+            "type": "string"
+          },
+          "tagline": {
+            "default": "",
+            "readOnly": true,
+            "type": "string"
+          },
           "test_count": {
             "default": 0,
+            "readOnly": true,
+            "type": "integer"
+          },
+          "thana_id": {
+            "nullable": true,
             "readOnly": true,
             "type": "integer"
           }
@@ -1231,6 +1373,7 @@
         "type": "object"
       },
       "DiagnosticCenterRequest": {
+        "description": "Schema-only declarations for the flat facility keys that\n`to_representation` injects from `FacilitySummarySerializer` (G1).\n\nThese fields are read-only: serialization output is fully controlled by\n`to_representation`, so declaring them only makes the OpenAPI schema match\nthe real response payload.",
         "properties": {
           "category_id": {
             "format": "uuid",
@@ -1682,6 +1825,11 @@
       "DoctorBooking": {
         "properties": {
           "cancel_reason": {
+            "readOnly": true,
+            "type": "string"
+          },
+          "confirm_code": {
+            "nullable": true,
             "readOnly": true,
             "type": "string"
           },
@@ -2240,6 +2388,11 @@
           "description": {
             "type": "string"
           },
+          "display_order": {
+            "maximum": 32767,
+            "minimum": 0,
+            "type": "integer"
+          },
           "doctor_count": {
             "readOnly": true,
             "type": "integer"
@@ -2313,6 +2466,11 @@
           "description": {
             "type": "string"
           },
+          "display_order": {
+            "maximum": 32767,
+            "minimum": 0,
+            "type": "integer"
+          },
           "formal_name": {
             "maxLength": 120,
             "type": "string"
@@ -2365,6 +2523,49 @@
         },
         "required": [
           "name"
+        ],
+        "type": "object"
+      },
+      "FacilityCategoryRef": {
+        "description": "`category` shape actually returned by Hospital/DiagnosticCenter to_representation.",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "slug"
+        ],
+        "type": "object"
+      },
+      "FacilityCategoryRefRequest": {
+        "description": "`category` shape actually returned by Hospital/DiagnosticCenter to_representation.",
+        "properties": {
+          "id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "slug": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "slug"
         ],
         "type": "object"
       },
@@ -2767,6 +2968,48 @@
           "name",
           "password",
           "phone_number"
+        ],
+        "type": "object"
+      },
+      "FacilityServiceRef": {
+        "description": "`services[]` shape actually returned by Hospital/DiagnosticCenter to_representation.",
+        "properties": {
+          "icon": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "icon",
+          "id",
+          "name"
+        ],
+        "type": "object"
+      },
+      "FacilityServiceRefRequest": {
+        "description": "`services[]` shape actually returned by Hospital/DiagnosticCenter to_representation.",
+        "properties": {
+          "icon": {
+            "type": "string"
+          },
+          "id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "icon",
+          "id",
+          "name"
         ],
         "type": "object"
       },
@@ -3402,13 +3645,33 @@
         "type": "object"
       },
       "Hospital": {
+        "description": "Schema-only declarations for the flat facility keys that\n`to_representation` injects from `FacilitySummarySerializer` (G1).\n\nThese fields are read-only: serialization output is fully controlled by\n`to_representation`, so declaring them only makes the OpenAPI schema match\nthe real response payload.",
         "properties": {
           "accreditation": {
             "maxLength": 150,
             "type": "string"
           },
+          "address": {
+            "readOnly": true,
+            "type": "string"
+          },
           "ambulance_phone": {
             "maxLength": 50,
+            "type": "string"
+          },
+          "area": {
+            "nullable": true,
+            "readOnly": true,
+            "type": "string"
+          },
+          "area_bn": {
+            "nullable": true,
+            "readOnly": true,
+            "type": "string"
+          },
+          "badge": {
+            "default": "",
+            "readOnly": true,
             "type": "string"
           },
           "bed_capacity": {
@@ -3417,13 +3680,28 @@
             "nullable": true,
             "type": "integer"
           },
+          "branch": {
+            "readOnly": true,
+            "type": "string"
+          },
           "category": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/HospitalCategory"
+                "$ref": "#/components/schemas/FacilityCategoryRef"
               }
             ],
+            "nullable": true,
             "readOnly": true
+          },
+          "category_name": {
+            "nullable": true,
+            "readOnly": true,
+            "type": "string"
+          },
+          "description": {
+            "default": "",
+            "readOnly": true,
+            "type": "string"
           },
           "details_reviewed": {
             "default": false,
@@ -3433,10 +3711,48 @@
             "maxLength": 100,
             "type": "string"
           },
+          "display_name": {
+            "readOnly": true,
+            "type": "string"
+          },
+          "district": {
+            "nullable": true,
+            "readOnly": true,
+            "type": "string"
+          },
+          "district_bn": {
+            "nullable": true,
+            "readOnly": true,
+            "type": "string"
+          },
+          "district_id": {
+            "nullable": true,
+            "readOnly": true,
+            "type": "integer"
+          },
+          "division": {
+            "nullable": true,
+            "readOnly": true,
+            "type": "string"
+          },
+          "division_bn": {
+            "nullable": true,
+            "readOnly": true,
+            "type": "string"
+          },
+          "division_id": {
+            "nullable": true,
+            "readOnly": true,
+            "type": "integer"
+          },
           "doctor_count": {
             "default": 0,
             "readOnly": true,
             "type": "integer"
+          },
+          "email": {
+            "readOnly": true,
+            "type": "string"
           },
           "emergency_phone": {
             "maxLength": 50,
@@ -3461,25 +3777,92 @@
             "nullable": true,
             "type": "integer"
           },
+          "id": {
+            "format": "uuid",
+            "readOnly": true,
+            "type": "string"
+          },
+          "image": {
+            "nullable": true,
+            "readOnly": true,
+            "type": "string"
+          },
+          "is_active": {
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "is_verified": {
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "location_type": {
+            "readOnly": true,
+            "type": "string"
+          },
+          "logo": {
+            "nullable": true,
+            "readOnly": true,
+            "type": "string"
+          },
+          "name": {
+            "readOnly": true,
+            "type": "string"
+          },
+          "open_timing": {
+            "default": "",
+            "readOnly": true,
+            "type": "string"
+          },
           "ot_suites_count": {
             "maximum": 2147483647,
             "minimum": -2147483648,
             "nullable": true,
             "type": "integer"
           },
+          "ownership_type": {
+            "readOnly": true,
+            "type": "string"
+          },
           "parking_capacity": {
             "maxLength": 100,
             "type": "string"
           },
+          "phone": {
+            "readOnly": true,
+            "type": "string"
+          },
+          "rating": {
+            "format": "double",
+            "readOnly": true,
+            "type": "number"
+          },
+          "reviews_count": {
+            "readOnly": true,
+            "type": "integer"
+          },
           "services": {
             "items": {
-              "$ref": "#/components/schemas/HospitalService"
+              "$ref": "#/components/schemas/FacilityServiceRef"
             },
             "readOnly": true,
             "type": "array"
           },
+          "slug": {
+            "readOnly": true,
+            "type": "string"
+          },
+          "tagline": {
+            "default": "",
+            "readOnly": true,
+            "type": "string"
+          },
           "test_count": {
             "default": 0,
+            "readOnly": true,
+            "type": "integer"
+          },
+          "thana_id": {
+            "nullable": true,
             "readOnly": true,
             "type": "integer"
           }
@@ -3562,6 +3945,7 @@
         "type": "object"
       },
       "HospitalRequest": {
+        "description": "Schema-only declarations for the flat facility keys that\n`to_representation` injects from `FacilitySummarySerializer` (G1).\n\nThese fields are read-only: serialization output is fully controlled by\n`to_representation`, so declaring them only makes the OpenAPI schema match\nthe real response payload.",
         "properties": {
           "accreditation": {
             "maxLength": 150,
@@ -5074,6 +5458,7 @@
         "type": "object"
       },
       "PatchedDiagnosticCenterRequest": {
+        "description": "Schema-only declarations for the flat facility keys that\n`to_representation` injects from `FacilitySummarySerializer` (G1).\n\nThese fields are read-only: serialization output is fully controlled by\n`to_representation`, so declaring them only makes the OpenAPI schema match\nthe real response payload.",
         "properties": {
           "category_id": {
             "format": "uuid",
@@ -5342,6 +5727,11 @@
           "description": {
             "type": "string"
           },
+          "display_order": {
+            "maximum": 32767,
+            "minimum": 0,
+            "type": "integer"
+          },
           "formal_name": {
             "maxLength": 120,
             "type": "string"
@@ -5479,6 +5869,7 @@
         "type": "object"
       },
       "PatchedHospitalRequest": {
+        "description": "Schema-only declarations for the flat facility keys that\n`to_representation` injects from `FacilitySummarySerializer` (G1).\n\nThese fields are read-only: serialization output is fully controlled by\n`to_representation`, so declaring them only makes the OpenAPI schema match\nthe real response payload.",
         "properties": {
           "accreditation": {
             "maxLength": 150,
@@ -5929,6 +6320,11 @@
             "nullable": true,
             "type": "integer",
             "writeOnly": true
+          },
+          "preferred_time": {
+            "format": "time",
+            "nullable": true,
+            "type": "string"
           }
         },
         "type": "object"
@@ -6135,6 +6531,25 @@
         "required": [
           "name",
           "phone"
+        ],
+        "type": "object"
+      },
+      "PatientCancelRequest": {
+        "properties": {
+          "patient_token": {
+            "maxLength": 32,
+            "minLength": 1,
+            "type": "string"
+          },
+          "reason": {
+            "maxLength": 255,
+            "minLength": 3,
+            "type": "string"
+          }
+        },
+        "required": [
+          "patient_token",
+          "reason"
         ],
         "type": "object"
       },
@@ -7229,6 +7644,11 @@
             "format": "date",
             "type": "string"
           },
+          "preferred_time": {
+            "format": "time",
+            "nullable": true,
+            "type": "string"
+          },
           "price": {
             "format": "decimal",
             "nullable": true,
@@ -7316,6 +7736,11 @@
             "nullable": true,
             "type": "integer",
             "writeOnly": true
+          },
+          "preferred_time": {
+            "format": "time",
+            "nullable": true,
+            "type": "string"
           }
         },
         "required": [
@@ -9881,6 +10306,146 @@
           {
             "jwtAuth": []
           }
+        ],
+        "tags": [
+          "Bookings"
+        ]
+      }
+    },
+    "/api/v1/bookings/doctor/{id}/patient-cancel/": {
+      "post": {
+        "description": "Shared booking viewset behaviour (Part 5 P5.6.2).\n\nSubclasses keep only `queryset`/`select_related`, `serializer_class` and the\ntwo lookups. Anonymous users see nothing; super admins see everything;\nfacility staff see their managed locations; a doctor sees their own bookings\nwhen `doctor_user_lookup` is set.",
+        "operationId": "bookings_doctor_patient_cancel_create",
+        "parameters": [
+          {
+            "description": "A UUID string identifying this doctor booking.",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatientCancelRequest"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/PatientCancelRequest"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/PatientCancelRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {},
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {},
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {},
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jwtAuth": []
+          },
+          {}
+        ],
+        "tags": [
+          "Bookings"
+        ]
+      }
+    },
+    "/api/v1/bookings/doctor/{id}/status/": {
+      "get": {
+        "description": "Shared booking viewset behaviour (Part 5 P5.6.2).\n\nSubclasses keep only `queryset`/`select_related`, `serializer_class` and the\ntwo lookups. Anonymous users see nothing; super admins see everything;\nfacility staff see their managed locations; a doctor sees their own bookings\nwhen `doctor_user_lookup` is set.",
+        "operationId": "bookings_doctor_status_retrieve",
+        "parameters": [
+          {
+            "description": "A UUID string identifying this doctor booking.",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "phone",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {},
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {},
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jwtAuth": []
+          },
+          {}
         ],
         "tags": [
           "Bookings"

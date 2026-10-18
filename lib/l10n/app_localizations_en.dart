@@ -707,6 +707,34 @@ class AppLocalizationsEn extends AppLocalizations {
       'Not confirmed in time. If you didn\'t get an SMS, call the chamber.';
 
   @override
+  String get statusCancelledTag => 'Cancelled';
+
+  @override
+  String cancelBookingDesc(String facility) {
+    return 'This cancels your appointment at $facility and the chamber is notified.';
+  }
+
+  @override
+  String get cancelReasonHint => 'Reason for cancelling';
+
+  @override
+  String get cancelReasonRequired => 'Enter a reason (at least 3 characters).';
+
+  @override
+  String get confirmCancellation => 'Yes, cancel';
+
+  @override
+  String get cancelFailed => 'Could not cancel the booking. Please try again.';
+
+  @override
+  String get cancelNotAllowed =>
+      'This booking can no longer be cancelled. Pull to refresh to see its status.';
+
+  @override
+  String get manageRequestInBookings =>
+      'You can track or cancel this request from the Bookings tab.';
+
+  @override
   String toCancelCall(String facility) {
     return 'To cancel, call $facility';
   }
@@ -780,6 +808,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get errRequestTooLate =>
       'Too late to request this session. Please call the chamber.';
+
+  @override
+  String get errOtpRequired =>
+      'Your phone verification expired. Please verify again.';
 
   @override
   String get errNotCallMode => 'This chamber no longer takes phone bookings.';

@@ -1,39 +1,7 @@
 import '../../../core/network/api_client.dart';
+import '../../../core/network/app_failure.dart';
 import '../domain/models/booking_request.dart';
 import '../domain/models/booking_result.dart';
-
-class PatientLookupResult {
-  const PatientLookupResult({
-    required this.found,
-    this.name,
-    this.phone,
-    this.age,
-    this.gender,
-  });
-
-  final bool found;
-  final String? name;
-  final String? phone;
-  final int? age;
-  final String? gender;
-
-  factory PatientLookupResult.fromJson(Map<String, dynamic> json) {
-    final patientRaw = json['patient'];
-    final patient = patientRaw is Map
-        ? Map<String, dynamic>.from(patientRaw)
-        : const <String, dynamic>{};
-    final gender = patient['gender'] is String
-        ? (patient['gender'] as String).toLowerCase()
-        : null;
-    return PatientLookupResult(
-      found: json['found'] == true,
-      name: patient['name'] as String?,
-      phone: patient['phone'] as String?,
-      age: (patient['age'] as num?)?.toInt(),
-      gender: gender == null || gender.isEmpty ? null : gender,
-    );
-  }
-}
 
 class BookingRepository {
   BookingRepository(this._apiClient);
@@ -62,21 +30,39 @@ class BookingRepository {
     return null;
   }
 
-  Future<PatientLookupResult> lookupPatient(String phone) async {
+  /// Live status of a doctor booking. Anonymous; `phone` must match the
+  /// booking's `patient_phone`. Returns null on 404 `booking_not_found`.
+  Future<DoctorBookingStatusResult?> getDoctorBookingStatus({
+    required String bookingId,
+    required String phone,
+  }) async {
     try {
       final response = await _apiClient.get(
-        '/bookings/patients/lookup/',
+        '/bookings/doctor/$bookingId/status/',
         queryParameters: {'phone': phone},
       );
-      if (response.data is Map<String, dynamic>) {
-        return PatientLookupResult.fromJson(
-          response.data as Map<String, dynamic>,
-        );
-      }
-    } catch (_) {
-      // Lookup is best-effort
+      return DoctorBookingStatusResult.fromJson(
+        response.data as Map<String, dynamic>,
+      );
+    } on NotFoundFailure {
+      return null;
     }
-    return const PatientLookupResult(found: false);
+  }
+
+  /// Cancels a doctor booking (`pending` request or `confirmed`) with a
+  /// mandatory reason. The `patient_token` comes from the create response.
+  Future<void> cancelDoctorBooking({
+    required String bookingId,
+    required String patientToken,
+    required String reason,
+  }) async {
+    await _apiClient.post(
+      '/bookings/doctor/$bookingId/patient-cancel/',
+      data: {
+        'patient_token': patientToken,
+        'reason': reason,
+      },
+    );
   }
 
   Future<DoctorBookingResult> bookDoctor(DoctorBookingRequest request) async {

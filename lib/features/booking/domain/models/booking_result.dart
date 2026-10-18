@@ -49,6 +49,8 @@ class DoctorBookingResult {
     this.confirmDeadline,
     this.isUrgent = false,
     this.source,
+    this.patientToken,
+    this.confirmCode,
   });
 
   final String id;
@@ -65,6 +67,12 @@ class DoctorBookingResult {
   final String? confirmDeadline;
   final bool isUrgent;
   final String? source;
+
+  /// Bearer token for `GET .../status/` and `POST .../patient-cancel/`.
+  final String? patientToken;
+
+  /// Staff one-tap link code (`/r/{code}`); stored but unused by the app.
+  final String? confirmCode;
 
   /// Booking reference: the first 8 characters of the booking id.
   String get shortRef =>
@@ -93,6 +101,8 @@ class DoctorBookingResult {
       confirmDeadline: json['confirm_deadline'] as String?,
       isUrgent: json['is_urgent'] == true,
       source: json['source'] as String?,
+      patientToken: json['patient_token'] as String?,
+      confirmCode: json['confirm_code'] as String?,
     );
   }
 
@@ -111,7 +121,45 @@ class DoctorBookingResult {
         'confirm_deadline': confirmDeadline,
         'is_urgent': isUrgent,
         'source': source,
+        'patient_token': patientToken,
+        'confirm_code': confirmCode,
       };
+}
+
+/// Response of `GET /bookings/doctor/{id}/status/?phone=`.
+class DoctorBookingStatusResult {
+  const DoctorBookingStatusResult({
+    required this.id,
+    required this.status,
+    this.serialNumber,
+    this.serialDisplay,
+    this.estimatedTime,
+    this.confirmDeadline,
+    this.isUrgent = false,
+    this.source,
+  });
+
+  final String id;
+  final BookingStatus status;
+  final int? serialNumber;
+  final String? serialDisplay;
+  final String? estimatedTime;
+  final String? confirmDeadline;
+  final bool isUrgent;
+  final String? source;
+
+  factory DoctorBookingStatusResult.fromJson(Map<String, dynamic> json) {
+    return DoctorBookingStatusResult(
+      id: json['id']?.toString() ?? '',
+      status: bookingStatusFromString(json['status'] as String?),
+      serialNumber: (json['serial_number'] as num?)?.toInt(),
+      serialDisplay: json['serial_display'] as String?,
+      estimatedTime: json['estimated_time'] as String?,
+      confirmDeadline: json['confirm_deadline'] as String?,
+      isUrgent: json['is_urgent'] == true,
+      source: json['source'] as String?,
+    );
+  }
 }
 
 enum CollectionType { center, home, unknown }

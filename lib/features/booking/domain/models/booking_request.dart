@@ -52,6 +52,7 @@ class TestBookingRequest {
     this.patientAge,
     this.patientGender,
     this.notes,
+    this.preferredTime, // window start "HH:MM"
   });
 
   final String facilityTestId;
@@ -65,6 +66,7 @@ class TestBookingRequest {
   final int? patientAge;
   final String? patientGender;
   final String? notes;
+  final String? preferredTime;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{
@@ -84,6 +86,9 @@ class TestBookingRequest {
       map['patient_gender'] = patientGender;
     }
     if (notes != null && notes!.isNotEmpty) map['notes'] = notes;
+    if (preferredTime != null && preferredTime!.isNotEmpty) {
+      map['preferred_time'] = preferredTime;
+    }
     return map;
   }
 }

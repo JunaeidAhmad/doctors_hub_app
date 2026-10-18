@@ -25,14 +25,20 @@ class DhakaTime {
         .subtract(offset);
   }
 
-  /// True when the session starts in under one hour (or has already started).
-  /// Used for the request-mode "too late to request" rule (backend rule B7).
-  static bool startsWithinHour({
+  /// True when a request-mode session has reached its cutoff.
+  /// Morning sessions (start before 12:00 Dhaka) close 2 hours before start;
+  /// every other session closes 1 hour before start (backend Part 8
+  /// `request_rules.py`). The boundary itself counts as closed; the server
+  /// still has the final say.
+  static bool requestCutoffReached({
     required DateTime now,
     required String dateIso,
     required String sessionStart,
   }) {
     final start = parseDhaka(dateIso, sessionStart);
-    return start.isBefore(now.add(const Duration(hours: 1)));
+    final parts = sessionStart.split(':');
+    final hour = parts.isNotEmpty ? int.tryParse(parts[0]) ?? 0 : 0;
+    final cutoff = Duration(hours: hour < 12 ? 2 : 1);
+    return !start.isAfter(now.add(cutoff));
   }
 }

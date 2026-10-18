@@ -15,6 +15,7 @@ import 'package:doctors_hub_app/core/widgets/phone_field.dart';
 import 'package:doctors_hub_app/features/booking/data/booking_repository.dart';
 import 'package:doctors_hub_app/features/booking/domain/booking_mode.dart';
 import 'package:doctors_hub_app/features/booking/presentation/booking_success_screen.dart';
+import 'package:doctors_hub_app/features/booking/presentation/doctor_booking_step1_screen.dart';
 import 'package:doctors_hub_app/features/booking/presentation/doctor_booking_step2_screen.dart';
 import 'package:doctors_hub_app/features/doctors/data/doctor_repository.dart';
 import 'package:doctors_hub_app/features/doctors/domain/models/availability.dart';
@@ -25,12 +26,26 @@ import 'package:doctors_hub_app/l10n/app_localizations.dart';
 import '../helpers/recording_adapter.dart';
 
 class FakeDoctorRepository extends DoctorRepository {
-  FakeDoctorRepository(this.doctor) : super(ApiClient());
+  FakeDoctorRepository(this.doctor, {this.availability}) : super(ApiClient());
 
   final Doctor doctor;
+  final AffiliationAvailability? availability;
 
   @override
   Future<Doctor> getDoctorDetails(String idOrSlug) async => doctor;
+
+  @override
+  Future<AffiliationAvailability> getAvailability(
+    String chamberId, {
+    required String from,
+    int days = 14,
+  }) async {
+    final value = availability;
+    if (value == null) {
+      throw UnimplementedError('No availability configured for the fake.');
+    }
+    return value;
+  }
 }
 
 Chamber buildChamber(String id, BookingMode mode) => Chamber(
@@ -133,6 +148,85 @@ Future<RecordingAdapter> pumpStep2(
   return adapter;
 }
 
+AffiliationAvailability availabilityWithSession({
+  required String dateIso,
+  required String startHm,
+}) {
+  return AffiliationAvailability(
+    affiliationId: 'c1',
+    facility: const FacilitySummary(
+      id: 'f1',
+      displayName: 'Popular Diagnostic Centre (Dhanmondi)',
+      address: 'House 16, Road 2, Dhanmondi',
+    ),
+    dates: [
+      AvailabilityDate(
+        date: dateIso,
+        weekday: 'Thu',
+        status: AvailabilityDateStatus.available,
+        hasSchedule: true,
+        sessions: [
+          AvailabilitySession(
+            sessionKey: 's:test',
+            startTime: startHm,
+            endTime: '23:59',
+            sessionStart: startHm,
+            sessionEnd: '23:59',
+            capacity: 10,
+            booked: 4,
+            remaining: 6,
+            nextSerial: 5,
+            estimatedTime: startHm,
+            status: AvailabilitySessionStatus.available,
+          ),
+        ],
+      ),
+    ],
+  );
+}
+
+Future<void> pumpStep1(
+  WidgetTester tester, {
+  required BookingMode mode,
+  required AffiliationAvailability availability,
+}) async {
+  tester.view.physicalSize = const Size(1080, 2200);
+  tester.view.devicePixelRatio = 2.0;
+  addTearDown(() => tester.view.resetPhysicalSize());
+
+  SharedPreferences.setMockInitialValues({});
+  final prefs = await SharedPreferences.getInstance();
+
+  final router = GoRouter(
+    initialLocation: '/doctors/d1/book',
+    routes: [
+      GoRoute(
+        path: '/doctors/:id/book',
+        builder: (_, __) => const DoctorBookingStep1Screen(doctorId: 'd1'),
+      ),
+    ],
+  );
+
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(prefs),
+        doctorRepositoryProvider.overrideWithValue(
+          FakeDoctorRepository(buildDoctor(mode), availability: availability),
+        ),
+      ],
+      child: MaterialApp.router(
+        routerConfig: router,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+      ),
+    ),
+  );
+  await tester.pump();
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 100));
+}
+
 Future<void> fillAndSubmit(WidgetTester tester, {String buttonLabel = 'Book appointment'}) async {
   await tester.enterText(find.byType(TextField).first, 'Test Patient');
   await tester.enterText(
@@ -230,12 +324,21 @@ void main() {
     });
   });
 
-  group('request 1-hour rule (frozen clock)', () {
-    test('a session starting within the hour is too late', () {
-      final now = DateTime.utc(2026, 10, 15, 10, 30); // 4:30 PM Dhaka
+  group('request cutoff rule (frozen clock)', () {
+    test('evening session stays requestable until one hour before start', () {
+      // 15:59 Dhaka: 61 min to a 17:00 session, still requestable.
       expect(
-        DhakaTime.startsWithinHour(
-          now: now,
+        DhakaTime.requestCutoffReached(
+          now: DateTime.utc(2026, 10, 15, 9, 59),
+          dateIso: '2026-10-15',
+          sessionStart: '17:00',
+        ),
+        isFalse,
+      );
+      // 16:01 Dhaka: 59 min to start, too late.
+      expect(
+        DhakaTime.requestCutoffReached(
+          now: DateTime.utc(2026, 10, 15, 10, 1),
           dateIso: '2026-10-15',
           sessionStart: '17:00',
         ),
@@ -243,16 +346,78 @@ void main() {
       );
     });
 
-    test('a session later in the day is still requestable', () {
-      final now = DateTime.utc(2026, 10, 15, 9, 0); // 3:00 PM Dhaka
+    test('morning session stays requestable until two hours before start', () {
+      // 06:59 Dhaka: 121 min to a 09:00 session, still requestable.
       expect(
-        DhakaTime.startsWithinHour(
-          now: now,
+        DhakaTime.requestCutoffReached(
+          now: DateTime.utc(2026, 10, 15, 0, 59),
           dateIso: '2026-10-15',
-          sessionStart: '18:00',
+          sessionStart: '09:00',
         ),
         isFalse,
       );
+      // 07:01 Dhaka: 119 min to start, too late.
+      expect(
+        DhakaTime.requestCutoffReached(
+          now: DateTime.utc(2026, 10, 15, 1, 1),
+          dateIso: '2026-10-15',
+          sessionStart: '09:00',
+        ),
+        isTrue,
+      );
+    });
+
+    test('exactly at the cutoff counts as closed', () {
+      // 16:00 Dhaka for a 17:00 session (1-hour cutoff).
+      expect(
+        DhakaTime.requestCutoffReached(
+          now: DateTime.utc(2026, 10, 15, 10, 0),
+          dateIso: '2026-10-15',
+          sessionStart: '17:00',
+        ),
+        isTrue,
+      );
+      // 07:00 Dhaka for a 09:00 session (2-hour cutoff).
+      expect(
+        DhakaTime.requestCutoffReached(
+          now: DateTime.utc(2026, 10, 15, 1, 0),
+          dateIso: '2026-10-15',
+          sessionStart: '09:00',
+        ),
+        isTrue,
+      );
+    });
+
+    testWidgets('instant sessions ignore the request cutoff', (tester) async {
+      final soon = DhakaTime.now().add(const Duration(minutes: 30));
+      final dateIso = DhakaTime.isoDate(soon);
+      final startHm = '${soon.hour.toString().padLeft(2, '0')}:'
+          '${soon.minute.toString().padLeft(2, '0')}';
+
+      await pumpStep1(
+        tester,
+        mode: BookingMode.instant,
+        availability:
+            availabilityWithSession(dateIso: dateIso, startHm: startHm),
+      );
+
+      expect(find.text('Too late to request — call the chamber'), findsNothing);
+    });
+
+    testWidgets('request sessions inside the cutoff are disabled', (tester) async {
+      final soon = DhakaTime.now().add(const Duration(minutes: 30));
+      final dateIso = DhakaTime.isoDate(soon);
+      final startHm = '${soon.hour.toString().padLeft(2, '0')}:'
+          '${soon.minute.toString().padLeft(2, '0')}';
+
+      await pumpStep1(
+        tester,
+        mode: BookingMode.request,
+        availability:
+            availabilityWithSession(dateIso: dateIso, startHm: startHm),
+      );
+
+      expect(find.text('Too late to request — call the chamber'), findsOneWidget);
     });
   });
 

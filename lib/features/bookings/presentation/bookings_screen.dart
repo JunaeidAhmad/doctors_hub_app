@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import '../../../core/network/app_failure.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
@@ -16,6 +17,79 @@ import '../domain/models/booking_item.dart';
 
 class BookingsScreen extends ConsumerWidget {
   const BookingsScreen({super.key});
+
+  /// Refreshes the live status of every server-manageable booking
+  /// (doctor bookings with a `patient_token`). User-initiated only — the
+  /// request is throttled server-side (30/min).
+  Future<void> _refreshStatuses(WidgetRef ref) async {
+    final targets =
+        ref.read(localBookingsProvider).where((b) => b.canManageOnServer).toList();
+    if (targets.isEmpty) return;
+    final repo = ref.read(bookingRepositoryProvider);
+    final notifier = ref.read(localBookingsProvider.notifier);
+    for (final booking in targets) {
+      try {
+        final status = await repo.getDoctorBookingStatus(
+          bookingId: booking.id,
+          phone: booking.patientPhone,
+        );
+        if (status == null || status.status == BookingStatus.unknown) continue;
+        await notifier.addBooking(
+          booking.copyWith(
+            status: status.status,
+            serialDisplay: status.serialDisplay,
+            serialNumber: status.serialNumber,
+            estimatedTime: status.estimatedTime,
+          ),
+        );
+      } on AppFailure {
+        // Best-effort refresh; keep the local copy.
+      }
+    }
+  }
+
+  Future<void> _showRemoteCancelDialog(
+    BuildContext context,
+    WidgetRef ref,
+    BookingItem booking,
+  ) async {
+    final l10n = AppLocalizations.of(context)!;
+    final messenger = ScaffoldMessenger.of(context);
+    final reason = await showDialog<String>(
+      context: context,
+      builder: (_) => _CancelReasonDialog(facilityName: booking.facilityName),
+    );
+    if (reason == null) return;
+
+    try {
+      await ref.read(bookingRepositoryProvider).cancelDoctorBooking(
+            bookingId: booking.id,
+            patientToken: booking.patientToken!,
+            reason: reason,
+          );
+      await ref
+          .read(localBookingsProvider.notifier)
+          .addBooking(booking.copyWith(status: BookingStatus.cancelled));
+    } on AppFailure catch (failure) {
+      if (failure is ValidationFailure &&
+          failure.code == 'not_cancellable') {
+        await _refreshStatuses(ref);
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(l10n.cancelNotAllowed),
+            backgroundColor: AppColors.accent,
+          ),
+        );
+        return;
+      }
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(l10n.cancelFailed),
+          backgroundColor: AppColors.accent,
+        ),
+      );
+    }
+  }
 
   void _showCancelDialog(
     BuildContext context,
@@ -119,6 +193,9 @@ class BookingsScreen extends ConsumerWidget {
         booking.type == 'doctor') {
       return l10n.statusConfirmedTag;
     }
+    if (booking.status == BookingStatus.cancelled) {
+      return l10n.statusCancelledTag;
+    }
     if (booking.status == BookingStatus.pending) {
       if (booking.type == 'doctor') return l10n.awaitingConfirmationTag;
       if (booking.type == 'test') return l10n.awaitingLabTag;
@@ -128,9 +205,10 @@ class BookingsScreen extends ConsumerWidget {
   }
 
   bool _isPastDeadline(BookingItem booking) {
+    if (booking.type != 'doctor') return false;
+    if (booking.status == BookingStatus.expired) return true;
     final deadline = booking.confirmDeadline;
     if (booking.status != BookingStatus.pending ||
-        booking.type != 'doctor' ||
         deadline == null ||
         deadline.isEmpty) {
       return false;
@@ -191,14 +269,20 @@ class BookingsScreen extends ConsumerWidget {
                       actionLabel: isBn ? 'ডাক্তার খুঁজুন' : 'Find a doctor',
                       onAction: () => context.go('/doctors'),
                     )
-                  : ListView.separated(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: bookings.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 12),
-                      itemBuilder: (context, index) {
-                        final booking = bookings[index];
-                        return _buildBookingCard(context, ref, booking, isBn);
-                      },
+                  : RefreshIndicator(
+                      onRefresh: () => _refreshStatuses(ref),
+                      color: AppColors.accent,
+                      backgroundColor: AppColors.paper,
+                      child: ListView.separated(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.all(16),
+                        itemCount: bookings.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 12),
+                        itemBuilder: (context, index) {
+                          final booking = bookings[index];
+                          return _buildBookingCard(context, ref, booking, isBn);
+                        },
+                      ),
                     ),
             ),
           ],
@@ -419,7 +503,16 @@ class BookingsScreen extends ConsumerWidget {
                 else
                   const SizedBox.shrink(),
                 InkWell(
-                  onTap: () => _showCancelDialog(context, ref, booking, isBn),
+                  onTap: () {
+                    final canRemoteCancel = booking.canManageOnServer &&
+                        (booking.status == BookingStatus.pending ||
+                            booking.status == BookingStatus.confirmed);
+                    if (canRemoteCancel) {
+                      _showRemoteCancelDialog(context, ref, booking);
+                    } else {
+                      _showCancelDialog(context, ref, booking, isBn);
+                    }
+                  },
                   child: Padding(
                     padding: const EdgeInsets.all(4),
                     child: Text(
@@ -438,6 +531,105 @@ class BookingsScreen extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Mandatory-reason dialog for server-side cancel (`reason` 3–255 chars).
+class _CancelReasonDialog extends StatefulWidget {
+  const _CancelReasonDialog({required this.facilityName});
+
+  final String facilityName;
+
+  @override
+  State<_CancelReasonDialog> createState() => _CancelReasonDialogState();
+}
+
+class _CancelReasonDialogState extends State<_CancelReasonDialog> {
+  final _controller = TextEditingController();
+  String? _error;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    final l10n = AppLocalizations.of(context)!;
+    if (_controller.text.trim().length < 3) {
+      setState(() => _error = l10n.cancelReasonRequired);
+      return;
+    }
+    Navigator.pop(context, _controller.text.trim());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return AlertDialog(
+      backgroundColor: AppColors.paper,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+      title: Text(l10n.cancelDialogTitle, style: AppTypography.h2),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.cancelBookingDesc(widget.facilityName),
+            style: AppTypography.body,
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _controller,
+            minLines: 2,
+            maxLines: 3,
+            maxLength: 255,
+            style: AppTypography.body,
+            decoration: InputDecoration(
+              hintText: l10n.cancelReasonHint,
+              errorText: _error,
+              counterText: '',
+              border: const OutlineInputBorder(
+                borderRadius: BorderRadius.zero,
+                borderSide: BorderSide(
+                  color: AppColors.ink,
+                  width: AppColors.borderWidth,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(
+            l10n.close,
+            style: const TextStyle(
+              fontFamily: AppTypography.fontArchivo,
+              color: AppColors.ink,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.accent,
+            foregroundColor: AppColors.paper,
+            shape:
+                const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+          ),
+          onPressed: _submit,
+          child: Text(
+            l10n.confirmCancellation,
+            style: const TextStyle(
+              fontFamily: AppTypography.fontArchivo,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

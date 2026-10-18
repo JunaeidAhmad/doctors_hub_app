@@ -69,6 +69,14 @@ class _TestBookingScreenState extends ConsumerState<TestBookingScreen> {
     '4:00–6:00 pm',
   ];
 
+  /// Window label → `preferred_time` start ("HH:MM") sent to the API.
+  static const Map<String, String> _windowStart = {
+    '7:00–9:00 am': '07:00',
+    '9:00–11:00 am': '09:00',
+    '11:00 am–1:00 pm': '11:00',
+    '4:00–6:00 pm': '16:00',
+  };
+
   @override
   void initState() {
     super.initState();
@@ -95,24 +103,6 @@ class _TestBookingScreenState extends ConsumerState<TestBookingScreen> {
     _ageController.dispose();
     _addressController.dispose();
     super.dispose();
-  }
-
-  void _onPhoneChanged(String phone) async {
-    if (phone.length == 11 && Validators.isValidBdPhone(phone)) {
-      final res = await ref.read(bookingRepositoryProvider).lookupPatient(phone);
-      if (!mounted || !res.found) return;
-      setState(() {
-        if (_nameController.text.isEmpty && res.name != null) {
-          _nameController.text = res.name!;
-        }
-        if (_ageController.text.isEmpty && res.age != null) {
-          _ageController.text = res.age.toString();
-        }
-        if (_gender == null && res.gender != null) {
-          _gender = res.gender;
-        }
-      });
-    }
   }
 
   bool _validate(AppLocalizations l10n) {
@@ -536,7 +526,6 @@ class _TestBookingScreenState extends ConsumerState<TestBookingScreen> {
                     PhoneField(
                       controller: _phoneController,
                       errorText: _phoneError,
-                      onChanged: _onPhoneChanged,
                     ),
                     const SizedBox(height: 16),
                     Row(
@@ -677,7 +666,7 @@ class _TestBookingScreenState extends ConsumerState<TestBookingScreen> {
           otpCode: otpCode,
           patientAge: int.tryParse(_ageController.text.trim()),
           patientGender: _gender,
-          notes: 'Window: $_selectedTimeWindow',
+          preferredTime: _windowStart[_selectedTimeWindow],
         ),
       );
 
@@ -696,7 +685,6 @@ class _TestBookingScreenState extends ConsumerState<TestBookingScreen> {
         fee: total,
         paymentMethod: 'counter',
         facilityPhone: offering.facility.phone,
-        notes: 'Window: $_selectedTimeWindow',
         createdAt: DateTime.now(),
         status: response.status,
       );

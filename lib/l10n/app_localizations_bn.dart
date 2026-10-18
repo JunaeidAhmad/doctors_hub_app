@@ -709,6 +709,34 @@ class AppLocalizationsBn extends AppLocalizations {
       'সময়ের মধ্যে নিশ্চিত হয়নি। এসএমএস না পেলে চেম্বারে কল করুন।';
 
   @override
+  String get statusCancelledTag => 'বাতিল';
+
+  @override
+  String cancelBookingDesc(String facility) {
+    return 'এটি $facility-এ আপনার অ্যাপয়েন্টমেন্ট বাতিল করবে এবং চেম্বারকে জানানো হবে।';
+  }
+
+  @override
+  String get cancelReasonHint => 'বাতিলের কারণ';
+
+  @override
+  String get cancelReasonRequired => 'কারণ লিখুন (কমপক্ষে ৩ অক্ষর)।';
+
+  @override
+  String get confirmCancellation => 'হ্যাঁ, বাতিল করুন';
+
+  @override
+  String get cancelFailed => 'বুকিং বাতিল করা যায়নি। আবার চেষ্টা করুন।';
+
+  @override
+  String get cancelNotAllowed =>
+      'এই বুকিংটি আর বাতিল করা যাবে না। স্ট্যাটাস দেখতে নিচে টেনে রিফ্রেশ করুন।';
+
+  @override
+  String get manageRequestInBookings =>
+      'বুকিং ট্যাব থেকে এই অনুরোধটি দেখতে বা বাতিল করতে পারবেন।';
+
+  @override
   String toCancelCall(String facility) {
     return 'বাতিল করতে $facility নম্বরে কল করুন';
   }
@@ -783,6 +811,10 @@ class AppLocalizationsBn extends AppLocalizations {
   @override
   String get errRequestTooLate =>
       'এই সেশনের জন্য অনুরোধ করার সময় পার হয়ে গেছে। অনুগ্রহ করে চেম্বারে কল করুন।';
+
+  @override
+  String get errOtpRequired =>
+      'ফোন যাচাইয়ের সময় শেষ হয়ে গেছে। অনুগ্রহ করে আবার যাচাই করুন।';
 
   @override
   String get errNotCallMode => 'এই চেম্বারে আর ফোনে বুকিং নেওয়া হয় না।';

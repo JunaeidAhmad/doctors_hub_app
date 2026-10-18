@@ -272,7 +272,7 @@ class BookingSuccessScreen extends ConsumerWidget {
       final deadline = _formatDeadline(booking.confirmDeadline!);
       final urgent =
           booking.isUrgent ? ' — ${l10n.beforeSessionStarts}' : '';
-      return '${l10n.expectCallBy(deadline)}$urgent';
+      return '${l10n.expectCallBy(deadline)}$urgent\n${l10n.manageRequestInBookings}';
     }
     if (booking.status == BookingStatus.confirmed) {
       return l10n.successNote;

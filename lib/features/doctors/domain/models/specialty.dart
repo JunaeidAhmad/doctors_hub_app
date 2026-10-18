@@ -34,6 +34,7 @@ class Specialty {
     required this.slug,
     this.icon,
     this.doctorCount,
+    this.displayOrder,
     this.isUmbrella = false,
     this.isPopular = false,
     this.parents = const [],
@@ -47,6 +48,9 @@ class Specialty {
   final String slug;
   final String? icon;
   final int? doctorCount;
+
+  /// Taxonomy curation order (1–24) from the server; null when absent.
+  final int? displayOrder;
   final bool isUmbrella;
   final bool isPopular;
   final List<SpecialtyParent> parents;
@@ -69,6 +73,7 @@ class Specialty {
       slug: json['slug'] as String? ?? '',
       icon: json['icon'] as String?,
       doctorCount: (json['doctor_count'] as num?)?.toInt(),
+      displayOrder: (json['display_order'] as num?)?.toInt(),
       isUmbrella: json['is_umbrella'] as bool? ?? false,
       isPopular: json['is_popular'] as bool? ?? false,
       parents: parentsRaw
@@ -87,6 +92,7 @@ class Specialty {
     'slug': slug,
     'icon': icon,
     'doctor_count': doctorCount,
+    'display_order': displayOrder,
     'is_umbrella': isUmbrella,
     'is_popular': isPopular,
     'parents': parents.map((p) => p.toJson()).toList(),

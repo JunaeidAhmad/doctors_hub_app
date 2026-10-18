@@ -32,7 +32,9 @@
   },
   "confirm_deadline": "2026-10-15T12:00:00+06:00",
   "is_urgent": false,
-  "source": "app",
+  "source": "request",
+  "patient_token": "req7Tok3nAbCdEf",
+  "confirm_code": "k7fq29sdp13m",
   "created_at": "2026-10-13T15:35:00+06:00",
   "updated_at": "2026-10-13T15:35:00+06:00"
 }

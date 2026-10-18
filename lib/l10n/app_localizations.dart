@@ -1364,6 +1364,54 @@ abstract class AppLocalizations {
   /// **'Not confirmed in time. If you didn\'t get an SMS, call the chamber.'**
   String get notConfirmedInTime;
 
+  /// No description provided for @statusCancelledTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get statusCancelledTag;
+
+  /// No description provided for @cancelBookingDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'This cancels your appointment at {facility} and the chamber is notified.'**
+  String cancelBookingDesc(String facility);
+
+  /// No description provided for @cancelReasonHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason for cancelling'**
+  String get cancelReasonHint;
+
+  /// No description provided for @cancelReasonRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a reason (at least 3 characters).'**
+  String get cancelReasonRequired;
+
+  /// No description provided for @confirmCancellation.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, cancel'**
+  String get confirmCancellation;
+
+  /// No description provided for @cancelFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not cancel the booking. Please try again.'**
+  String get cancelFailed;
+
+  /// No description provided for @cancelNotAllowed.
+  ///
+  /// In en, this message translates to:
+  /// **'This booking can no longer be cancelled. Pull to refresh to see its status.'**
+  String get cancelNotAllowed;
+
+  /// No description provided for @manageRequestInBookings.
+  ///
+  /// In en, this message translates to:
+  /// **'You can track or cancel this request from the Bookings tab.'**
+  String get manageRequestInBookings;
+
   /// No description provided for @toCancelCall.
   ///
   /// In en, this message translates to:
@@ -1495,6 +1543,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Too late to request this session. Please call the chamber.'**
   String get errRequestTooLate;
+
+  /// No description provided for @errOtpRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Your phone verification expired. Please verify again.'**
+  String get errOtpRequired;
 
   /// No description provided for @errNotCallMode.
   ///

@@ -367,6 +367,19 @@
   "awaitingLabTag": "Awaiting lab",
   "awaitingHospitalTag": "Awaiting hospital",
   "notConfirmedInTime": "Not confirmed in time. If you didn't get an SMS, call the chamber.",
+  "statusCancelledTag": "Cancelled",
+  "cancelBookingDesc": "This cancels your appointment at {facility} and the chamber is notified.",
+  "@cancelBookingDesc": {
+    "placeholders": {
+      "facility": {"type": "String"}
+    }
+  },
+  "cancelReasonHint": "Reason for cancelling",
+  "cancelReasonRequired": "Enter a reason (at least 3 characters).",
+  "confirmCancellation": "Yes, cancel",
+  "cancelFailed": "Could not cancel the booking. Please try again.",
+  "cancelNotAllowed": "This booking can no longer be cancelled. Pull to refresh to see its status.",
+  "manageRequestInBookings": "You can track or cancel this request from the Bookings tab.",
   "toCancelCall": "To cancel, call {facility}",
   "@toCancelCall": {
     "placeholders": {
@@ -402,6 +415,7 @@
 
   "errBookingModeCallOnly": "This chamber takes bookings by phone only. Please call the chamber.",
   "errRequestTooLate": "Too late to request this session. Please call the chamber.",
+  "errOtpRequired": "Your phone verification expired. Please verify again.",
   "errNotCallMode": "This chamber no longer takes phone bookings.",
   "errNoNumbers": "This chamber has no phone number listed yet. Please try another chamber.",
 

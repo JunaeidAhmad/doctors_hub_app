@@ -150,8 +150,11 @@ What each mode means for the Flutter app's booking screen:
 - **`request`**: Booking request flow. The patient chooses a date and session, completes OTP,
   and calls `POST /api/v1/bookings/doctor/`. The booking is created with status `pending`
   and `serial_number: null`. The confirmation screen informs the patient that the chamber
-  will call to confirm ("We'll call you") and displays no serial or time. If requested too
-  close to the session start, the API returns a `400` with code `request_too_late`.
+  will call to confirm ("We'll call you") and displays no serial or time. Request sessions
+  close before the session starts: **2 hours before** when the session starts before 12:00
+  Dhaka, **1 hour before** otherwise. The app mirrors this cutoff when disabling sessions;
+  if the API still answers `400` with code `request_too_late`, it shows its own localized
+  ARB copy (the server `detail` mixes English and Bangla in one string — gap G9).
 - **`call_only`**: Phone consultation flow. The booking form does not show date or session
   pickers, slot counts, or serial numbers. After entering patient details and completing OTP,
   the app calls `POST /api/v1/bookings/call-leads/`, which logs the patient lead and returns
@@ -161,6 +164,24 @@ What each mode means for the Flutter app's booking screen:
   app **must** implement an `unknown` fallback when parsing `booking_mode`. If a mode is
   unrecognized or unsupported by the client build, display the chamber information and
   weekly visiting hours with **no booking button**.
+
+### Patient booking status and cancel (2026-10-18)
+
+`POST /api/v1/bookings/doctor/` returns a `patient_token` on every booking. With that token
+the app can read and change a doctor booking without an account:
+
+- `GET /api/v1/bookings/doctor/{id}/status/?phone=` — the canonical BD phone must match the
+  booking's `patient_phone`; returns `status`, `serial_number` / `serial_display`,
+  `estimated_time`, `confirm_deadline`, `is_urgent`. `404 {code: booking_not_found}`.
+- `POST /api/v1/bookings/doctor/{id}/patient-cancel/` — `{patient_token, reason}` (reason
+  3–255 chars). Cancels `pending` requests and `confirmed` bookings; request cancellations
+  queue the usual patient SMS. `404 {code: invalid_token}`, `409 {code: not_cancellable}`.
+
+Anonymous bookings (doctor, test, hospital-service) require OTP verification: a missing
+`otp_code` answers `400 {code: otp_required}` unless the caller is authenticated staff with
+write access to the chamber or facility. Domain errors on the booking endpoints use the flat
+envelope `{"code": "<string>", "detail": "<en>", "detail_bn": "<bn>"}`; DRF field errors
+keep their per-field shape. User-facing copy still comes from the app's ARB files.
 
 ### The schema file
 

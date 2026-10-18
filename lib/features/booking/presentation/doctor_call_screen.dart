@@ -84,24 +84,6 @@ class _DoctorCallScreenState extends ConsumerState<DoctorCallScreen> {
     super.dispose();
   }
 
-  void _onPhoneChanged(String phone) async {
-    if (phone.length == 11 && Validators.isValidBdPhone(phone)) {
-      final res = await ref.read(bookingRepositoryProvider).lookupPatient(phone);
-      if (!mounted || !res.found) return;
-      setState(() {
-        if (_nameController.text.isEmpty && res.name != null) {
-          _nameController.text = res.name!;
-        }
-        if (_ageController.text.isEmpty && res.age != null) {
-          _ageController.text = res.age.toString();
-        }
-        if (_gender == null && res.gender != null) {
-          _gender = res.gender;
-        }
-      });
-    }
-  }
-
   bool _validate(AppLocalizations l10n) {
     bool valid = true;
     if (_nameController.text.trim().isEmpty) {
@@ -329,7 +311,6 @@ class _DoctorCallScreenState extends ConsumerState<DoctorCallScreen> {
                 PhoneField(
                   controller: _phoneController,
                   errorText: _phoneError,
-                  onChanged: _onPhoneChanged,
                 ),
                 const SizedBox(height: 16),
                 Row(

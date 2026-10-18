@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:doctors_hub_app/features/booking/data/booking_repository.dart';
 import 'package:doctors_hub_app/features/booking/domain/models/booking_result.dart';
 import 'package:doctors_hub_app/features/doctors/domain/models/chamber.dart';
 import 'package:doctors_hub_app/features/doctors/domain/models/doctor.dart';
@@ -228,28 +227,6 @@ void main() {
       expect(bookingStatusFromString('postponed'), BookingStatus.unknown);
       expect(bookingStatusFromString(null), BookingStatus.unknown);
       expect(bookingStatusFromString('expired'), BookingStatus.expired);
-    });
-  });
-
-  group('Patient lookup', () {
-    test('not-found fixture has no patient', () {
-      final result = PatientLookupResult.fromJson(
-        fixture('patient_lookup_not_found.json') as Map<String, dynamic>,
-      );
-
-      expect(result.found, isFalse);
-      expect(result.name, isNull);
-    });
-
-    test('found fixture reads the nested patient', () {
-      final result = PatientLookupResult.fromJson(
-        fixture('patient_lookup_found.json') as Map<String, dynamic>,
-      );
-
-      expect(result.found, isTrue);
-      expect(result.name, 'Rahim Uddin');
-      expect(result.age, 34);
-      expect(result.gender, 'male');
     });
   });
 }

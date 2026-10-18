@@ -9,6 +9,7 @@ Specialty _umbrella({
   required String name,
   String? bnName,
   int? count,
+  int? order,
 }) {
   return Specialty(
     id: id,
@@ -16,6 +17,7 @@ Specialty _umbrella({
     bnName: bnName,
     slug: slug,
     doctorCount: count,
+    displayOrder: order,
     isUmbrella: true,
   );
 }
@@ -26,6 +28,7 @@ Specialty _leaf({
   required String name,
   String? bnName,
   int? count,
+  int? order,
   List<SpecialtyParent> parents = const [],
 }) {
   return Specialty(
@@ -34,6 +37,7 @@ Specialty _leaf({
     bnName: bnName,
     slug: slug,
     doctorCount: count,
+    displayOrder: order,
     parents: parents,
   );
 }
@@ -133,6 +137,48 @@ void main() {
       _leaf(id: 'l1', slug: 'cardio', name: 'Cardiology'),
     ]);
     expect(groups, isEmpty);
+  });
+
+  test('display_order sorts groups and leaves when present', () {
+    final groups = buildSpecialtyGroups([
+      _umbrella(id: 'u1', slug: 'aaa', name: 'A & Care', count: 10, order: 2),
+      _umbrella(id: 'u2', slug: 'bbb', name: 'B & Care', count: 999, order: 1),
+      _leaf(
+        id: 'l1',
+        slug: 'slow',
+        name: 'Slow',
+        count: 5,
+        order: 2,
+        parents: const [
+          SpecialtyParent(id: 'u1', slug: 'aaa', name: 'A & Care'),
+        ],
+      ),
+      _leaf(
+        id: 'l2',
+        slug: 'fast',
+        name: 'Fast',
+        count: 300,
+        order: 1,
+        parents: const [
+          SpecialtyParent(id: 'u1', slug: 'aaa', name: 'A & Care'),
+        ],
+      ),
+    ]);
+
+    // display_order wins over doctor count: group B (1) before A (2).
+    expect(groups[0].umbrella!.slug, 'bbb');
+    expect(groups[1].umbrella!.slug, 'aaa');
+    // Leaf order follows display_order, not count: Fast (1) before Slow (2).
+    expect(groups[1].leaves.first.slug, 'fast');
+    expect(groups[1].leaves.last.slug, 'slow');
+  });
+
+  test('falls back to doctor count when display_order is absent', () {
+    final groups = buildSpecialtyGroups([
+      _umbrella(id: 'u1', slug: 'aaa', name: 'A & Care', count: 10),
+      _umbrella(id: 'u2', slug: 'bbb', name: 'B & Care', count: 999),
+    ]);
+    expect(groups[0].umbrella!.slug, 'bbb');
   });
 
   testWidgets('SpecialtyDropdown opens sheet and selects a leaf',

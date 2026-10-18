@@ -125,10 +125,12 @@ All paths are under `/api/v1` unless noted. List endpoints use DRF `PageNumberPa
 | Test categories | `GET /test-categories/` | |
 | Test search | `GET /facility-tests/search/?q=&testcat=&division_id=&district_id=&thana_id=&location_id=&fulfillment=&ownership=&ordering=&page=&page_size=` | One call returns test groups with `offerings[]` and `facets`; server-side filters |
 | Hospital services | `GET /hospital-services/` | `{id, name, icon}` for the hospital page |
-| OTP | `POST /bookings/otp/send/ {phone, purpose}`, `POST /bookings/otp/verify/` | Purposes: `doctor_booking`, `test_booking`, `hospital_service_booking`, `call_lead`. The code goes on the booking/lead POST as `otp_code`; never verify first |
-| Returning patient prefill | `GET /bookings/patients/lookup/?phone=` | Returns `{found, patient: {name, age, gender}}` |
-| Book doctor | `POST /bookings/doctor/ {affiliation_id, date, session_key, patient_name, patient_phone, patient_age?, patient_gender?, notes?, otp_code?}` | `instant` → `confirmed` + serial, `estimated_time`; `request` → `pending`, `serial_number: null` |
-| Book test | `POST /bookings/test/ {facility_test_id, pickup_date, collection_type, pickup_thana_id?, pickup_address_line?, patient_name, patient_phone, patient_age?, patient_gender?, notes?, otp_code?}` | `collection_type` `center`/`home`; home needs thana + address line; date ≤ 30 days ahead |
+| OTP | `POST /bookings/otp/send/ {phone, purpose}`, `POST /bookings/otp/verify/` | Purposes: `doctor_booking`, `test_booking`, `hospital_service_booking`, `call_lead`. The code goes on the booking/lead POST as `otp_code`; never verify first. Required for anonymous bookings (`400 otp_required` otherwise) |
+| Returning patient prefill | `GET /bookings/patients/lookup/?phone=` | Anonymous callers get `{found: bool}` only (patient payload needs staff auth); the app no longer calls it — prefill comes from device storage |
+| Book doctor | `POST /bookings/doctor/ {affiliation_id, date, session_key, patient_name, patient_phone, patient_age?, patient_gender?, notes?, otp_code?}` | `instant` → `confirmed` + serial, `estimated_time`; `request` → `pending`, `serial_number: null`. Response includes `patient_token` (all) and `confirm_code` (requests) |
+| Doctor booking status | `GET /bookings/doctor/{id}/status/?phone=` | Anonymous; phone must match the booking; returns `status`, `serial_number` / `serial_display`, `estimated_time`, `confirm_deadline`, `is_urgent` |
+| Patient cancel | `POST /bookings/doctor/{id}/patient-cancel/ {patient_token, reason}` | Anonymous; cancels `pending` requests and `confirmed` bookings; reason 3–255 chars; 409 `not_cancellable` |
+| Book test | `POST /bookings/test/ {facility_test_id, pickup_date, collection_type, pickup_thana_id?, pickup_address_line?, patient_name, patient_phone, patient_age?, patient_gender?, notes?, preferred_time?, otp_code?}` | `collection_type` `center`/`home`; home needs thana + address line; date ≤ 30 days ahead; `preferred_time` is the window start "HH:MM" |
 | Book hospital service | `POST /bookings/hospital-service/ {hospital_id, service_id, booking_date, preferred_time, patient_name, patient_phone, patient_age?, patient_gender?, notes?, otp_code?}` | Created `pending` |
 | Call lead | `POST /bookings/call-leads/ {affiliation_id, patient_name, patient_phone, patient_age?, patient_gender?, otp_code}` | Returns `numbers[]`; no booking is created |
 
@@ -140,12 +142,12 @@ Build around these. Don't invent endpoints.
 
 1. **Booked-slot availability.** *Closed, see `docs/v1-migration-plan.md`:* the backend now exposes `GET /affiliations/{id}/availability/` with sessions, capacity, `next_serial` and `estimated_time`.
 2. **Payments.** *Still open.* No payment endpoints. Ship "Pay at the counter" only. Keep the "Pay now" UI behind a `kPayInAppEnabled = false` flag.
-3. **My bookings and cancel.** *Still open.* Booking list/update endpoints are admin-only (`PublicCreateAdminManage`). Store the POST response locally. **Cancel** removes the booking locally and shows "To cancel, call {facility}" with the facility phone if known. Server-side cancel needs a new endpoint (phone + OTP-verified cancel).
+3. **My bookings and cancel.** *Closed for doctor bookings (2026-10-18):* `POST /bookings/doctor/` returns `patient_token`; `GET /bookings/doctor/{id}/status/?phone=` reads the live status and `POST /bookings/doctor/{id}/patient-cancel/` cancels (pending request or confirmed) with a reason. Test and hospital-service bookings stay device-local with "To cancel, call {facility}".
 4. **Test collection type.** *Closed, see `docs/v1-migration-plan.md`:* `POST /bookings/test/` now takes `collection_type` (`center`/`home`), plus `pickup_thana_id` and `pickup_address_line` for home pickup.
 5. **OTP.** *Closed, see `docs/v1-migration-plan.md`:* send then post `otp_code` with the booking or lead on all four flows; no `kRequireOtp` flag, every flow asks.
 6. **Home sample charge.** Add `home_sample_charge` to the total when Home pickup is chosen, and show it as a line in the CTA sub-text.
 
-**Backend issues to fix before launch** (outside this app's scope, flag to the owner): `verify_otp` and `verify_otp_helper` accept `123` / `123456` as a universal code; `send_otp` returns the OTP in the response when `DEBUG` is on, and the default is `True` if the setting is missing. Also `/bookings/patients/lookup/` returns patient data for any phone number without verification. The full list of open gaps is in `docs/BACKEND_GAPS.md`.
+**Backend issues to fix before launch** — all three 2026-10-13 items are resolved (2026-10-18): OTP is required for anonymous bookings, bypass codes and the `otp` echo are DEBUG/TESTING-only, and `/bookings/patients/lookup/` returns `{found}` only for anonymous callers. The full list of open gaps is in `docs/BACKEND_GAPS.md`.
 
 ---
 

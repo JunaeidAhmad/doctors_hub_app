@@ -177,6 +177,8 @@ void main() {
     expect(body['pickup_thana_id'], 1);
     expect(body['pickup_address_line'], 'House 5, Road 3');
     expect(body['otp_code'], '123456');
+    expect(body['preferred_time'], '07:00');
+    expect(body.containsKey('notes'), isFalse);
     expect(body.containsKey('pickupDate'), isFalse);
   });
 
@@ -189,6 +191,7 @@ void main() {
 
     final body = adapter.lastOptions!.data as Map<String, dynamic>;
     expect(body['collection_type'], 'center');
+    expect(body['preferred_time'], '07:00');
     expect(body.containsKey('pickup_thana_id'), isFalse);
     expect(body.containsKey('pickup_address_line'), isFalse);
   });
